@@ -5,12 +5,23 @@
     <title>Helper</title>
     <script src="/static/helper.js"></script>
     <style>
+        .level_block {
+            border: solid 1px black;
+        }
     </style>
 </head>
 <body>
     <div id="puzzle_view" class="view">
-        <div id="options">Config:</div>
-        <div id="levels">Levels:</div>
+        <div>
+            Config:
+            <div id="config"></div>
+            <button id="add_config_button">Add config option</button>
+        </div>
+        <div>
+            Levels:
+            <div id="levels"></div>
+            <button id="add_level_button">Add level</button>
+        </div>
     </div>
 </body>
 </html>
