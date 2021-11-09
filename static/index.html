@@ -8,6 +8,15 @@
         .level_block {
             border: solid 1px black;
         }
+        .level_block.hl {
+            background-color: yellow;
+        }
+        .level_block.changed {
+            background-color: magenta;
+        }
+        .level_block.error {
+            background-color: darkred !important;
+        }
     </style>
 </head>
 <body>
@@ -21,6 +30,7 @@
             Levels:
             <div id="levels"></div>
             <button id="add_level_button">Add level</button>
+            <button id="save_levels_button">Save levels</button>
         </div>
     </div>
 </body>
