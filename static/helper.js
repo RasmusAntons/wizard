@@ -1,4 +1,6 @@
 let levelCache = {};
+let gridState = true;
+let snapDistance = 20;
 
 function promptKey() {
     localStorage.setItem('key', prompt('key'));
@@ -25,7 +27,7 @@ function apiCall(path, method, data) {
 function levelBlockToObj(levelBlock) {
     const level = {
         id: Number(levelBlock.getElementsByClassName('level_id')[0].textContent),
-        name: levelBlock.getElementsByClassName('level_name')[0].value,
+        name: levelBlock.getElementsByClassName('level_name')[0].value || null,
         grid_location: [null, null]
     };
     for (let solutionType of ['solutions', 'unlocks']) {
@@ -39,81 +41,102 @@ function levelBlockToObj(levelBlock) {
 }
 
 function createLevelBlock(level) {
-    const levelDiv = document.createElement('div');
+    levelCache[level.id] = level;
+    const block = document.createElement("div");
     let setEditedStatus = () => {
         const oldLevel = levelCache[level.id];
-        const newLevel = levelBlockToObj(levelDiv);
-        let changed = false;
+        const newLevel = levelBlockToObj(block);
+        let edited = false;
         for (let key of Object.getOwnPropertyNames(newLevel)) {
             if (JSON.stringify(oldLevel[key]) !== JSON.stringify(newLevel[key])) {
-                changed = true;
+                edited = true;
                 break;
             }
         }
-        levelDiv.classList.toggle('changed', changed);
+        block.classList.toggle('edited', edited);
     };
-    levelDiv.className = 'level_block';
-    const levelIdElem = document.createElement('span');
-    levelIdElem.className = 'level_id';
-    levelIdElem.style.color = 'grey';
-    levelIdElem.textContent = level.id;
-    levelDiv.appendChild(levelIdElem);
-    const titleSeparator = document.createElement('span');
-    titleSeparator.textContent = ' '
-    levelDiv.appendChild(titleSeparator);
-    const levelNameElem = document.createElement('input');
-    levelNameElem.className = 'level_name';
-    levelNameElem.oninput = setEditedStatus;
-    levelNameElem.value = level.name;
-    levelDiv.appendChild(levelNameElem);
-    levelDiv.appendChild(document.createElement('br'));
-    for (let solutionType of ['solutions', 'unlocks']) {
-        const solutionLabel = document.createElement('label');
-        solutionLabel.for = `${level.id}_${solutionType}`;
-        solutionLabel.textContent = `${solutionType}:`;
-        levelDiv.appendChild(solutionLabel);
-        const solutionElem = document.createElement('textarea');
-        solutionElem.className = `level_${solutionType}`;
-        solutionElem.oninput = setEditedStatus;
-        solutionElem.id = solutionLabel.for;
-        solutionElem.value = level[solutionType].join('\n');
-        levelDiv.appendChild(solutionElem);
-        levelDiv.appendChild(document.createElement('br'));
+
+    const levelId = document.createElement("span");
+    const levelName = document.createElement("input");
+    const levelSolutions = document.createElement("textarea");
+    const levelUnlocks = document.createElement("textarea");
+    const levelChannel = document.createElement("input");
+    const levelRole = document.createElement("input");
+    const levelBonusRole = document.createElement("input");
+
+    const channelIdCreateButton = document.createElement("button");
+    const roleIdCreateButton = document.createElement("button");
+    const extraRoleIdCreateButton = document.createElement("button");
+
+    levelName.placeholder = "level name";
+    levelSolutions.placeholder = "level solutions";
+    levelUnlocks.placeholder = "level unlocks";
+    levelChannel.placeholder = "level channel";
+    levelRole.placeholder = "level role";
+    levelBonusRole.placeholder = "level bonus role";
+
+    channelIdCreateButton.textContent = "create channel";
+    roleIdCreateButton.textContent = "create role";
+    extraRoleIdCreateButton.textContent = "create extra role";
+
+    levelId.className = "level_id";
+    levelName.className = "level_name";
+    levelSolutions.className = "level_solutions";
+    levelUnlocks.className = "level_unlocks";
+    levelChannel.className = "level_discord_channel";
+    levelRole.className = "level_discord_role";
+    levelBonusRole.className = "level_extra_discord_role";
+
+    levelId.textContent = level.id;
+    levelName.value = level.name;
+    levelSolutions.value = level.solutions.join('\n');
+    levelUnlocks.value = level.unlocks.join('\n');
+    levelChannel.value = level.discord_channel;
+    levelRole.value = level.discord_role;
+    levelBonusRole.value = level.extra_discord_role;
+
+    for (let elem of [levelId, levelName, levelSolutions, levelUnlocks, levelChannel, levelRole, levelBonusRole]) {
+        elem.addEventListener("mousedown", e => e.stopPropagation());
+        elem.oninput = setEditedStatus;
     }
-    for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role']) {
-        const discordIdLabel = document.createElement('label');
-        discordIdLabel.for = `${level.id}_${discordIdType}`;
-        discordIdLabel.textContent = `${discordIdType}:`;
-        levelDiv.appendChild(discordIdLabel);
-        const discordIdElem = document.createElement('input');
-        discordIdElem.className = `level_${discordIdType}`;
-        discordIdElem.oninput = setEditedStatus;
-        discordIdElem.maxLength = 18;
-        discordIdElem.id = discordIdLabel.for;
-        discordIdElem.value = level[discordIdType] || '';
-        levelDiv.appendChild(discordIdElem);
-        const discordIdCreateButton = document.createElement('button');
-        discordIdCreateButton.textContent = 'create';
-        discordIdCreateButton.onclick = () => {
+
+    for (let [button, inputElem] of [[channelIdCreateButton, levelChannel], [roleIdCreateButton, levelRole], [extraRoleIdCreateButton, levelBonusRole]]) {
+        button.onclick = () => {
             const channelName = prompt('Channel name');
             if (channelName === undefined)
                 return;
-            const apiPath = (discordIdType === 'discord_channel') ? '/api/channels/' : '/api/roles/';
+            const apiPath = (button === channelIdCreateButton) ? '/api/channels/' : '/api/roles/';
             apiCall(apiPath, 'POST', {'name': channelName}).then(r => {
-                discordIdElem.value = r.id;
+                inputElem.value = r.id;
                 setEditedStatus();
             });
         };
-        levelDiv.appendChild(discordIdCreateButton);
-        levelDiv.appendChild(document.createElement('br'));
     }
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = 'delete';
-    deleteButton.onclick = () => apiCall(`/api/levels/${level.id}`, 'DELETE').then(() => {
-        document.getElementById('levels').removeChild(levelDiv);
-    });
-    levelDiv.appendChild(deleteButton);
-    document.getElementById('levels').appendChild(levelDiv);
+
+    block.className = 'block';
+    block.appendChild(levelId);
+    block.appendChild(levelName);
+    block.appendChild(levelSolutions);
+    block.appendChild(levelChannel);
+    block.appendChild(channelIdCreateButton);
+    block.appendChild(levelRole);
+    block.appendChild(roleIdCreateButton);
+    block.appendChild(levelUnlocks);
+    block.appendChild(extraRoleIdCreateButton);
+    block.appendChild(levelBonusRole);
+    background.appendChild(block);
+
+    const draggable = new PlainDraggable(block);
+	draggable.onDrag = function(position) {
+	    const snappedX = Math.round((container.scrollLeft + position.left) / snapDistance) * snapDistance - container.scrollLeft;
+	    const snappedY = Math.round((container.scrollTop + position.top) / snapDistance) * snapDistance - container.scrollTop;
+	    position.snapped = snappedX != position.left || snappedY != position.top;
+	    if (position.snapped) {
+	        position.left = snappedX;
+	        position.top = snappedY;
+	    }
+    };
+	draggable.autoScroll = {target: container};
 }
 
 function loadConfig() {
@@ -140,29 +163,37 @@ function loadConfig() {
 
 function loadLevels() {
     apiCall('/api/levels/').then(levels => {
-        levelCache = levels;
         for (const [id, level] of Object.entries(levels)) {
             createLevelBlock(level);
         }
     });
 }
 
+function toggleGrid() {
+     if (gridState) {
+        main.style.fill = "#1a1a21";
+        gridState = false;
+     } else {
+        main.style.fill = "url(#bigGrid)";
+        gridState = true;
+     }
+}
 
 document.addEventListener('DOMContentLoaded', e => {
     if (localStorage.getItem('key') === null) {
         promptKey();
     }
-    loadConfig();
+    //loadConfig();
     loadLevels();
-    document.getElementById('add_config_button').onclick = e => {
-        const configKey = prompt('key');
-        if (!configKey)
-            return;
-        const configValue = prompt('key');
-        if (!configValue)
-            return;
-        apiCall('/api/config/', 'POST', {[configKey]: configValue}).then(loadConfig);
-    };
+//    document.getElementById('add_config_button').onclick = e => {
+//        const configKey = prompt('key');
+//        if (!configKey)
+//            return;
+//        const configValue = prompt('key');
+//        if (!configValue)
+//            return;
+//        apiCall('/api/config/', 'POST', {[configKey]: configValue}).then(loadConfig);
+//    };
     document.getElementById('add_level_button').onclick = () =>
         apiCall('/api/levels/', 'POST').then(createLevelBlock);
     document.getElementById('save_levels_button').onclick = () => {

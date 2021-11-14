@@ -1,37 +1,39 @@
-<!doctype html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Helper</title>
-    <script src="/static/helper.js"></script>
-    <style>
-        .level_block {
-            border: solid 1px black;
-        }
-        .level_block.hl {
-            background-color: yellow;
-        }
-        .level_block.changed {
-            background-color: magenta;
-        }
-        .level_block.error {
-            background-color: darkred !important;
-        }
-    </style>
-</head>
-<body>
-    <div id="puzzle_view" class="view">
-        <div>
-            Config:
-            <div id="config"></div>
-            <button id="add_config_button">Add config option</button>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="/static/grid.css">
+        <script src="/static/plain-draggable.min.js"></script>
+        <script src="/static/leader-line.min.js"></script>
+        <script src="/static/helper.js"></script>
+        <title>
+            grid
+        </title>
+    </head>
+    <body>
+        <div id="toolbar">
+            <h3>toolbar</h3>
+            <hr>
+            <button id="add_level_button">Create Block</button>
+            <button>Create Line</button>
+            <button onclick="toggleGrid()">Toggle Grid</button>
+            <button id="save_levels_button">Save</button>
+            <button>Configurations</button>
         </div>
-        <div>
-            Levels:
-            <div id="levels"></div>
-            <button id="add_level_button">Add level</button>
-            <button id="save_levels_button">Save levels</button>
+        <div id="container">
+            <div id="background">
+                <svg id="grid">
+                    <defs>
+                       <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                          <path d="M 20 0 L 0 0 L 0 20 L 20 20" fill="#1a1a21" stroke="gray" stroke-width="0.1"/>
+                       </pattern>
+                       <pattern id="bigGrid" width="200" height="200" patternUnits="userSpaceOnUse">
+                          <rect width="200" height="200" fill="url(#smallGrid)"/>
+                          <path d="M 200 0 L 0 0 0 200" fill="none" stroke="lightgray" stroke-width="0.2"/>
+                       </pattern>
+                    </defs>
+                    <rect id="main" fill="url(#bigGrid)" width="5000px" height="5000px"/>
+                </svg>
+            </div>
         </div>
-    </div>
-</body>
+    </body>
 </html>
