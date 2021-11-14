@@ -86,6 +86,17 @@ async def post_level(request):
     level.discord_role = body.get('discord_role')
     level.extra_discord_role = body.get('extra_discord_role')
     level.grid_x, level.grid_y = body.get('grid_location')
+    for key, cls in (('solutions', db.Solution), ('unlocks', db.Unlock)):
+        new_texts = set(body.get(key))
+        existing_texts = db.session.query(cls).where(cls.level_id == level_id)
+        for existing_text in existing_texts:
+            if existing_text.text in new_texts:
+                new_texts.remove(existing_text.text)
+            else:
+                db.session.delete(existing_text)
+        for new_text in new_texts:
+            obj = cls(level_id=level_id, text=new_text)
+            db.session.add(obj)
     db.session.commit()
     return aiohttp.web.json_response({'message': 'ok'})
 
