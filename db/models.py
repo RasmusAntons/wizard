@@ -1,4 +1,3 @@
-import secrets
 from sqlalchemy import Column, Integer, String, ForeignKey
 import sqlalchemy.orm
 

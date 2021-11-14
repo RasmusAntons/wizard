@@ -43,7 +43,7 @@ async def post_config(request):
     for config_key, config_value in body.items():
         db.session.merge(db.ConfigOption(key=config_key, value=config_value))
     db.session.commit()
-    return aiohttp.web.json_response({'message': 'ok'}, status=200)
+    return aiohttp.web.json_response({'message': 'ok'})
 
 
 @protected
@@ -53,7 +53,7 @@ async def delete_config(request):
     if config_option is None:
         return aiohttp.web.json_response({'error': 'config option does not exist'}, status=404)
     db.session.delete(config_option)
-    return aiohttp.web.json_response({'message': 'ok'}, status=200)
+    return aiohttp.web.json_response({'message': 'ok'})
 
 
 @protected
@@ -64,7 +64,10 @@ async def get_levels(request):
 
 @protected
 async def post_levels(request):
-    pass
+    level = db.Level()
+    db.session.add(level)
+    db.session.commit()
+    return aiohttp.web.json_response(level.to_api_dict())
 
 
 @protected
@@ -75,19 +78,27 @@ async def post_level(request):
     except (json.JSONDecodeError, KeyError):
         traceback.print_exc()
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
-    level: db.Level = db.session.get(db.Level, level_id)
+    level = db.session.get(db.Level, level_id)
+    if level is None:
+        return aiohttp.web.json_response({'error': 'level does not exist'}, status=404)
     level.name = body.get('name')
     level.discord_channel = body.get('discord_channel')
     level.discord_role = body.get('discord_role')
     level.extra_discord_role = body.get('extra_discord_role')
     level.grid_x, level.grid_y = body.get('grid_location')
     db.session.commit()
-    return aiohttp.web.json_response({'message': 'ok'}, status=200)
+    return aiohttp.web.json_response({'message': 'ok'})
 
 
 @protected
 async def delete_level(request):
-    pass
+    level_id = request.match_info.get('level_id')
+    level = db.session.get(db.Level, level_id)
+    if level is None:
+        return aiohttp.web.json_response({'error': 'level does not exist'}, status=404)
+    db.session.delete(level)
+    db.session.commit()
+    return aiohttp.web.json_response({'message': 'ok'})
 
 
 @protected

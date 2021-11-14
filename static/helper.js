@@ -107,6 +107,12 @@ function createLevelBlock(level) {
         levelDiv.appendChild(discordIdCreateButton);
         levelDiv.appendChild(document.createElement('br'));
     }
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'delete';
+    deleteButton.onclick = () => apiCall(`/api/levels/${level.id}`, 'DELETE').then(() => {
+        document.getElementById('levels').removeChild(levelDiv);
+    });
+    levelDiv.appendChild(deleteButton);
     document.getElementById('levels').appendChild(levelDiv);
 }
 
