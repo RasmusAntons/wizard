@@ -98,7 +98,7 @@ function createLevelBlock(level) {
             const channelName = prompt('Channel name');
             if (channelName === undefined)
                 return;
-            const apiPath = (discordIdType === 'channel_id') ? '/api/channels/' : '/api/roles/';
+            const apiPath = (discordIdType === 'discord_channel') ? '/api/channels/' : '/api/roles/';
             apiCall(apiPath, 'POST', {'name': channelName}).then(r => {
                 discordIdElem.value = r.id;
                 setEditedStatus();
