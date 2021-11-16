@@ -28,8 +28,12 @@ function apiCall(path, method, data) {
 }
 
 function compareLevels(levelA, levelB) {
+    let unsetValues = [null, undefined, ""];
     for (let key of Object.getOwnPropertyNames(levelA)) {
         if (JSON.stringify(levelA[key]) !== JSON.stringify(levelB[key])) {
+            if (unsetValues.includes(levelA[key]) && unsetValues.includes(levelB[key])) {
+                continue;
+            }
             return true;
         }
     }
