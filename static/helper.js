@@ -1,4 +1,7 @@
-let levelCache = {};
+let levelsOriginal = {};
+let levelsChanged = {};
+let levelBlocks = {};
+let selectedLevelId;
 let gridState = true;
 let snapDistance = 20;
 
@@ -24,118 +27,87 @@ function apiCall(path, method, data) {
     });
 }
 
-function levelBlockToObj(levelBlock) {
-    const level = {
-        id: Number(levelBlock.getElementsByClassName('level_id')[0].textContent),
-        name: levelBlock.getElementsByClassName('level_name')[0].value || null,
-        grid_location: [null, null]
-    };
-    for (let solutionType of ['solutions', 'unlocks']) {
-        const solutionsStr = levelBlock.getElementsByClassName(`level_${solutionType}`)[0].value;
-        level[solutionType] = solutionsStr.split('\n').filter(e => e);
+function compareLevels(levelA, levelB) {
+    for (let key of Object.getOwnPropertyNames(levelA)) {
+        if (JSON.stringify(levelA[key]) !== JSON.stringify(levelB[key])) {
+            return true;
+        }
     }
-    for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role']) {
-        level[discordIdType] = levelBlock.getElementsByClassName(`level_${discordIdType}`)[0].value || null;
-    }
-    return level;
+    return false;
+}
+
+function cloneLevel(level) {
+    return JSON.parse(JSON.stringify(level));
 }
 
 function createLevelBlock(level) {
-    levelCache[level.id] = level;
-    const block = document.createElement("div");
-    let setEditedStatus = () => {
-        const oldLevel = levelCache[level.id];
-        const newLevel = levelBlockToObj(block);
-        let edited = false;
-        for (let key of Object.getOwnPropertyNames(newLevel)) {
-            if (JSON.stringify(oldLevel[key]) !== JSON.stringify(newLevel[key])) {
-                edited = true;
-                break;
-            }
-        }
-        block.classList.toggle('edited', edited);
+    levelsOriginal[level.id] = level;
+    levelsChanged[level.id] = cloneLevel(level);
+    const levelBlock = document.createElement("div");
+    levelBlocks[level.id] = levelBlock;
+    levelBlock.className = 'block';
+    const levelName = document.createElement("p");
+    levelName.textContent = level.name;
+    levelBlock.appendChild(levelName);
+    document.getElementById('background').appendChild(levelBlock);
+
+    let checkForChange = () => {
+        levelBlock.classList.toggle('edited', compareLevels(levelsOriginal[level.id], levelsChanged[level.id]));
     };
 
-    const levelId = document.createElement("span");
-    const levelName = document.createElement("input");
-    const levelSolutions = document.createElement("textarea");
-    const levelUnlocks = document.createElement("textarea");
-    const levelChannel = document.createElement("input");
-    const levelRole = document.createElement("input");
-    const levelBonusRole = document.createElement("input");
+    levelBlock.onmousedown = e => {
+        e.stopPropagation();
+        selectedLevelId = level.id;
+        for (let selectedLevel of document.querySelectorAll('.selected'))
+            selectedLevel.classList.toggle('selected', false);
+        levelBlock.classList.toggle('selected', true);
 
-    const channelIdCreateButton = document.createElement("button");
-    const roleIdCreateButton = document.createElement("button");
-    const extraRoleIdCreateButton = document.createElement("button");
-
-    levelName.placeholder = "level name";
-    levelSolutions.placeholder = "level solutions";
-    levelUnlocks.placeholder = "level unlocks";
-    levelChannel.placeholder = "level channel";
-    levelRole.placeholder = "level role";
-    levelBonusRole.placeholder = "level bonus role";
-
-    channelIdCreateButton.textContent = "create channel";
-    roleIdCreateButton.textContent = "create role";
-    extraRoleIdCreateButton.textContent = "create extra role";
-
-    levelId.className = "level_id";
-    levelName.className = "level_name";
-    levelSolutions.className = "level_solutions";
-    levelUnlocks.className = "level_unlocks";
-    levelChannel.className = "level_discord_channel";
-    levelRole.className = "level_discord_role";
-    levelBonusRole.className = "level_extra_discord_role";
-
-    levelId.textContent = level.id;
-    levelName.value = level.name;
-    levelSolutions.value = level.solutions.join('\n');
-    levelUnlocks.value = level.unlocks.join('\n');
-    levelChannel.value = level.discord_channel;
-    levelRole.value = level.discord_role;
-    levelBonusRole.value = level.extra_discord_role;
-
-    for (let elem of [levelId, levelName, levelSolutions, levelUnlocks, levelChannel, levelRole, levelBonusRole]) {
-        elem.addEventListener("mousedown", e => e.stopPropagation());
-        elem.oninput = setEditedStatus;
-    }
-
-    for (let [button, inputElem] of [[channelIdCreateButton, levelChannel], [roleIdCreateButton, levelRole], [extraRoleIdCreateButton, levelBonusRole]]) {
-        button.onclick = () => {
-            const channelName = prompt('Channel name');
-            if (channelName === undefined)
-                return;
-            const apiPath = (button === channelIdCreateButton) ? '/api/channels/' : '/api/roles/';
-            apiCall(apiPath, 'POST', {'name': channelName}).then(r => {
-                inputElem.value = r.id;
-                setEditedStatus();
-            });
+        const levelNameInput = document.getElementById('level_name');
+        levelNameInput.value = levelsChanged[level.id].name;
+        levelNameInput.oninput = levelNameInput.onchange = () => {
+            levelsChanged[level.id].name = levelNameInput.value;
+            levelName.textContent = levelsChanged[level.id].name;
+            checkForChange();
         };
-    }
 
-    block.className = 'block';
-    block.appendChild(levelId);
-    block.appendChild(levelName);
-    block.appendChild(levelSolutions);
-    block.appendChild(levelChannel);
-    block.appendChild(channelIdCreateButton);
-    block.appendChild(levelRole);
-    block.appendChild(roleIdCreateButton);
-    block.appendChild(levelUnlocks);
-    block.appendChild(extraRoleIdCreateButton);
-    block.appendChild(levelBonusRole);
-    background.appendChild(block);
+        for (let solutionType of ['solutions', 'unlocks']) {
+            const solutionsInput = document.getElementById(`level_${solutionType}`);
+            solutionsInput.value = levelsChanged[level.id][solutionType].join('\n');
+            solutionsInput.oninput = solutionsInput.onchange = () => {
+                levelsChanged[level.id][solutionType] = solutionsInput.value.split('\n').filter(e => e);
+                checkForChange();
+            };
+        }
 
-    const draggable = new PlainDraggable(block);
+        for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role']) {
+            const discordIdInput = document.getElementById(`level_${discordIdType}`);
+            discordIdInput.value = levelsChanged[level.id][discordIdType];
+            discordIdInput.oninput = discordIdInput.onchange = () => {
+                levelsChanged[level.id][discordIdType] = discordIdInput.value;
+                checkForChange();
+            }
+        }
+    };
+
+    const container = document.getElementById('container');
+    const draggable = new PlainDraggable(levelBlock);
+    if (level.grid_location[0] !== null)
+        draggable.left = level.grid_location[0];
+    if (level.grid_location[1] !== null)
+        draggable.top = level.grid_location[1];
 	draggable.onDrag = function(position) {
 	    const snappedX = Math.round((container.scrollLeft + position.left) / snapDistance) * snapDistance - container.scrollLeft;
 	    const snappedY = Math.round((container.scrollTop + position.top) / snapDistance) * snapDistance - container.scrollTop;
-	    position.snapped = snappedX != position.left || snappedY != position.top;
+	    position.snapped = snappedX !== position.left || snappedY !== position.top;
 	    if (position.snapped) {
 	        position.left = snappedX;
 	        position.top = snappedY;
 	    }
     };
+    draggable.onDragEnd = function(position) {
+        levelsChanged[level.id].grid_location = [position.left, position.top];
+        checkForChange();
+    }
 	draggable.autoScroll = {target: container};
 }
 
@@ -197,17 +169,44 @@ document.addEventListener('DOMContentLoaded', e => {
     document.getElementById('add_level_button').onclick = () =>
         apiCall('/api/levels/', 'POST').then(createLevelBlock);
     document.getElementById('save_levels_button').onclick = () => {
-        for (let levelBlock of document.querySelectorAll('.level_block.changed')) {
-            const newLevel = levelBlockToObj(levelBlock);
-            apiCall(`/api/levels/${newLevel.id}`, 'POST', newLevel).then(r => {
-                if (r.message === 'ok') {
-                    levelBlock.classList.toggle('changed', false);
-                    levelCache[newLevel.id] = newLevel;
-                } else {
-                    levelBlock.classList.toggle('error', true);
-                }
-            });
-            console.log(newLevel);
+        for (let [levelId, levelOriginal] of Object.entries(levelsOriginal)) {
+            const levelChanged = levelsChanged[levelId];
+            const levelBlock = levelBlocks[levelId];
+            if (compareLevels(levelOriginal, levelChanged)) {
+                apiCall(`/api/levels/${levelId}`, 'POST', levelChanged).then(r => {
+                    if (r.message === 'ok') {
+                        levelsOriginal[levelChanged.id] = cloneLevel(levelChanged);
+                        levelBlock.classList.toggle('edited', false);
+                    } else {
+                        levelBlock.classList.toggle('error', true);
+                    }
+                });
+            }
         }
     }
+    for (let [buttonId, inputId, targetKey] of [
+        ['level_create_channel', 'level_discord_channel', 'discord_channel'],
+        ['level_create_role', 'level_discord_role', 'discord_role'],
+        ['level_create_extra_role', 'level_extra_discord_role', 'discord_extra_role']
+    ]) {
+        const buttonElem = document.getElementById(buttonId);
+        const inputElem = document.getElementById(inputId);
+        buttonElem.onclick = () => {
+            const targetLevelId = selectedLevelId;
+            const channelName = prompt('Channel name');
+            if (channelName === null)
+                return;
+            const apiPath = (buttonId === 'level_create_channel') ? '/api/channels/' : '/api/roles/';
+            apiCall(apiPath, 'POST', {'name': channelName}).then(r => {
+                levelsChanged[targetLevelId][targetKey] = r.id;
+                if (selectedLevelId === targetLevelId)
+                    inputElem.value = r.id;
+                levelBlocks[targetLevelId].classList.toggle('edited', true);
+            });
+        };
+    }
+    document.getElementById('background').onmousedown = e => {
+        for (let selectedLevel of document.querySelectorAll('.selected'))
+            selectedLevel.classList.toggle('selected', false);
+    };
 });

@@ -13,11 +13,23 @@
         <div id="toolbar">
             <h3>toolbar</h3>
             <hr>
-            <button id="add_level_button">Create Block</button>
-            <button>Create Line</button>
-            <button onclick="toggleGrid()">Toggle Grid</button>
-            <button id="save_levels_button">Save</button>
+            <div class="toolbar-group">
+                <button id="add_level_button">Create Block</button>
+                <button>Create Line</button>
+            </div>
+            <div class="toolbar-group">
+                <button onclick="toggleGrid()">Toggle Grid</button>
+                <button id="save_levels_button">Save</button>
+            </div>
             <button>Configurations</button>
+            <div id="toolbar-level" class="toolbar-group">
+                <div class="toolbar-row"><label for="level_solutions">name</label><input type="text" id="level_name"></div>
+                <div class="toolbar-row"><label for="level_solutions">solutions</label><textarea id="level_solutions"></textarea></div>
+                <div class="toolbar-row"><label for="level_unlocks">unlocks</label><textarea id="level_unlocks"></textarea></div>
+                <div class="toolbar-row"><label for="level_discord_channel">discord channel</label><input type="text" maxlength="18" id="level_discord_channel"><button id="level_create_channel">create channel</button></div>
+                <div class="toolbar-row"><label for="level_discord_role">discord role</label><input type="text" maxlength="18" id="level_discord_role"><button id="level_create_role">create role</button></div>
+                <div class="toolbar-row"><label for="level_extra_discord_role">extra discord role</label><input type="text" maxlength="18" id="level_extra_discord_role"><button id="level_create_extra_role">create extra role</button></div>
+            </div>
         </div>
         <div id="container">
             <div id="background">
