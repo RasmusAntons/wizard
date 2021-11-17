@@ -96,23 +96,23 @@ function createLevelBlock(level) {
     const container = document.getElementById('container');
     const draggable = new PlainDraggable(levelBlock);
     if (level.grid_location[0] !== null)
-        draggable.left = level.grid_location[0];
+        draggable.left = level.grid_location[0] - container.scrollLeft;
     if (level.grid_location[1] !== null)
-        draggable.top = level.grid_location[1];
-	draggable.onDrag = function(position) {
-	    const snappedX = Math.round((container.scrollLeft + position.left) / snapDistance) * snapDistance - container.scrollLeft;
-	    const snappedY = Math.round((container.scrollTop + position.top) / snapDistance) * snapDistance - container.scrollTop;
-	    position.snapped = snappedX !== position.left || snappedY !== position.top;
-	    if (position.snapped) {
-	        position.left = snappedX;
-	        position.top = snappedY;
-	    }
+        draggable.top = level.grid_location[1] - container.scrollTop;
+    draggable.onDrag = function(position) {
+        const snappedX = Math.round((container.scrollLeft + position.left) / snapDistance) * snapDistance - container.scrollLeft;
+        const snappedY = Math.round((container.scrollTop + position.top) / snapDistance) * snapDistance - container.scrollTop;
+        position.snapped = snappedX !== position.left || snappedY !== position.top;
+        if (position.snapped) {
+            position.left = snappedX;
+            position.top = snappedY;
+        }
     };
     draggable.onDragEnd = function(position) {
-        levelsChanged[level.id].grid_location = [position.left, position.top];
+        levelsChanged[level.id].grid_location = [position.left + container.scrollLeft, position.top + container.scrollTop];
         checkForChange();
     }
-	draggable.autoScroll = {target: container};
+    draggable.autoScroll = {target: container};
 }
 
 function loadConfig() {
