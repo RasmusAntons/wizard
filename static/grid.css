@@ -1,99 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+* {
+    font-family: 'Share Tech Mono', monospace;
+}
+
 body {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
 }
 
 input {
-	width: 100%;
-	background: none;
-	border: none;
-	text-align: center;
-	font-size: 15px;
-	font-family: "Lucida Console";
+    width: 91%;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 3px;
+    height: 23px;
+    border: none;
+}
+
+textarea {
+    width: 91%;
+    height: 36px;
+    resize: vertical;
+    border: none;
 }
 
 ::placeholder {
-	color: gray;
+    color: gray;
 }
 
 button {
-	font-family: "Lucida Console";
-	background-color: #2A5F90;
-	margin-top: 5px;
-	cursor: pointer;
-	border: none;
-	height: 30px;
-	width: 100%;
-	color: #fff;
-	text-transform: lowercase;
-	border-bottom: solid 1px #1a3b59;
+    font-family: 'Share Tech Mono', monospace;
+    background-color: #424255;
+    margin-top: 0px;
+    cursor: pointer;
+    border: none;
+    height: 26px;
+    width: 91%;
+    color: #fff;
+    text-transform: lowercase;
+    border-bottom: solid 1px #000;
+    border-top: solid 1px #656475;
 }
 
 button:hover {
-	background-color: #285177;
-}
-
-button:hover:focus:active {
-	background-color: #1a364f;
+    background-color: #363646;
+    border-top: solid 1px #111;
 }
 
 .block {
-	box-sizing: border-box;
-	border: #0e65b7 3px solid;
-	background: #eee;
-	position: absolute;
-	width: 120px;
-	height: 60px;
-	padding: 4px;
+    box-sizing: border-box;
+    background: #424255;
+    position: absolute;
+    width: 160px;
+    height: 80px;
+    padding: 1px;
+    color: #fff;
 }
 
-.selected {
-	box-shadow: 0px 0px 5px 1px #f2ffA3 !important;
-}
-
-.edited {
-	border: 1px red solid;
+.block p {
+    margin-top: 15px;
+    margin-left: 7px;
+    font-weight: bold;
 }
 
 #grid {
-	position: absolute;
-	height: 100%;
-	width: 100%;
+    position: absolute;
+    height: 100%;
+    width: 100%;
 }
 
 #toolbar {
-	font-family: "Lucida Console";
-	background: #0e65b7;
-	position: absolute;
-	text-align: center;
-	user-select: none;
-	z-index: 9999;
-	height: 100%;
-	width: 320px;
-	color: #fff;
-	left: 0;
-	overflow-y: auto;
+    background: #2f2f40;
+    position: absolute;
+    text-align: center;
+    user-select: none;
+    z-index: 9999;
+    height: 100%;
+    width: 320px;
+    color: #fff;
+    left: 0;
+    overflow-y: auto;
+}
+
+.markers-div {
+    position: absolute;
+    bottom: 0;
+    background: #232330;
+    width: 100%;
+    height: 30px;
+    border-top: 1px red solid;
+}
+
+.marker {
+    width: 14px;
+    padding: 3px 3px 3px 6px;
+    margin-top: 5px;
+}
+
+#discordstuff button {
+    width: 20%;
+}
+
+#discordstuff input {
+    width: 70%;
+    margin-right: 4px;
 }
 
 .toolbar-group {
-	margin-top: 20px;
+    margin-top: 15px;
 }
 
 #toolbar-level {
-	margin-top: 100px;
+    margin-top: 17px;
+    background-color: #232330;
+    padding-top: 1px;
+    padding-bottom: 25px;
+    display: none;
+}
+
+.toolbar-row {
+    margin-top: 14px;
 }
 
 #container {
-	background: #104D88;
-	position: absolute;
-	overflow: scroll;
-	height: 100%;
-	width: calc(100% - 320px);
-	right: 0;
+    background: #2f2f40;
+    position: absolute;
+    overflow: scroll;
+    height: 100%;
+    width: calc(100% - 320px);
+    right: 0;
 }
 
 #background {
-	position: relative;
-	width: 8000px;
-	height: 5000px;
+    position: relative;
+    width: 8000px;
+    height: 5000px;
+}
+
+.block.edited {
+    border: 1px red solid;
+	padding: 0;
+}
+
+.block.selected::after {
+    opacity: 0.1 !important;
+    position: absolute;
+    content: "";
+    top: calc(-1 * 1px);
+    left: calc(-1 * 1px);
+    z-index: -1;
+    width: calc(100% + 1px * 2);
+    height: calc(100% + 1px * 2);
+    background-size: 300% 300%;
+    background: linear-gradient(
+            60deg,
+            hsl(224, 85%, 66%),
+            hsl(269, 85%, 66%),
+            hsl(314, 85%, 66%),
+            hsl(359, 85%, 66%),
+            hsl(44, 85%, 66%),
+            hsl(89, 85%, 66%),
+            hsl(134, 85%, 66%),
+            hsl(179, 85%, 66%)
+    ) 0 50%;
+    border-radius: 0;
+    animation: moveGradient 4s alternate infinite;
+    /*animation-iteration-count: 1;*/
+}
+
+@keyframes moveGradient {
+    50% {
+        background-position: 100% 50%;
+    }
 }

@@ -100,7 +100,7 @@ function createLevelBlock(level) {
         draggable.left = level.grid_location[0] - container.scrollLeft;
     if (level.grid_location[1] !== null)
         draggable.top = level.grid_location[1] - container.scrollTop;
-    draggable.onDrag = function(position) {
+    draggable.onDrag = function (position) {
         const snappedX = Math.round((container.scrollLeft + position.left) / snapDistance) * snapDistance - container.scrollLeft;
         const snappedY = Math.round((container.scrollTop + position.top) / snapDistance) * snapDistance - container.scrollTop;
         position.snapped = snappedX !== position.left || snappedY !== position.top;
@@ -109,7 +109,7 @@ function createLevelBlock(level) {
             position.top = snappedY;
         }
     };
-    draggable.onDragEnd = function(position) {
+    draggable.onDragEnd = function (position) {
         levelsChanged[level.id].grid_location = [position.left + container.scrollLeft, position.top + container.scrollTop];
         checkForChange();
     }
@@ -147,13 +147,13 @@ function loadLevels() {
 }
 
 function toggleGrid() {
-     if (gridState) {
+    if (gridState) {
         main.style.fill = "#1a1a21";
         gridState = false;
-     } else {
+    } else {
         main.style.fill = "url(#bigGrid)";
         gridState = true;
-     }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', e => {
