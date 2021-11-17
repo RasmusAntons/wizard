@@ -65,6 +65,7 @@ function createLevelBlock(level) {
         for (let selectedLevel of document.querySelectorAll('.selected'))
             selectedLevel.classList.toggle('selected', false);
         levelBlock.classList.toggle('selected', true);
+        document.getElementById('toolbar-level').style.display = 'block';
 
         const levelNameInput = document.getElementById('level_name');
         levelNameInput.value = levelsChanged[level.id].name;
@@ -210,6 +211,8 @@ document.addEventListener('DOMContentLoaded', e => {
         };
     }
     document.getElementById('background').onmousedown = e => {
+        selectedLevelId = undefined;
+        document.getElementById('toolbar-level').style.display = '';
         for (let selectedLevel of document.querySelectorAll('.selected'))
             selectedLevel.classList.toggle('selected', false);
     };
