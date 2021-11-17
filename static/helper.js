@@ -114,6 +114,36 @@ function createLevelBlock(level) {
         checkForChange();
     }
     draggable.autoScroll = {target: container};
+
+    //temporarily adding markers like this to work on css
+    const markersDiv = document.createElement("div");
+    markersDiv.className = "markers-div";
+    levelBlock.appendChild(markersDiv);
+
+    const markerSolution = document.createElement("img");
+    const markerChannel = document.createElement("img");
+    const markerRole = document.createElement("img");
+    const markerUnlock = document.createElement("img");
+    const markerExtraRole = document.createElement("img");
+
+    markerSolution.className = "marker";
+    markerChannel.className = "marker";
+    markerRole.className = "marker";
+    markerUnlock.className = "marker";
+    markerExtraRole.className = "marker";
+
+    markerSolution.src = "/static/marker_solution.svg";
+    markerChannel.src = "/static/marker_channel.svg";
+    markerRole.src = "/static/marker_role.svg";
+    markerUnlock.src = "/static/marker_unlock.svg";
+    markerExtraRole.src = "/static/marker_extra_role.svg";
+
+    markersDiv.appendChild(markerSolution);
+    markersDiv.appendChild(markerChannel);
+    markersDiv.appendChild(markerRole);
+    markersDiv.appendChild(markerUnlock);
+    markersDiv.appendChild(markerExtraRole);
+    //temporarily adding markers like this to work on css
 }
 
 function loadConfig() {

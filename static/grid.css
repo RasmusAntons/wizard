@@ -55,7 +55,6 @@ button:hover {
     position: absolute;
     width: 160px;
     height: 80px;
-    padding: 1px;
     color: #fff;
 }
 
@@ -139,13 +138,8 @@ button:hover {
     height: 5000px;
 }
 
-.block.edited {
-    border: 1px red solid;
-    padding: 0;
-}
-
 .selected::after {
-    opacity: 0.1 !important;
+    opacity: 0.3 !important;
     position: absolute;
     content: "";
     top: calc(-1 * 1px);
