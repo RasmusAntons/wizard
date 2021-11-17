@@ -141,10 +141,10 @@ button:hover {
 
 .block.edited {
     border: 1px red solid;
-	padding: 0;
+    padding: 0;
 }
 
-.block.selected::after {
+.selected::after {
     opacity: 0.1 !important;
     position: absolute;
     content: "";
@@ -153,7 +153,6 @@ button:hover {
     z-index: -1;
     width: calc(100% + 1px * 2);
     height: calc(100% + 1px * 2);
-    background-size: 300% 300%;
     background: linear-gradient(
             60deg,
             hsl(224, 85%, 66%),
@@ -164,7 +163,9 @@ button:hover {
             hsl(89, 85%, 66%),
             hsl(134, 85%, 66%),
             hsl(179, 85%, 66%)
-    ) 0 50%;
+    );
+    background-size: 300% 300%;
+    background-position: 0 50%;
     border-radius: 0;
     animation: moveGradient 4s alternate infinite;
     /*animation-iteration-count: 1;*/
