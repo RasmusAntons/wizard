@@ -237,8 +237,9 @@ button:hover {
 }
 
 #discord_category_color {
-    width: 16px;
-	height: 16px;
+    width: 14px;
+	height: 14px;
+	padding: 1px;
 }
 
 .toolbar-row {
