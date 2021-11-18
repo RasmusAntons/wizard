@@ -203,8 +203,9 @@ button:hover {
 }
 
 #category_list li {
+	box-sizing: border-box;
     font-family: 'Share Tech Mono', monospace;
-    background-color: #424255;
+    background-color: #37374c;
     cursor: pointer;
     border: none;
     height: 26px;
@@ -213,15 +214,13 @@ button:hover {
     color: #fff;
     text-transform: lowercase;
     border-bottom: solid 1px #000;
-    border-top: solid 1px #656475;
 	list-style-type: none;
 	border-left: solid 2px red;
 	margin-left: 15px;
 }
 
 #category_list li:hover {
-    background-color: #363646;
-    border-top: solid 1px #111;
+    background-color: #2b2b3d;
 }
 
 #category_id button {
