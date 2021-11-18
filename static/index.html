@@ -5,9 +5,7 @@
         <script src="/static/plain-draggable.min.js"></script>
         <script src="/static/leader-line.min.js"></script>
         <script src="/static/helper.js"></script>
-        <title>
-            grid
-        </title>
+        <title>helper</title>
     </head>
     <body>
         <div id="toolbar">
@@ -20,8 +18,8 @@
                 <div class="toolbar-group">
                     <button onclick="toggleGrid()">Toggle Grid</button>
                 </div>
-                <button>Categories</button>
-                <button>Configurations</button>
+                <button id="category-menu-button">Categories</button>
+                <button id="configuration-menu-button">Configurations</button>
             </div>
             <div id="toolbar-level" class="toolbar-group">
                 <div class="toolbar-row"><label for="level_solutions">name</label><input type="text" id="level_name"></div>
@@ -61,6 +59,11 @@
                     <button id="add_category_button">➕</button>
                     <button id="remove_category_button">➖</button>
                 </div>
+                <div class="toolbar-row">
+                    <label for="discord_category_name">category name</label>
+                    <br>
+                    <input type="text" id="discord_category_name">
+                </div>
                 <div class="toolbar-row" id="category_id">
                     <label for="discord_category_id">discord category id</label>
                     <br>
@@ -68,12 +71,7 @@
                     <button>create</button>
                 </div>
                 <div class="toolbar-row">
-                    <label for="discord_category_name">discord category name</label>
-                    <br>
-                    <input type="text" id="discord_category_name">
-                </div>
-                <div class="toolbar-row">
-                    <label for="discord_category_color">discord category color</label>
+                    <label for="discord_category_color">category color</label>
                     <input type="color" id="discord_category_color" value="#ff0000">
                 </div>
             </div>

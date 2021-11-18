@@ -85,6 +85,7 @@ function createLevelBlock(level) {
             selectedLevel.classList.toggle('selected', false);
         levelBlock.classList.toggle('selected', true);
         document.getElementById('toolbar-level').style.display = 'block';
+        document.getElementById('toolbar-category').style.display = '';
 
         const levelNameInput = document.getElementById('level_name');
         levelNameInput.value = levelsChanged[level.id].name;
@@ -211,6 +212,10 @@ document.addEventListener('DOMContentLoaded', e => {
             }
         }
     }
+    document.getElementById('category-menu-button').onclick = () => {
+        document.getElementById('toolbar-level').style.display = '';
+        document.getElementById('toolbar-category').style.display = 'block';
+    };
     for (let [buttonId, inputId, targetKey] of [
         ['level_create_channel', 'level_discord_channel', 'discord_channel'],
         ['level_create_role', 'level_discord_role', 'discord_role'],
@@ -235,6 +240,7 @@ document.addEventListener('DOMContentLoaded', e => {
     document.getElementById('background').onmousedown = e => {
         selectedLevelId = undefined;
         document.getElementById('toolbar-level').style.display = '';
+        document.getElementById('toolbar-category').style.display = '';
         for (let selectedLevel of document.querySelectorAll('.selected'))
             selectedLevel.classList.toggle('selected', false);
     };
