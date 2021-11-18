@@ -11,16 +11,18 @@
     </head>
     <body>
         <div id="toolbar">
-            <div class="toolbar-group">
-                <button id="add_level_button">Create Block</button>
-                <button>Create Line</button>
-                <button id="save_levels_button">Save</button>
+            <div id="toolbar-buttons">
+                <div class="toolbar-group">
+                    <button id="add_level_button">Create Block</button>
+                    <button>Create Line</button>
+                    <button id="save_levels_button">Save</button>
+                </div>
+                <div class="toolbar-group">
+                    <button onclick="toggleGrid()">Toggle Grid</button>
+                </div>
+                <button>Categories</button>
+                <button>Configurations</button>
             </div>
-            <div class="toolbar-group">
-                <button onclick="toggleGrid()">Toggle Grid</button>
-            </div>
-            <button>Categories</button>
-            <button>Configurations</button>
             <div id="toolbar-level" class="toolbar-group">
                 <div class="toolbar-row"><label for="level_solutions">name</label><input type="text" id="level_name"></div>
                 <div class="toolbar-row"><label for="level_solutions">solutions</label><textarea id="level_solutions"></textarea></div>
@@ -56,8 +58,8 @@
                     </ul>
                 </div>
                 <div id="category_buttons">
-                    <button id="add_category_button">+</button>
-                    <button id="remove_category_button">-</button>
+                    <button id="add_category_button">➕</button>
+                    <button id="remove_category_button">➖</button>
                 </div>
                 <div class="toolbar-row" id="category_id">
                     <label for="discord_category_id">discord category id</label>
