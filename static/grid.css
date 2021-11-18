@@ -33,7 +33,7 @@ textarea {
 button {
     font-family: 'Share Tech Mono', monospace;
     background-color: #424255;
-    margin-top: 0px;
+    margin-top: 0;
     cursor: pointer;
     border: none;
     height: 26px;
@@ -64,6 +64,70 @@ button:hover {
     font-weight: bold;
 }
 
+.block.edited {
+
+}
+
+.marker {
+    width: 14px;
+    padding: 3px 3px 3px 6px;
+    margin-top: 5px;
+}
+
+.marker_edited {
+	float: right;
+    display: none;
+}
+
+.block.edited .marker_edited {
+    display: unset;
+}
+
+
+.block .marker_solutions, .marker_discord_channel, .marker_discord_role, .marker_unlocks, .marker_extra_discord_role {
+    display: none;
+}
+
+.block.has_solutions .marker_solutions {
+    display: unset;
+}
+
+.block.has_discord_channel .marker_discord_channel {
+    display: unset;
+}
+
+.block.has_discord_role .marker_discord_role {
+    display: unset;
+}
+
+.block.has_unlocks .marker_unlocks {
+    display: unset;
+}
+
+.block.has_extra_discord_role .marker_extra_discord_role {
+    display: unset;
+}
+
+.block.has_solutions .marker_inactive_solutions {
+    display: none;
+}
+
+.block.has_discord_channel .marker_inactive_discord_channel {
+    display: none;
+}
+
+.block.has_discord_role .marker_inactive_discord_role {
+    display: none;
+}
+
+.block.has_unlocks .marker_inactive_unlocks {
+    display: none;
+}
+
+.block.has_extra_discord_role .marker_inactive_extra_discord_role {
+    display: none;
+}
+
 #grid {
     position: absolute;
     height: 100%;
@@ -90,18 +154,6 @@ button:hover {
     width: 100%;
     height: 30px;
     border-top: 1px red solid;
-}
-
-.marker {
-    width: 14px;
-    padding: 3px 3px 3px 6px;
-    margin-top: 5px;
-}
-
-.marker-edited {
-    width: 14px;
-	float: right;
-	padding: 9px 4px;
 }
 
 #discordstuff button {

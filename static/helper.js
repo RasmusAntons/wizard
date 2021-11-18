@@ -4,6 +4,7 @@ let levelBlocks = {};
 let selectedLevelId;
 let gridState = true;
 let snapDistance = 20;
+const unsetValues = [null, undefined, ""];
 
 function promptKey() {
     localStorage.setItem('key', prompt('key'));
@@ -28,7 +29,6 @@ function apiCall(path, method, data) {
 }
 
 function compareLevels(levelA, levelB) {
-    let unsetValues = [null, undefined, ""];
     for (let key of Object.getOwnPropertyNames(levelA)) {
         if (JSON.stringify(levelA[key]) !== JSON.stringify(levelB[key])) {
             if (unsetValues.includes(levelA[key]) && unsetValues.includes(levelB[key])) {
@@ -54,10 +54,29 @@ function createLevelBlock(level) {
     levelName.textContent = level.name;
     levelBlock.appendChild(levelName);
     document.getElementById('background').appendChild(levelBlock);
+    const markersDiv = document.createElement("div");
+    markersDiv.className = "markers-div";
+    levelBlock.appendChild(markersDiv);
+    for (let markerType of ['solutions', 'inactive_solutions', 'discord_channel', 'inactive_discord_channel',
+        'discord_role', 'inactive_discord_role', 'unlocks', 'inactive_unlocks', 'extra_discord_role',
+        'inactive_extra_discord_role', 'edited']) {
+        const markerImg = document.createElement('img');
+        markerImg.classList.add('marker');
+        markerImg.classList.add(`marker_${markerType}`);
+        markerImg.src = `/static/marker_${markerType}.svg`;
+        markersDiv.appendChild(markerImg);
+    }
 
     let checkForChange = () => {
         levelBlock.classList.toggle('edited', compareLevels(levelsOriginal[level.id], levelsChanged[level.id]));
     };
+    let checkForMakers = () => {
+        for (let solutionType of ['solutions', 'unlocks'])
+            levelBlock.classList.toggle(`has_${solutionType}`, levelsChanged[level.id][solutionType].length > 0);
+        for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role'])
+            levelBlock.classList.toggle(`has_${discordIdType}`, !unsetValues.includes(levelsChanged[level.id][discordIdType]));
+    }
+    checkForMakers();
 
     levelBlock.onmousedown = e => {
         e.stopPropagation();
@@ -73,6 +92,7 @@ function createLevelBlock(level) {
             levelsChanged[level.id].name = levelNameInput.value;
             levelName.textContent = levelsChanged[level.id].name;
             checkForChange();
+            checkForMakers();
         };
 
         for (let solutionType of ['solutions', 'unlocks']) {
@@ -81,6 +101,7 @@ function createLevelBlock(level) {
             solutionsInput.oninput = solutionsInput.onchange = () => {
                 levelsChanged[level.id][solutionType] = solutionsInput.value.split('\n').filter(e => e);
                 checkForChange();
+                checkForMakers()
             };
         }
 
@@ -90,6 +111,7 @@ function createLevelBlock(level) {
             discordIdInput.oninput = discordIdInput.onchange = () => {
                 levelsChanged[level.id][discordIdType] = discordIdInput.value;
                 checkForChange();
+                checkForMakers()
             }
         }
     };
@@ -114,40 +136,6 @@ function createLevelBlock(level) {
         checkForChange();
     }
     draggable.autoScroll = {target: container};
-
-    //temporarily adding markers like this to work on css
-    const markersDiv = document.createElement("div");
-    markersDiv.className = "markers-div";
-    levelBlock.appendChild(markersDiv);
-
-    const markerSolution = document.createElement("img");
-    const markerChannel = document.createElement("img");
-    const markerRole = document.createElement("img");
-    const markerUnlock = document.createElement("img");
-    const markerExtraRole = document.createElement("img");
-    const markerEdited = document.createElement("img");
-
-    markerSolution.className = "marker";
-    markerChannel.className = "marker";
-    markerRole.className = "marker";
-    markerUnlock.className = "marker";
-    markerExtraRole.className = "marker";
-    markerEdited.className = "marker-edited";
-
-    markerSolution.src = "/static/marker_solution.svg";
-    markerChannel.src = "/static/marker_channel.svg";
-    markerRole.src = "/static/marker_role.svg";
-    markerUnlock.src = "/static/marker_unlock.svg";
-    markerExtraRole.src = "/static/marker_extra_role.svg";
-    markerEdited.src = "/static/marker_edited.svg";
-
-    markersDiv.appendChild(markerSolution);
-    markersDiv.appendChild(markerChannel);
-    markersDiv.appendChild(markerRole);
-    markersDiv.appendChild(markerUnlock);
-    markersDiv.appendChild(markerExtraRole);
-    markersDiv.appendChild(markerEdited);
-    //temporarily adding markers like this to work on css
 }
 
 function loadConfig() {
