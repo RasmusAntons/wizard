@@ -14,17 +14,17 @@
             <div class="toolbar-group">
                 <button id="add_level_button">Create Block</button>
                 <button>Create Line</button>
+                <button id="save_levels_button">Save</button>
             </div>
             <div class="toolbar-group">
                 <button onclick="toggleGrid()">Toggle Grid</button>
-                <button id="save_levels_button">Save</button>
             </div>
+            <button>Categories</button>
             <button>Configurations</button>
             <div id="toolbar-level" class="toolbar-group">
                 <div class="toolbar-row"><label for="level_solutions">name</label><input type="text" id="level_name"></div>
                 <div class="toolbar-row"><label for="level_solutions">solutions</label><textarea id="level_solutions"></textarea></div>
                 <div class="toolbar-row"><label for="level_unlocks">unlocks</label><textarea id="level_unlocks"></textarea></div>
-
                 <div id="discordstuff">
                     <div class="toolbar-row">
                         <label for="level_discord_channel">discord channel</label>
@@ -38,9 +38,39 @@
                         <input type="text" maxlength="18" id="level_discord_role">
                         <button id="level_create_role">create</button>
                     </div>
-                    <div class="toolbar-row"><label for="level_extra_discord_role">extra discord role</label><br><input type="text" maxlength="18" id="level_extra_discord_role"><button id="level_create_extra_role">create</button></div>
+                    <div class="toolbar-row">
+                        <label for="level_extra_discord_role">extra discord role</label>
+                        <br>
+                        <input type="text" maxlength="18" id="level_extra_discord_role">
+                        <button id="level_create_extra_role">create</button>
+                    </div>
                 </div>
-
+            </div>
+            <div id=toolbar-category" class="toolbar-group">
+                <div class="toolbar-row">
+                    <label for="category_list">category list</label>
+                    <ul id="category_list">
+                        <li>Positive</li>
+                        <li>Negative</li>
+                        <li>Greek</li>
+                        <li>➕</li>
+                    </ul>
+                </div>
+                <div class="toolbar-row">
+                    <label for="discord_category_id">discord category id</label>
+                    <br>
+                    <input type="text" id="discord_category_id">
+                    <button>create</button>
+                </div>
+                <div class="toolbar-row">
+                    <label for="discord_category_name">discord category name</label>
+                    <br>
+                    <input type="text" id="discord_category_name">
+                </div>
+                <div class="toolbar-row">
+                    <label for="discord_category_color">discord category color</label>
+                    <input type="color" id="discord_category_color" value="#ff0000">
+                </div>
             </div>
         </div>
         <div id="container">

@@ -125,24 +125,28 @@ function createLevelBlock(level) {
     const markerRole = document.createElement("img");
     const markerUnlock = document.createElement("img");
     const markerExtraRole = document.createElement("img");
+    const markerEdited = document.createElement("img");
 
     markerSolution.className = "marker";
     markerChannel.className = "marker";
     markerRole.className = "marker";
     markerUnlock.className = "marker";
     markerExtraRole.className = "marker";
+    markerEdited.className = "marker-edited";
 
     markerSolution.src = "/static/marker_solution.svg";
     markerChannel.src = "/static/marker_channel.svg";
     markerRole.src = "/static/marker_role.svg";
     markerUnlock.src = "/static/marker_unlock.svg";
     markerExtraRole.src = "/static/marker_extra_role.svg";
+    markerEdited.src = "/static/marker_edited.svg";
 
     markersDiv.appendChild(markerSolution);
     markersDiv.appendChild(markerChannel);
     markersDiv.appendChild(markerRole);
     markersDiv.appendChild(markerUnlock);
     markersDiv.appendChild(markerExtraRole);
+    markersDiv.appendChild(markerEdited);
     //temporarily adding markers like this to work on css
 }
 

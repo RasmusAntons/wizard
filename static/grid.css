@@ -98,6 +98,12 @@ button:hover {
     margin-top: 5px;
 }
 
+.marker-edited {
+    width: 14px;
+	float: right;
+	padding: 9px 4px;
+}
+
 #discordstuff button {
     width: 20%;
 }
@@ -162,7 +168,6 @@ button:hover {
     background-position: 0 50%;
     border-radius: 0;
     animation: moveGradient 4s alternate infinite;
-    /*animation-iteration-count: 1;*/
 }
 
 @keyframes moveGradient {
