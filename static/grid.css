@@ -79,7 +79,6 @@ button:hover {
     display: unset;
 }
 
-
 .block .marker_solutions, .marker_discord_channel, .marker_discord_role, .marker_unlocks, .marker_extra_discord_role {
     display: none;
 }
@@ -203,8 +202,9 @@ button:hover {
 }
 
 #category_list li {
+	box-sizing: border-box;
     font-family: 'Share Tech Mono', monospace;
-    background-color: #424255;
+    background-color: #37374c;
     cursor: pointer;
     border: none;
     height: 26px;
@@ -213,15 +213,13 @@ button:hover {
     color: #fff;
     text-transform: lowercase;
     border-bottom: solid 1px #000;
-    border-top: solid 1px #656475;
 	list-style-type: none;
 	border-left: solid 2px red;
 	margin-left: 15px;
 }
 
 #category_list li:hover {
-    background-color: #363646;
-    border-top: solid 1px #111;
+    background-color: #2b2b3d;
 }
 
 #category_id button {
@@ -238,8 +236,9 @@ button:hover {
 }
 
 #discord_category_color {
-    width: 16px;
-	height: 16px;
+    width: 14px;
+	height: 14px;
+	padding: 1px;
 }
 
 .toolbar-row {
@@ -291,4 +290,40 @@ button:hover {
     50% {
         background-position: 100% 50%;
     }
+}
+
+/* tooltips */
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 100px;
+  background-color: #424255;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 125%;
+  left: 100%;
+  margin-left: -60px;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #424255 transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
