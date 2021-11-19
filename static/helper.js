@@ -2,7 +2,6 @@ let levelsOriginal = {};
 let levelsChanged = {};
 let levelBlocks = {};
 let selectedLevelId;
-let gridState = true;
 let snapDistance = 20;
 const unsetValues = [null, undefined, ""];
 
@@ -178,31 +177,12 @@ function loadLevels() {
     });
 }
 
-function toggleGrid() {
-    if (gridState) {
-        main.style.fill = "#1a1a21";
-        gridState = false;
-    } else {
-        main.style.fill = "url(#bigGrid)";
-        gridState = true;
-    }
-}
-
 document.addEventListener('DOMContentLoaded', e => {
     if (localStorage.getItem('key') === null) {
         promptKey();
     }
     //loadConfig();
     loadLevels();
-//    document.getElementById('add_config_button').onclick = e => {
-//        const configKey = prompt('key');
-//        if (!configKey)
-//            return;
-//        const configValue = prompt('key');
-//        if (!configValue)
-//            return;
-//        apiCall('/api/config/', 'POST', {[configKey]: configValue}).then(loadConfig);
-//    };
     document.getElementById('add_level_button').onclick = () =>
         apiCall('/api/levels/', 'POST').then(createLevelBlock);
     document.getElementById('save_levels_button').onclick = () => {
@@ -231,11 +211,16 @@ document.addEventListener('DOMContentLoaded', e => {
         document.getElementById('toolbar-category').style.display = '';
         document.getElementById('toolbar-configurations').style.display = 'block';
     };
+    const enableGrid = document.getElementById('enable_grid');
+    enableGrid.onchange = e => {
+        document.getElementById('main').style.fill = e.target.checked ? 'url(#bigGrid)' : '#1a1a21';
+    };
+    enableGrid.onchange({target: enableGrid});
     for (let [buttonId, inputId, targetKey] of [
-        ['level_create_channel', 'level_discord_channel', 'discord_channel'],
-        ['level_create_role', 'level_discord_role', 'discord_role'],
-        ['level_create_extra_role', 'level_extra_discord_role', 'discord_extra_role']
-    ]) {
+            ['level_create_channel', 'level_discord_channel', 'discord_channel'],
+            ['level_create_role', 'level_discord_role', 'discord_role'],
+            ['level_create_extra_role', 'level_extra_discord_role', 'discord_extra_role']
+        ]) {
         const buttonElem = document.getElementById(buttonId);
         const inputElem = document.getElementById(inputId);
         buttonElem.onclick = () => {
