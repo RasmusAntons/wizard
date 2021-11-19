@@ -85,6 +85,7 @@ async def post_level(request):
     level.discord_channel = body.get('discord_channel')
     level.discord_role = body.get('discord_role')
     level.extra_discord_role = body.get('extra_discord_role')
+    level.category_id = body.get('category')
     level.grid_x, level.grid_y = body.get('grid_location')
     for key, cls in (('solutions', db.Solution), ('unlocks', db.Unlock)):
         new_texts = set(body.get(key))
@@ -155,6 +156,47 @@ async def post_roles(request):
     return aiohttp.web.json_response({'id': role.id})
 
 
+@protected
+async def get_categories(request):
+    categories = db.session.query(db.Category).all()
+    return aiohttp.web.json_response({category.id: category.to_api_dict() for category in categories})
+
+
+@protected
+async def post_categories(request):
+    category = db.Category()
+    db.session.add(category)
+    db.session.commit()
+    return aiohttp.web.json_response(category.to_api_dict())
+
+
+@protected
+async def post_category(request):
+    category_id = request.match_info.get('category_id')
+    try:
+        body = await request.json()
+    except json.JSONDecodeError:
+        return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
+    category = db.session.get(db.Category, category_id)
+    if category is None:
+        return aiohttp.web.json_response({'error': 'category does not exist'}, status=404)
+    category.name = body.get('name')
+    category.colour = body.get('colour')
+    db.session.commit()
+    return aiohttp.web.json_response({'message': 'ok'})
+
+
+@protected
+async def delete_category(request):
+    category_id = request.match_info.get('category_id')
+    category = db.session.get(db.Level, category_id)
+    if category is None:
+        return aiohttp.web.json_response({'error': 'category does not exist'}, status=404)
+    db.session.delete(category)
+    db.session.commit()
+    return aiohttp.web.json_response({'message': 'ok'})
+
+
 async def api_server():
     app = aiohttp.web.Application()
     app.add_routes([
@@ -167,6 +209,10 @@ async def api_server():
         aiohttp.web.delete('/api/levels/{level_id}', delete_level),
         aiohttp.web.post('/api/channels/', post_channels),
         aiohttp.web.post('/api/roles/', post_roles),
+        aiohttp.web.get('/api/categories/', get_categories),
+        aiohttp.web.post('/api/categories/', post_categories),
+        aiohttp.web.post('/api/categories/{category_id}', post_category),
+        aiohttp.web.delete('/api/categories/{category_id}', delete_category),
         aiohttp.web.get('/', get_index),
         aiohttp.web.get('/favicon.ico', get_favicon),
         aiohttp.web.static('/static', 'static'),

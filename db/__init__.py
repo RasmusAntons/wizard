@@ -1,5 +1,5 @@
 import sqlalchemy.orm
-from .models import Level, Solution, Unlock, ConfigOption
+from .models import Level, Solution, Unlock, Category, ConfigOption
 
 
 engine = sqlalchemy.create_engine('sqlite:///db.sqlite')

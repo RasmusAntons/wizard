@@ -18,6 +18,8 @@ class Level(Base):
     discord_channel = Column(String(18), nullable=True)
     discord_role = Column(String(18), nullable=True)
     extra_discord_role = Column(String(18), nullable=True)
+    category_id = Column(Integer, ForeignKey('category.id'))
+    category = sqlalchemy.orm.relationship('Category')
     grid_x = Column(Integer, nullable=True)
     grid_y = Column(Integer, nullable=True)
 
@@ -31,6 +33,7 @@ class Level(Base):
             'unlocks': [unlock.text for unlock in self.unlocks],
             'discord_channel': self.discord_channel,
             'discord_role': self.discord_role,
+            'category': self.category_id,
             'extra_discord_role': self.discord_role,
             'grid_location': (self.grid_x, self.grid_y)
         }
@@ -48,6 +51,20 @@ class Unlock(Base):
     level_id = Column(Integer, ForeignKey(Level.id), primary_key=True)
     level = sqlalchemy.orm.relationship(Level, foreign_keys=[level_id], backref='unlocks')
     text = Column(String, index=True, primary_key=True)
+
+
+class Category(Base):
+    __tablename__ = 'category'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=True)
+    colour = Column(Integer, nullable=True)
+
+    def to_api_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'colour': self.colour
+        }
 
 
 class ConfigOption(Base):
