@@ -199,6 +199,7 @@ button:hover {
     background-color: #232330;
     padding-top: 1px;
     padding-bottom: 25px;
+    display: none;
 }
 
 #toolbar-configurations button {

@@ -86,6 +86,7 @@ function createLevelBlock(level) {
         levelBlock.classList.toggle('selected', true);
         document.getElementById('toolbar-level').style.display = 'block';
         document.getElementById('toolbar-category').style.display = '';
+        document.getElementById('toolbar-configurations').style.display = '';
 
         const levelNameInput = document.getElementById('level_name');
         levelNameInput.value = levelsChanged[level.id].name;
@@ -214,7 +215,13 @@ document.addEventListener('DOMContentLoaded', e => {
     }
     document.getElementById('category-menu-button').onclick = () => {
         document.getElementById('toolbar-level').style.display = '';
+        document.getElementById('toolbar-configurations').style.display = '';
         document.getElementById('toolbar-category').style.display = 'block';
+    };
+    document.getElementById('configuration-menu-button').onclick = () => {
+        document.getElementById('toolbar-level').style.display = '';
+        document.getElementById('toolbar-category').style.display = '';
+        document.getElementById('toolbar-configurations').style.display = 'block';
     };
     for (let [buttonId, inputId, targetKey] of [
         ['level_create_channel', 'level_discord_channel', 'discord_channel'],
@@ -241,6 +248,7 @@ document.addEventListener('DOMContentLoaded', e => {
         selectedLevelId = undefined;
         document.getElementById('toolbar-level').style.display = '';
         document.getElementById('toolbar-category').style.display = '';
+        document.getElementById('toolbar-configurations').style.display = '';
         for (let selectedLevel of document.querySelectorAll('.selected'))
             selectedLevel.classList.toggle('selected', false);
     };
