@@ -60,11 +60,19 @@ function createLevelBlock(level) {
     for (let markerType of ['solutions', 'inactive_solutions', 'discord_channel', 'inactive_discord_channel',
         'discord_role', 'inactive_discord_role', 'unlocks', 'inactive_unlocks', 'extra_discord_role',
         'inactive_extra_discord_role', 'edited']) {
+        const markerDiv = document.createElement('div');
+        markerDiv.className = 'tooltip';
         const markerImg = document.createElement('img');
         markerImg.classList.add('marker');
         markerImg.classList.add(`marker_${markerType}`);
         markerImg.src = `/static/marker_${markerType}.svg`;
-        markersDiv.appendChild(markerImg);
+        markerDiv.appendChild(markerImg);
+        const markerTooltip = document.createElement('span');
+        markerTooltip.className = 'tooltiptext';
+        markerTooltip.textContent = markerType.replaceAll('_', ' ')
+            .replace('inactive', 'no');
+        markerDiv.appendChild(markerTooltip);
+        markersDiv.appendChild(markerDiv);
     }
 
     let checkForChange = () => {
