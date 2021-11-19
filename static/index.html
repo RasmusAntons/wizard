@@ -53,12 +53,20 @@
                         <input type="text" maxlength="18" id="level_extra_discord_role">
                         <button id="level_create_extra_role">create</button>
                     </div>
+                    <div class="toolbar-row">
+                    <label for="selectable_category_list">category list</label>
+                    <ul id="selectable_category_list" class="category_list">
+                        <li>Positive</li>
+                        <li>Negative</li>
+                        <li>Greek</li>
+                    </ul>
+                </div>
                 </div>
             </div>
             <div id="toolbar-category" class="toolbar-group">
                 <div class="toolbar-row">
-                    <label for="category_list">category list</label>
-                    <ul id="category_list">
+                    <label for="editable_category_list">category list</label>
+                    <ul id="editable_category_list" class="category_list">
                         <li>Positive</li>
                         <li>Negative</li>
                         <li>Greek</li>
@@ -87,21 +95,33 @@
             <div id="toolbar-configurations" class="toolbar-group">
                 <div class="toolbar-row">
                     <label for="bot_token">bot token</label>
+                    <br>
                     <input type="password" id="bot_token">
-                    <button id="show_bot_token"><img src="/static/eye1.svg" style="width: 30px; opacity: 0.6"></button>
+                    <button id="show_bot_token">
+                        <img src="/static/eye_open.svg" style="width: 23px; opacity: 0.4">
+                    </button>
                 </div>
                 <div class="toolbar-row">
                     <label for="unlock_key">key</label>
+                    <br>
                     <input type="password" id="unlock_key">
-                    <button id="show_unlock_key"><img src="/static/eye1.svg" style="width: 30px; opacity: 0.6"></button>
+                    <button id="show_unlock_key">
+                        <img src="/static/eye_open.svg" style="width: 23px; opacity: 0.4">
+                    </button>
                 </div>
                 <div class="toolbar-row">
-                    <label for="enable_grid">enable grid</label>
-                    <button id="enable_grid">(O ) this is a toggle switch</button>
+                    <label class="switch">
+                        <span class="labeltext">enable grid</span>
+                        <input type="checkbox" id="enable_grid">
+                        <span class="slider"></span>
+                    </label>
                 </div>
                 <div class="toolbar-row">
-                    <label for="enable_tooltips">enable tooltips</label>
-                    <button id="enable_tooltips">(O ) this is a toggle switch</button>
+                    <label class="switch">
+                        <span class="labeltext">enable tooltips</span>
+                        <input type="checkbox" id="enable_tooltips">
+                        <span class="slider"></span>
+                    </label>
                 </div>
             </div>
         </div>
