@@ -205,6 +205,8 @@ document.addEventListener('DOMContentLoaded', e => {
         document.getElementById('toolbar-level').style.display = '';
         document.getElementById('toolbar-configurations').style.display = '';
         document.getElementById('toolbar-category').style.display = 'block';
+        for (let selectedLevel of document.querySelectorAll('.selected'))
+            selectedLevel.classList.toggle('selected', false);
     };
     document.getElementById('configuration-menu-button').onclick = () => {
         document.getElementById('toolbar-level').style.display = '';
@@ -212,6 +214,8 @@ document.addEventListener('DOMContentLoaded', e => {
         document.getElementById('toolbar-configurations').style.display = 'block';
         document.getElementById('bot_token').type = 'password';
         document.getElementById('unlock_key').type = 'password';
+        for (let selectedLevel of document.querySelectorAll('.selected'))
+            selectedLevel.classList.toggle('selected', false);
     };
     document.getElementById('show_bot_token').onclick = () => {
         const targetElem = document.getElementById('bot_token');
