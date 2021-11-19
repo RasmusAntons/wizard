@@ -210,7 +210,17 @@ document.addEventListener('DOMContentLoaded', e => {
         document.getElementById('toolbar-level').style.display = '';
         document.getElementById('toolbar-category').style.display = '';
         document.getElementById('toolbar-configurations').style.display = 'block';
+        document.getElementById('bot_token').type = 'password';
+        document.getElementById('unlock_key').type = 'password';
     };
+    document.getElementById('show_bot_token').onclick = () => {
+        const targetElem = document.getElementById('bot_token');
+        targetElem.type = (targetElem.type === 'password') ? 'text' : 'password';
+    }
+    document.getElementById('show_unlock_key').onclick = () => {
+        const targetElem = document.getElementById('unlock_key');
+        targetElem.type = (targetElem.type === 'password') ? 'text' : 'password';
+    }
     const enableGrid = document.getElementById('enable_grid');
     enableGrid.onchange = e => {
         document.getElementById('main').style.fill = e.target.checked ? 'url(#bigGrid)' : '#1a1a21';
