@@ -69,7 +69,7 @@ function createLevelBlock(level, unsaved) {
         levelBlock.classList.add('edited');
     }
 
-    for (let [markerType, markerText] of [['solutions', 's'], ['discord_channel', 'c'], ['discord_role', 'r'], ['unlocks', 'u'], ['extra_discord_role', 'e'], ['edited', '*']]) {
+    for (let [markerType, markerText] of [['solutions', 'S'], ['discord_channel', 'C'], ['discord_role', 'R'], ['unlocks', 'U'], ['extra_discord_role', 'E'], ['edited', '*']]) {
         const markerDiv = document.createElement('div');
         markerDiv.className = 'tooltip';
         const markerSpan = document.createElement('span');
