@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;700&display=swap');
 
 * {
     font-family: 'Share Tech Mono', monospace;
@@ -61,66 +62,107 @@ button:hover {
 .block p {
     margin-top: 15px;
     margin-left: 7px;
-    font-weight: bold;
 }
+
+/* remade svg to text below */
 
 .marker {
+	font-weight: 300;
+	box-sizing: border-box;
+	font-family: 'Roboto Mono', monospace;
+	font-weight: bold;
+	display: inline-block;
+	line-height: 12px;
+	font-size: 10px;
     width: 14px;
-    padding: 3px 3px 3px 6px;
-    margin-top: 5px;
-}
-
-.marker_edited {
-	float: right;
-    display: none;
-}
-
-.block.edited .marker_edited {
-    display: unset;
-}
-
-.block .marker_solutions, .marker_discord_channel, .marker_discord_role, .marker_unlocks, .marker_extra_discord_role {
-    display: none;
+	height: 14px;
+	margin-top: 8px;
+	padding-right: 0px;
+	margin-left: 7px;
+	padding-left: 3px;
+	border-radius: 2px;
+	background-color: #15151E;
+	border-top: 1px solid #000000;
+	border-left: 1px solid #000000;
+	border-bottom: 1px solid #45455b;
+	border-right: 1px solid #45455b;
+	color: #424255;
 }
 
 .block.has_solutions .marker_solutions {
-    display: unset;
+	background-color: #6946C6;
+	border-top: 1px solid #876AD2;
+	border-left: 1px solid #876AD2;
+	border-bottom: 1px solid #6946C6;
+	border-right: 1px solid #6946C6;
+	border-bottom: none;
+	border-right: none;
+	color: white;
 }
 
 .block.has_discord_channel .marker_discord_channel {
-    display: unset;
+	background-color: #9D1A3A;
+	border-top: 1px solid #c43155;
+	border-left: 1px solid #c43155;
+	border-bottom: 1px solid #9D1A3A;
+	border-right: 1px solid #9D1A3A;
+	border-bottom: none;
+	border-right: none;
+	color: white;
 }
 
 .block.has_discord_role .marker_discord_role {
-    display: unset;
+	background-color: #939D00;
+	border-top: 1px solid #c3ce27;
+	border-left: 1px solid #c3ce27;
+	border-bottom: 1px solid #939D00;
+	border-right: 1px solid #939D00;
+	border-bottom: none;
+	border-right: none;
+	color: white;
 }
 
 .block.has_unlocks .marker_unlocks {
-    display: unset;
+	background-color: #18831E;
+	border-top: 1px solid #2ca332;
+	border-left: 1px solid #2ca332;
+	border-bottom: 1px solid #18831E;
+	border-right: 1px solid #18831E;
+	border-bottom: none;
+	border-right: none;
+	color: white;
 }
 
 .block.has_extra_discord_role .marker_extra_discord_role {
-    display: unset;
+	background-color: #135879;
+	border-top: 1px solid #237aa3;
+	border-left: 1px solid #237aa3;
+	border-bottom: 1px solid #135879;
+	border-right: 1px solid #135879;
+	border-bottom: none;
+	border-right: none;
+	color: white;
 }
 
-.block.has_solutions .marker_inactive_solutions {
-    display: none;
+.block.has_edited .marker_edited {
+	display: unset;
 }
 
-.block.has_discord_channel .marker_inactive_discord_channel {
-    display: none;
-}
+.block.edited .marker_edited {display:unset}
 
-.block.has_discord_role .marker_inactive_discord_role {
-    display: none;
-}
-
-.block.has_unlocks .marker_inactive_unlocks {
-    display: none;
-}
-
-.block.has_extra_discord_role .marker_inactive_extra_discord_role {
-    display: none;
+.marker_edited {
+	font-weight: 700;
+	float: right;
+	background-color: transparent;
+	border-top: none;
+	border-left: none;
+	border-bottom: none;
+	border-right: none;
+	font-size: 36px;
+	position: absolute;
+	margin-top: -10px;
+	right: 14px;
+	display: none;
 }
 
 #grid {
@@ -160,9 +202,9 @@ button:hover {
     position: absolute;
     bottom: 0;
     background: #232330;
-    width: 100%;
     height: 30px;
     border-top: 1px red solid;
+	width: 100%;
 }
 
 #discordstuff button {
@@ -199,7 +241,7 @@ button:hover {
     background-color: #232330;
     padding-top: 1px;
     padding-bottom: 25px;
-    display: none;
+	display: none;
 }
 
 #toolbar-configurations button {
@@ -345,7 +387,7 @@ input[type="checkbox"] {
     content: "";
     position: absolute;
     bottom: 100%;
-    left: 50%;
+    left: 53%;
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;

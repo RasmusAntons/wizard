@@ -71,16 +71,18 @@ function createLevelBlock(level, unsaved) {
 
     for (let [markerType, markerText] of [['solutions', 'S'], ['discord_channel', 'C'], ['discord_role', 'R'], ['unlocks', 'U'], ['extra_discord_role', 'E'], ['edited', '*']]) {
         const markerDiv = document.createElement('div');
-        markerDiv.className = 'tooltip';
         const markerSpan = document.createElement('span');
         markerSpan.classList.add('marker');
         markerSpan.classList.add(`marker_${markerType}`);
         markerSpan.textContent = markerText;
         markerDiv.appendChild(markerSpan);
-        const markerTooltip = document.createElement('span');
-        markerTooltip.className = 'tooltiptext';
-        markerTooltip.textContent = markerType.replaceAll('_', ' ');
-        markerDiv.appendChild(markerTooltip);
+        if (markerType !== 'edited') {
+            markerDiv.className = 'tooltip';
+            const markerTooltip = document.createElement('span');
+            markerTooltip.className = 'tooltiptext';
+            markerTooltip.textContent = markerType.replaceAll('_', ' ');
+            markerDiv.appendChild(markerTooltip);
+        }
         markersDiv.appendChild(markerDiv);
     }
 
