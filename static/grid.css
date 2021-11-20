@@ -216,6 +216,10 @@ button:hover {
     margin-right: 4px;
 }
 
+#delete_level_button {
+	width: 91% !important;
+}
+
 .toolbar-group {
     margin-top: 15px;
 }
