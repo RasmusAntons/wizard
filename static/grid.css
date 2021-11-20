@@ -259,9 +259,7 @@ button:hover {
     bottom: 0;
     background: #232330;
     height: 30px;
-    border-top-color: red;
-    border-top-width: 1px;
-    border-top-style: solid;
+    border-top: 1px red solid;
 	width: 100%;
 }
 
@@ -435,16 +433,17 @@ input[type="checkbox"] {
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 100px;
+    min-width: 80px;
+	border-radius: 1px;
     background-color: #424255;
     color: #fff;
     text-align: center;
-    padding: 5px 0;
+    padding: 5px;
     position: absolute;
     z-index: 1;
     top: 125%;
     left: 100%;
-    margin-left: -60px;
+    margin-left: -65px;
 }
 
 .tooltiptext:hover {
