@@ -63,12 +63,14 @@ class Category(Base):
     __tablename__ = 'category'
     id = Column(String(36), primary_key=True, default=generate_id)
     name = Column(String, nullable=True)
+    discord_category = Column(String(18), nullable=True)
     colour = Column(Integer, nullable=True)
 
     def to_api_dict(self):
         return {
             'id': self.id,
             'name': self.name,
+            'discord_category': self.discord_category,
             'colour': self.colour
         }
 

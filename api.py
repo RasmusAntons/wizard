@@ -177,6 +177,7 @@ async def put_category(request):
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
     category = db.Category(id=category_id)
     category.name = body.get('name')
+    category.discord_category = body.get('discord_category')
     category.colour = body.get('colour')
     db.session.merge(category)
     db.session.commit()

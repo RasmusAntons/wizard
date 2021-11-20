@@ -2,6 +2,10 @@ let levelsOriginal = {};
 let levelsCurrent = {};
 let levelsChanged = {};
 let levelBlocks = {};
+let categoriesOriginal = {};
+let categoriesCurrent = {};
+let categoriesChanged = {};
+let levelCategoryListItems = {};
 let selectedLevelId;
 let snapDistance = 20;
 const unsetValues = [null, undefined, ""];
@@ -47,13 +51,22 @@ function compareLevels(levelA, levelB) {
     return false;
 }
 
-function cloneLevel(level) {
-    return JSON.parse(JSON.stringify(level));
+function cloneObject(obj) {
+    return JSON.parse(JSON.stringify(obj));
 }
+
+let checkLevelChange = (level_id) => {
+    const isChanged = compareLevels(levelsOriginal[level_id], levelsCurrent[level_id]);
+    levelBlocks[level_id].classList.toggle('edited', isChanged);
+    if (isChanged)
+        levelsChanged[level_id] = levelsCurrent[level_id];
+    else
+        delete levelsChanged[level_id];
+};
 
 function createLevelBlock(level, unsaved) {
     levelsOriginal[level.id] = level;
-    levelsCurrent[level.id] = cloneLevel(level);
+    levelsCurrent[level.id] = cloneObject(level);
     const levelBlock = document.createElement("div");
     levelBlocks[level.id] = levelBlock;
     levelBlock.className = 'block';
@@ -63,6 +76,10 @@ function createLevelBlock(level, unsaved) {
     document.getElementById('background').appendChild(levelBlock);
     const markersDiv = document.createElement("div");
     markersDiv.className = "markers-div";
+    if (level.category && categoriesOriginal[level.category]) {
+        const colour = '#' + categoriesOriginal[level.category].colour.toString(16).padStart(6, '0');
+        markersDiv.style.borderTopColor = colour;
+    }
     levelBlock.appendChild(markersDiv);
     if (unsaved) {
         levelsOriginal[level.id].unsaved = true;
@@ -86,14 +103,7 @@ function createLevelBlock(level, unsaved) {
         markersDiv.appendChild(markerDiv);
     }
 
-    let checkForChange = () => {
-        const isChanged = compareLevels(levelsOriginal[level.id], levelsCurrent[level.id]);
-        levelBlock.classList.toggle('edited', isChanged);
-        if (isChanged)
-            levelsChanged[level.id] = levelsCurrent[level.id];
-        else
-            delete levelsChanged[level.id];
-    };
+
     let checkForMakers = () => {
         for (let solutionType of ['solutions', 'unlocks'])
             levelBlock.classList.toggle(`has_${solutionType}`, levelsCurrent[level.id][solutionType].length > 0);
@@ -117,7 +127,7 @@ function createLevelBlock(level, unsaved) {
         levelNameInput.oninput = levelNameInput.onchange = () => {
             levelsCurrent[level.id].name = levelNameInput.value;
             levelName.textContent = levelsCurrent[level.id].name;
-            checkForChange();
+            checkLevelChange(level.id);
             checkForMakers();
         };
 
@@ -126,7 +136,7 @@ function createLevelBlock(level, unsaved) {
             solutionsInput.value = levelsCurrent[level.id][solutionType].join('\n');
             solutionsInput.oninput = solutionsInput.onchange = () => {
                 levelsCurrent[level.id][solutionType] = solutionsInput.value.split('\n').filter(e => e);
-                checkForChange();
+                checkLevelChange(level.id);
                 checkForMakers()
             };
         }
@@ -136,10 +146,18 @@ function createLevelBlock(level, unsaved) {
             discordIdInput.value = levelsCurrent[level.id][discordIdType];
             discordIdInput.oninput = discordIdInput.onchange = () => {
                 levelsCurrent[level.id][discordIdType] = discordIdInput.value;
-                checkForChange();
+                checkLevelChange(level.id);
                 checkForMakers()
             }
         }
+
+        const levelCategoryList = document.getElementById('selectable_category_list');
+        for (let otherLevelCategoryListItem of levelCategoryList.getElementsByTagName('li')) {
+            otherLevelCategoryListItem.classList.remove('selected-category');
+        }
+        console.log(level.category);
+        if (level.category)
+            levelCategoryListItems[level.category].classList.add('selected-category');
     };
 
     const container = document.getElementById('container');
@@ -159,7 +177,7 @@ function createLevelBlock(level, unsaved) {
     };
     draggable.onDragEnd = function (position) {
         levelsCurrent[level.id].grid_location = [position.left + container.scrollLeft, position.top + container.scrollTop];
-        checkForChange();
+        checkLevelChange(level.id);
     }
     draggable.autoScroll = {target: container};
 }
@@ -194,12 +212,53 @@ function loadLevels() {
     });
 }
 
+function createCategory(category, unsaved) {
+    const categoryList = document.getElementById('editable_category_list');
+    categoriesOriginal[category.id] = category;
+    categoriesCurrent[category.id] = cloneObject(category);
+    const categoryListItem = document.createElement('li');
+    categoryListItem.textContent = category.name;
+    categoryList.appendChild(categoryListItem);
+    if (unsaved) {
+        categoriesOriginal[category.id].unsaved = true;
+    }
+    categoryListItem.onclick = () => {
+        document.getElementById('discord_category_name').value = category.name;
+        document.getElementById('discord_category_id').value = category.discord_category;
+        document.getElementById('discord_category_color').value = '#' + category.colour.toString(16).padStart(6, '0');
+    };
+    const levelCategoryList = document.getElementById('selectable_category_list');
+    const levelCategoryListItem = categoryListItem.cloneNode(true);
+    levelCategoryListItems[category.id] = levelCategoryListItem;
+    levelCategoryListItem.onclick = () => {
+        levelsCurrent[selectedLevelId].category = category.id;
+        levelBlocks[selectedLevelId].getElementsByClassName('markers-div')[0].style.borderTopColor =
+            '#' + category.colour.toString(16).padStart(6, '0');
+        checkLevelChange(selectedLevelId);
+        for (let otherLevelCategoryListItem of levelCategoryList.getElementsByTagName('li')) {
+            otherLevelCategoryListItem.classList.remove('selected-category');
+        }
+        levelCategoryListItem.classList.add('selected-category');
+    };
+    levelCategoryList.appendChild(levelCategoryListItem);
+}
+
+function loadCategories(cb) {
+    apiCall('/api/categories/').then(categories => {
+        for (const[id, category] of Object.entries(categories)) {
+            createCategory(category, false);
+        }
+        if (cb)
+            cb();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', e => {
     if (localStorage.getItem('key') === null) {
         promptKey();
     }
     //loadConfig();
-    loadLevels();
+    loadCategories(loadLevels);
     document.getElementById('add_level_button').onclick = () => createLevelBlock({
         id: uuidv4(), name: '', parent_levels: [], child_levels: [], solutions: [], unlocks: [], discord_channel: null,
         discord_role: null, extra_discord_role: null, category: null, grid_location: [null, null]
@@ -210,7 +269,7 @@ document.addEventListener('DOMContentLoaded', e => {
             if (levelChanged.id) {
                 apiCall(`/api/levels/${levelId}`, 'PUT', levelChanged).then(r => {
                     if (r.message === 'ok') {
-                        levelsOriginal[levelChanged.id] = cloneLevel(levelChanged);
+                        levelsOriginal[levelChanged.id] = cloneObject(levelChanged);
                         levelBlock.classList.toggle('edited', false);
                     } else {
                         levelBlock.classList.toggle('error', true);
@@ -237,7 +296,7 @@ document.addEventListener('DOMContentLoaded', e => {
             deletePopup.style.display = '';
             pageOverlay.style.display = '';
         }
-        level_delete_cancel_button.onclick = () => {
+        document.getElementById('level_delete_cancel_button').onclick = () => {
             deletePopup.style.display = '';
             pageOverlay.style.display = '';
         }
@@ -273,7 +332,7 @@ document.addEventListener('DOMContentLoaded', e => {
     enableGrid.onchange({target: enableGrid});
 
     const enableTooltips = document.getElementById('enable_tooltips');
-    var tooltipsStyle = document.createElement('style');
+    const tooltipsStyle = document.createElement('style');
     document.body.appendChild(tooltipsStyle);
     enableTooltips.onchange = e => {
         if (e.target.checked) {
