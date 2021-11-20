@@ -63,24 +63,14 @@ async def get_levels(request):
 
 
 @protected
-async def post_levels(request):
-    level = db.Level()
-    db.session.add(level)
-    db.session.commit()
-    return aiohttp.web.json_response(level.to_api_dict())
-
-
-@protected
-async def post_level(request):
+async def put_level(request):
     level_id = request.match_info.get('level_id')
     try:
         body = await request.json()
     except (json.JSONDecodeError, KeyError):
         traceback.print_exc()
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
-    level = db.session.get(db.Level, level_id)
-    if level is None:
-        return aiohttp.web.json_response({'error': 'level does not exist'}, status=404)
+    level = db.Level(id=level_id)
     level.name = body.get('name')
     level.discord_channel = body.get('discord_channel')
     level.discord_role = body.get('discord_role')
@@ -98,6 +88,7 @@ async def post_level(request):
         for new_text in new_texts:
             obj = cls(level_id=level_id, text=new_text)
             db.session.add(obj)
+    db.session.merge(level)
     db.session.commit()
     return aiohttp.web.json_response({'message': 'ok'})
 
@@ -163,25 +154,16 @@ async def get_categories(request):
 
 
 @protected
-async def post_categories(request):
-    category = db.Category()
-    db.session.add(category)
-    db.session.commit()
-    return aiohttp.web.json_response(category.to_api_dict())
-
-
-@protected
-async def post_category(request):
+async def put_category(request):
     category_id = request.match_info.get('category_id')
     try:
         body = await request.json()
     except json.JSONDecodeError:
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
-    category = db.session.get(db.Category, category_id)
-    if category is None:
-        return aiohttp.web.json_response({'error': 'category does not exist'}, status=404)
+    category = db.Category(id=category_id)
     category.name = body.get('name')
     category.colour = body.get('colour')
+    db.session.merge(category)
     db.session.commit()
     return aiohttp.web.json_response({'message': 'ok'})
 
@@ -204,14 +186,12 @@ async def api_server():
         aiohttp.web.post('/api/config/', post_config),
         aiohttp.web.delete('/api/config/{config_key}', delete_config),
         aiohttp.web.get('/api/levels/', get_levels),
-        aiohttp.web.post('/api/levels/', post_levels),
-        aiohttp.web.post('/api/levels/{level_id}', post_level),
+        aiohttp.web.put('/api/levels/{level_id}', put_level),
         aiohttp.web.delete('/api/levels/{level_id}', delete_level),
         aiohttp.web.post('/api/channels/', post_channels),
         aiohttp.web.post('/api/roles/', post_roles),
         aiohttp.web.get('/api/categories/', get_categories),
-        aiohttp.web.post('/api/categories/', post_categories),
-        aiohttp.web.post('/api/categories/{category_id}', post_category),
+        aiohttp.web.put('/api/categories/{category_id}', put_category),
         aiohttp.web.delete('/api/categories/{category_id}', delete_category),
         aiohttp.web.get('/', get_index),
         aiohttp.web.get('/favicon.ico', get_favicon),

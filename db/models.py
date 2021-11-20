@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 import sqlalchemy.orm
+import uuid
 
 Base = sqlalchemy.orm.declarative_base()
 
@@ -8,9 +9,13 @@ level_relation = sqlalchemy.Table('prerequisite_level', Base.metadata,
                                   Column('child_level', ForeignKey('level.id'), primary_key=True))
 
 
+def generate_id():
+    return str(uuid.uuid4())
+
+
 class Level(Base):
     __tablename__ = 'level'
-    id = Column(Integer, primary_key=True)
+    id = Column(String(36), primary_key=True, default=generate_id)
     name = Column(String, nullable=True)
     parent_levels = sqlalchemy.orm.relationship('Level', secondary=level_relation, backref='child_levels',
                                                 primaryjoin=id == level_relation.c.parent_level,
@@ -41,21 +46,21 @@ class Level(Base):
 
 class Solution(Base):
     __tablename__ = 'solution'
-    level_id = Column(Integer, ForeignKey(Level.id), primary_key=True)
+    level_id = Column(String(36), ForeignKey(Level.id), primary_key=True)
     level = sqlalchemy.orm.relationship(Level, foreign_keys=[level_id], backref='solutions')
     text = Column(String, index=True, primary_key=True)
 
 
 class Unlock(Base):
     __tablename__ = 'unlock'
-    level_id = Column(Integer, ForeignKey(Level.id), primary_key=True)
+    level_id = Column(String(36), ForeignKey(Level.id), primary_key=True)
     level = sqlalchemy.orm.relationship(Level, foreign_keys=[level_id], backref='unlocks')
     text = Column(String, index=True, primary_key=True)
 
 
 class Category(Base):
     __tablename__ = 'category'
-    id = Column(Integer, primary_key=True)
+    id = Column(String(36), primary_key=True, default=generate_id)
     name = Column(String, nullable=True)
     colour = Column(Integer, nullable=True)
 

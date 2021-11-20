@@ -9,6 +9,13 @@ function promptKey() {
     localStorage.setItem('key', prompt('key'));
 }
 
+// https://stackoverflow.com/a/2117523
+function uuidv4() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+
 function apiCall(path, method, data) {
     const key = localStorage.getItem('key');
     const url = new URL(path, document.location.origin);
@@ -43,7 +50,7 @@ function cloneLevel(level) {
     return JSON.parse(JSON.stringify(level));
 }
 
-function createLevelBlock(level) {
+function createLevelBlock(level, unsaved) {
     levelsOriginal[level.id] = level;
     levelsChanged[level.id] = cloneLevel(level);
     const levelBlock = document.createElement("div");
@@ -56,6 +63,10 @@ function createLevelBlock(level) {
     const markersDiv = document.createElement("div");
     markersDiv.className = "markers-div";
     levelBlock.appendChild(markersDiv);
+    if (unsaved) {
+        levelsOriginal[level.id].unsaved = true;
+        levelBlock.classList.add('edited');
+    }
     for (let markerType of ['solutions', 'inactive_solutions', 'discord_channel', 'inactive_discord_channel',
         'discord_role', 'inactive_discord_role', 'unlocks', 'inactive_unlocks', 'extra_discord_role',
         'inactive_extra_discord_role', 'edited']) {
@@ -172,7 +183,7 @@ function loadConfig() {
 function loadLevels() {
     apiCall('/api/levels/').then(levels => {
         for (const [id, level] of Object.entries(levels)) {
-            createLevelBlock(level);
+            createLevelBlock(level, false);
         }
     });
 }
@@ -183,14 +194,16 @@ document.addEventListener('DOMContentLoaded', e => {
     }
     //loadConfig();
     loadLevels();
-    document.getElementById('add_level_button').onclick = () =>
-        apiCall('/api/levels/', 'POST').then(createLevelBlock);
+    document.getElementById('add_level_button').onclick = () => createLevelBlock({
+        id: uuidv4(), name: '', parent_levels: [], child_levels: [], solutions: [], unlocks: [], discord_channel: null,
+        discord_role: null, extra_discord_role: null, category: null, grid_location: [null, null]
+    }, true);
     document.getElementById('save_levels_button').onclick = () => {
         for (let [levelId, levelOriginal] of Object.entries(levelsOriginal)) {
             const levelChanged = levelsChanged[levelId];
             const levelBlock = levelBlocks[levelId];
             if (compareLevels(levelOriginal, levelChanged)) {
-                apiCall(`/api/levels/${levelId}`, 'POST', levelChanged).then(r => {
+                apiCall(`/api/levels/${levelId}`, 'PUT', levelChanged).then(r => {
                     if (r.message === 'ok') {
                         levelsOriginal[levelChanged.id] = cloneLevel(levelChanged);
                         levelBlock.classList.toggle('edited', false);
