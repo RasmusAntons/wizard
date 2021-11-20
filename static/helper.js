@@ -68,20 +68,18 @@ function createLevelBlock(level, unsaved) {
         levelsOriginal[level.id].unsaved = true;
         levelBlock.classList.add('edited');
     }
-    for (let markerType of ['solutions', 'inactive_solutions', 'discord_channel', 'inactive_discord_channel',
-        'discord_role', 'inactive_discord_role', 'unlocks', 'inactive_unlocks', 'extra_discord_role',
-        'inactive_extra_discord_role', 'edited']) {
+
+    for (let [markerType, markerText] of [['solutions', 's'], ['discord_channel', 'c'], ['discord_role', 'r'], ['unlocks', 'u'], ['extra_discord_role', 'e'], ['edited', '*']]) {
         const markerDiv = document.createElement('div');
         markerDiv.className = 'tooltip';
-        const markerImg = document.createElement('img');
-        markerImg.classList.add('marker');
-        markerImg.classList.add(`marker_${markerType}`);
-        markerImg.src = `/static/marker_${markerType}.svg`;
-        markerDiv.appendChild(markerImg);
+        const markerSpan = document.createElement('span');
+        markerSpan.classList.add('marker');
+        markerSpan.classList.add(`marker_${markerType}`);
+        markerSpan.textContent = markerText;
+        markerDiv.appendChild(markerSpan);
         const markerTooltip = document.createElement('span');
         markerTooltip.className = 'tooltiptext';
-        markerTooltip.textContent = markerType.replaceAll('_', ' ')
-            .replace('inactive', 'no');
+        markerTooltip.textContent = markerType.replaceAll('_', ' ');
         markerDiv.appendChild(markerTooltip);
         markersDiv.appendChild(markerDiv);
     }
