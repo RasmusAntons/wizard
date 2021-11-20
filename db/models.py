@@ -1,8 +1,9 @@
+import sqlalchemy
 from sqlalchemy import Column, Integer, String, ForeignKey
-import sqlalchemy.orm
+from sqlalchemy.orm import relationship, declarative_base, backref
 import uuid
 
-Base = sqlalchemy.orm.declarative_base()
+Base = declarative_base()
 
 level_relation = sqlalchemy.Table('prerequisite_level', Base.metadata,
                                   Column('parent_level', ForeignKey('level.id'), primary_key=True),
@@ -17,14 +18,14 @@ class Level(Base):
     __tablename__ = 'level'
     id = Column(String(36), primary_key=True, default=generate_id)
     name = Column(String, nullable=True)
-    parent_levels = sqlalchemy.orm.relationship('Level', secondary=level_relation, backref='child_levels',
-                                                primaryjoin=id == level_relation.c.parent_level,
-                                                secondaryjoin=id == level_relation.c.child_level)
+    parent_levels = relationship('Level', secondary=level_relation, backref='child_levels',
+                                 primaryjoin=id == level_relation.c.parent_level,
+                                 secondaryjoin=id == level_relation.c.child_level)
     discord_channel = Column(String(18), nullable=True)
     discord_role = Column(String(18), nullable=True)
     extra_discord_role = Column(String(18), nullable=True)
     category_id = Column(Integer, ForeignKey('category.id'))
-    category = sqlalchemy.orm.relationship('Category')
+    category = relationship('Category')
     grid_x = Column(Integer, nullable=True)
     grid_y = Column(Integer, nullable=True)
 
@@ -47,14 +48,14 @@ class Level(Base):
 class Solution(Base):
     __tablename__ = 'solution'
     level_id = Column(String(36), ForeignKey(Level.id), primary_key=True)
-    level = sqlalchemy.orm.relationship(Level, foreign_keys=[level_id], backref='solutions')
+    level = relationship(Level, foreign_keys=[level_id], backref=backref('solutions', cascade='all,delete'))
     text = Column(String, index=True, primary_key=True)
 
 
 class Unlock(Base):
     __tablename__ = 'unlock'
     level_id = Column(String(36), ForeignKey(Level.id), primary_key=True)
-    level = sqlalchemy.orm.relationship(Level, foreign_keys=[level_id], backref='unlocks')
+    level = relationship(Level, foreign_keys=[level_id], backref=backref('unlocks', cascade='all,delete'))
     text = Column(String, index=True, primary_key=True)
 
 

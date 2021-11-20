@@ -101,8 +101,19 @@ async def delete_level(request):
     level = db.session.get(db.Level, level_id)
     if level is None:
         return aiohttp.web.json_response({'error': 'level does not exist'}, status=404)
+    for solution in level.solutions:
+        db.session.delete(solution)
+    level.solutions.clear()
+    for unlock in level.unlocks:
+        db.session.delete(unlock)
+    level.unlocks.clear()
     db.session.delete(level)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:
+        traceback.print_exc()
+        db.session.rollback()
+        return aiohttp.web.json_response({'error': str(e)}, status=500)
     return aiohttp.web.json_response({'message': 'ok'})
 
 
