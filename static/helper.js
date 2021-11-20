@@ -286,8 +286,10 @@ document.addEventListener('DOMContentLoaded', e => {
     document.getElementById('delete_level_button').onclick = () => {
         const deletePopup = document.getElementById('delete_popup');
         const pageOverlay = document.getElementById('page-overlay')
+        const deletePopupName = document.getElementById('delete_popup_name')
         deletePopup.style.display = 'block';
         pageOverlay.style.display = 'block';
+        deletePopupName.textContent = levelsCurrent[selectedLevelId].name;
         document.getElementById('level_delete_ok_button').onclick = () => {
             levelsCurrent[selectedLevelId] = {};
             levelsChanged[selectedLevelId] = levelsCurrent[selectedLevelId];

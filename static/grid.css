@@ -15,7 +15,7 @@ input {
     width: 91%;
     text-align: center;
     font-size: 14px;
-    margin-top: 3px;
+    margin-top: 8px;
     height: 23px;
     border: none;
 	border-radius: 1px;
@@ -78,6 +78,7 @@ textarea {
     resize: vertical;
     border: none;
 	border-radius: 1px;
+	margin-top: 8px;
 }
 
 ::placeholder {
@@ -236,6 +237,7 @@ button:hover {
     color: #fff;
     left: 0;
     overflow-y: auto;
+	border-right: 2px solid #1a191e;
 }
 
 #category_buttons {
@@ -317,7 +319,7 @@ button:hover {
 	padding: 0;
 	margin: 0;
 	margin-right: 3px;
-	margin-top: 3px;
+	margin-top: 8px;
 }
 
 input[type="checkbox"] {
