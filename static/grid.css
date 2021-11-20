@@ -398,10 +398,6 @@ input[type="checkbox"] {
     border-color: transparent transparent #424255 transparent;
 }
 
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-}
-
 .switch {
     position: relative;
     display: inline-block;

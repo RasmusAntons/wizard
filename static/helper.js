@@ -258,6 +258,23 @@ document.addEventListener('DOMContentLoaded', e => {
         document.getElementById('main').style.fill = e.target.checked ? 'url(#bigGrid)' : '#1a1a21';
     };
     enableGrid.onchange({target: enableGrid});
+
+    const enableTooltips = document.getElementById('enable_tooltips');
+    var tooltipsStyle = document.createElement('style');
+    document.body.appendChild(tooltipsStyle);
+    enableTooltips.onchange = e => {
+        if (e.target.checked) {
+            if (tooltipsStyle.sheet.cssRules.length === 0) {
+                tooltipsStyle.sheet.insertRule(".tooltip:hover .tooltiptext {visibility: visible;}", 0);
+            }
+        } else {
+            if (tooltipsStyle.sheet.cssRules.length) {
+                tooltipsStyle.sheet.deleteRule(0);
+            }
+        }
+    };
+    enableTooltips.onchange({target: enableTooltips});
+
     for (let [buttonId, inputId, targetKey] of [
             ['level_create_channel', 'level_discord_channel', 'discord_channel'],
             ['level_create_role', 'level_discord_role', 'discord_role'],
