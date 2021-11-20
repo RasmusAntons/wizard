@@ -225,9 +225,22 @@ document.addEventListener('DOMContentLoaded', e => {
         }
     }
     document.getElementById('delete_level_button').onclick = () => {
-        levelsCurrent[selectedLevelId] = {};
-        levelsChanged[selectedLevelId] = levelsCurrent[selectedLevelId];
-        levelBlocks[selectedLevelId].remove();
+        const deletePopup = document.getElementById('delete_popup');
+        const pageOverlay = document.getElementById('page-overlay')
+        deletePopup.style.display = 'block';
+        pageOverlay.style.display = 'block';
+        document.getElementById('level_delete_ok_button').onclick = () => {
+            levelsCurrent[selectedLevelId] = {};
+            levelsChanged[selectedLevelId] = levelsCurrent[selectedLevelId];
+            levelBlocks[selectedLevelId].remove();
+            selectedLevelId = undefined;
+            deletePopup.style.display = '';
+            pageOverlay.style.display = '';
+        }
+        level_delete_cancel_button.onclick = () => {
+            deletePopup.style.display = '';
+            pageOverlay.style.display = '';
+        }
     };
     document.getElementById('category-menu-button').onclick = () => {
         document.getElementById('toolbar-level').style.display = '';

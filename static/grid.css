@@ -18,13 +18,66 @@ input {
     margin-top: 3px;
     height: 23px;
     border: none;
+	border-radius: 1px;
 }
+
+/* working on popup */
+
+#delete_popup {
+    box-sizing: border-box;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    margin-left: -200px;
+    height: 176px;
+    margin-top: -88px;
+    background: #2F2F40;
+    z-index: 10001;
+    color: white;
+    padding-left: 15px;
+	padding-left: 15px;
+    border-bottom: solid 1px #000;
+    border-top: solid 1px #656475;
+    border-radius: 1px;
+	line-height: 32px;
+    display: none;
+}
+
+#page-overlay {
+    position: fixed;
+    z-index: 10000;
+    background-color: black;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    opacity: 0.5;
+    display: none;
+}
+
+.delete_popup_checkbox {
+	display: inline-block;
+    width: 14px;
+	height: 14px;
+	margin-right: 13px;
+}
+
+#popup_buttons button {
+    width: 190px;
+    height: 26px;
+    margin-left: -6px;
+	margin-top: 10px;
+}
+
+/* popup above */
 
 textarea {
     width: 91%;
     height: 36px;
     resize: vertical;
     border: none;
+	border-radius: 1px;
 }
 
 ::placeholder {
@@ -43,6 +96,7 @@ button {
     text-transform: lowercase;
     border-bottom: solid 1px #000;
     border-top: solid 1px #656475;
+	border-radius: 1px;
 }
 
 button:hover {
