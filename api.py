@@ -1,5 +1,6 @@
 import json
 import traceback
+import uuid
 
 import aiohttp.web
 import nextcord
@@ -66,8 +67,9 @@ async def get_levels(request):
 async def put_level(request):
     level_id = request.match_info.get('level_id')
     try:
+        uuid.UUID(level_id)
         body = await request.json()
-    except (json.JSONDecodeError, KeyError):
+    except (ValueError, json.JSONDecodeError):
         traceback.print_exc()
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
     level = db.Level(id=level_id)
@@ -157,8 +159,10 @@ async def get_categories(request):
 async def put_category(request):
     category_id = request.match_info.get('category_id')
     try:
+        uuid.UUID(category_id)
         body = await request.json()
-    except json.JSONDecodeError:
+    except (ValueError, json.JSONDecodeError):
+        traceback.print_exc()
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
     category = db.Category(id=category_id)
     category.name = body.get('name')
