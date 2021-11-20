@@ -443,6 +443,10 @@ input[type="checkbox"] {
     margin-left: -60px;
 }
 
+.tooltiptext:hover {
+    visibility: hidden !important;
+}
+
 .tooltip .tooltiptext::after {
     content: "";
     position: absolute;
