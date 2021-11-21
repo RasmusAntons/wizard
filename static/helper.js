@@ -264,7 +264,7 @@ function createCategory(category, unsaved) {
             checkCategoryChange(category.id);
         };
         const categoryColourInput = document.getElementById('discord_category_color');
-        categoryColourInput.value = '#' + category.colour.toString(16).padStart(6, '0');
+        categoryColourInput.value = '#' + categoriesCurrent[category.id].colour.toString(16).padStart(6, '0');
         categoryColourInput.disabled = false;
         categoryColourInput.onchange = () => {
             const newColour = parseInt(categoryColourInput.value.substr(1), 16);
