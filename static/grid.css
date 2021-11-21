@@ -1,28 +1,28 @@
 @font-face {
-  font-family: 'Share Tech Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(share_tech_mono_latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    font-family: 'Share Tech Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(share_tech_mono_latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-  font-family: 'Roboto Mono';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(roboto_mono_latin_300.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url(roboto_mono_latin_300.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-  font-family: 'Roboto Mono';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(roboto_mono_latin_700.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(roboto_mono_latin_700.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 * {
@@ -42,7 +42,7 @@ input {
     margin-top: 8px;
     height: 23px;
     border: none;
-	border-radius: 1px;
+    border-radius: 1px;
 }
 
 /* working on popup */
@@ -63,7 +63,7 @@ input {
     border-bottom: solid 1px #000;
     border-top: solid 1px #656475;
     border-radius: 1px;
-	line-height: 32px;
+    line-height: 32px;
     display: none;
 }
 
@@ -80,17 +80,17 @@ input {
 }
 
 .delete_popup_checkbox {
-	display: inline-block;
+    display: inline-block;
     width: 14px;
-	height: 14px;
-	margin-right: 13px;
+    height: 14px;
+    margin-right: 13px;
 }
 
 #popup_buttons button {
     width: 190px;
     height: 26px;
     margin-left: -6px;
-	margin-top: 10px;
+    margin-top: 10px;
 }
 
 /* popup above */
@@ -100,8 +100,8 @@ textarea {
     height: 36px;
     resize: vertical;
     border: none;
-	border-radius: 1px;
-	margin-top: 8px;
+    border-radius: 1px;
+    margin-top: 8px;
 }
 
 ::placeholder {
@@ -120,7 +120,7 @@ button {
     text-transform: lowercase;
     border-bottom: solid 1px #000;
     border-top: solid 1px #656475;
-	border-radius: 1px;
+    border-radius: 1px;
 }
 
 button:hover {
@@ -135,11 +135,11 @@ button:hover {
     width: 160px;
     height: 80px;
     color: #fff;
-	border-bottom: solid 1px #000;
+    border-bottom: solid 1px #000;
     border-top: solid 1px #656475;
-	border-radius: 1px;
-	/*border-right: solid 1px #000;
-	border-left: solid 1px #000;*/
+    border-radius: 1px;
+    /*border-right: solid 1px #000;
+    border-left: solid 1px #000;*/
 }
 
 .block p {
@@ -150,101 +150,101 @@ button:hover {
 /* remade svg to text below */
 
 .marker {
-	font-weight: 700;
-	box-sizing: border-box;
-	font-family: 'Roboto Mono', monospace;
-	display: inline-block;
-	line-height: 12px;
-	font-size: 10px;
+    font-weight: 700;
+    box-sizing: border-box;
+    font-family: 'Roboto Mono', monospace;
+    display: inline-block;
+    line-height: 12px;
+    font-size: 10px;
     width: 14px;
-	height: 14px;
-	margin-top: 8px;
-	padding-right: 0px;
-	margin-left: 7px;
-	padding-left: 3px;
-	border-radius: 2px;
-	background-color: #15151E;
-	border-top: 1px solid #000000;
-	border-left: 1px solid #000000;
-	border-bottom: 1px solid #45455b;
-	border-right: 1px solid #45455b;
-	color: #424255;
+    height: 14px;
+    margin-top: 8px;
+    padding-right: 0px;
+    margin-left: 7px;
+    padding-left: 3px;
+    border-radius: 2px;
+    background-color: #15151E;
+    border-top: 1px solid #000000;
+    border-left: 1px solid #000000;
+    border-bottom: 1px solid #45455b;
+    border-right: 1px solid #45455b;
+    color: #424255;
 }
 
 .block.has_solutions .marker_solutions {
-	background-color: #6946C6;
-	border-top: 1px solid #876AD2;
-	border-left: 1px solid #876AD2;
-	border-bottom: 1px solid #6946C6;
-	border-right: 1px solid #6946C6;
-	border-bottom: none;
-	border-right: none;
-	color: white;
+    background-color: #6946C6;
+    border-top: 1px solid #876AD2;
+    border-left: 1px solid #876AD2;
+    border-bottom: 1px solid #6946C6;
+    border-right: 1px solid #6946C6;
+    border-bottom: none;
+    border-right: none;
+    color: white;
 }
 
 .block.has_discord_channel .marker_discord_channel {
-	background-color: #9D1A3A;
-	border-top: 1px solid #c43155;
-	border-left: 1px solid #c43155;
-	border-bottom: 1px solid #9D1A3A;
-	border-right: 1px solid #9D1A3A;
-	border-bottom: none;
-	border-right: none;
-	color: white;
+    background-color: #9D1A3A;
+    border-top: 1px solid #c43155;
+    border-left: 1px solid #c43155;
+    border-bottom: 1px solid #9D1A3A;
+    border-right: 1px solid #9D1A3A;
+    border-bottom: none;
+    border-right: none;
+    color: white;
 }
 
 .block.has_discord_role .marker_discord_role {
-	background-color: #939D00;
-	border-top: 1px solid #c3ce27;
-	border-left: 1px solid #c3ce27;
-	border-bottom: 1px solid #939D00;
-	border-right: 1px solid #939D00;
-	border-bottom: none;
-	border-right: none;
-	color: white;
+    background-color: #939D00;
+    border-top: 1px solid #c3ce27;
+    border-left: 1px solid #c3ce27;
+    border-bottom: 1px solid #939D00;
+    border-right: 1px solid #939D00;
+    border-bottom: none;
+    border-right: none;
+    color: white;
 }
 
 .block.has_unlocks .marker_unlocks {
-	background-color: #18831E;
-	border-top: 1px solid #2ca332;
-	border-left: 1px solid #2ca332;
-	border-bottom: 1px solid #18831E;
-	border-right: 1px solid #18831E;
-	border-bottom: none;
-	border-right: none;
-	color: white;
+    background-color: #18831E;
+    border-top: 1px solid #2ca332;
+    border-left: 1px solid #2ca332;
+    border-bottom: 1px solid #18831E;
+    border-right: 1px solid #18831E;
+    border-bottom: none;
+    border-right: none;
+    color: white;
 }
 
 .block.has_extra_discord_role .marker_extra_discord_role {
-	background-color: #135879;
-	border-top: 1px solid #237aa3;
-	border-left: 1px solid #237aa3;
-	border-bottom: 1px solid #135879;
-	border-right: 1px solid #135879;
-	border-bottom: none;
-	border-right: none;
-	color: white;
+    background-color: #135879;
+    border-top: 1px solid #237aa3;
+    border-left: 1px solid #237aa3;
+    border-bottom: 1px solid #135879;
+    border-right: 1px solid #135879;
+    border-bottom: none;
+    border-right: none;
+    color: white;
 }
 
 .block.has_edited .marker_edited {
-	display: unset;
+    display: unset;
 }
 
 .block.edited .marker_edited {display:unset}
 
 .marker_edited {
-	font-weight: 700;
-	float: right;
-	background-color: transparent;
-	border-top: none;
-	border-left: none;
-	border-bottom: none;
-	border-right: none;
-	font-size: 34px;
-	position: absolute;
-	margin-top: -10px;
-	right: 14px;
-	display: none;
+    font-weight: 700;
+    float: right;
+    background-color: transparent;
+    border-top: none;
+    border-left: none;
+    border-bottom: none;
+    border-right: none;
+    font-size: 34px;
+    position: absolute;
+    margin-top: -10px;
+    right: 14px;
+    display: none;
 }
 
 #grid {
@@ -264,7 +264,7 @@ button:hover {
     color: #fff;
     left: 0;
     overflow-y: auto;
-	border-right: 2px solid #1a191e;
+    border-right: 2px solid #1a191e;
 }
 
 #category_buttons {
@@ -287,7 +287,7 @@ button:hover {
     background: #232330;
     height: 30px;
     border-top: 1px red solid;
-	width: 100%;
+    width: 100%;
 }
 
 #discordstuff button {
@@ -300,7 +300,7 @@ button:hover {
 }
 
 #delete_level_button {
-	width: 91% !important;
+    width: 91% !important;
 }
 
 .toolbar-group {
@@ -316,9 +316,9 @@ button:hover {
 }
 
 #toolbar-category {
-	margin-top: 17px;
+    margin-top: 17px;
     background-color: #232330;
-	padding-top: 1px;
+    padding-top: 1px;
     padding-bottom: 25px;
     display: none;
 }
@@ -328,23 +328,23 @@ button:hover {
     background-color: #232330;
     padding-top: 1px;
     padding-bottom: 25px;
-	display: none;
+    display: none;
 }
 
 #toolbar-configurations button {
-	width: 20%;
-	margin-right: 10px;
-	float: right;
-	padding-top: 2px;
-	margin-top: 7px;
+    width: 20%;
+    margin-right: 10px;
+    float: right;
+    padding-top: 2px;
+    margin-top: 7px;
 }
 
 #toolbar-configurations input {
-	width: 70%;
-	padding: 0;
-	margin: 0;
-	margin-right: 3px;
-	margin-top: 8px;
+    width: 70%;
+    padding: 0;
+    margin: 0;
+    margin-right: 3px;
+    margin-top: 8px;
 }
 
 input[type="checkbox"] {
@@ -353,28 +353,28 @@ input[type="checkbox"] {
 
 .category_list {
     height: 120px;
-	overflow: scroll;
-	overflow-x: hidden;
-	padding: 0;
-	background: #1b1b28;
-	width: 292px;
-	margin-left: 14px;
+    overflow: scroll;
+    overflow-x: hidden;
+    padding: 0;
+    background: #1b1b28;
+    width: 292px;
+    margin-left: 14px;
 }
 
 .category_list li {
-	box-sizing: border-box;
+    box-sizing: border-box;
     font-family: 'Share Tech Mono', monospace;
     background-color: #37374c;
     cursor: pointer;
     border: none;
     height: 26px;
-	line-height: 25px;
+    line-height: 25px;
     width: 286px;
     color: #fff;
     text-transform: lowercase;
     border-bottom: solid 1px #000;
-	list-style-type: none;
-	border-left: solid 2px red;
+    list-style-type: none;
+    border-left: solid 2px red;
 }
 
 .category_list li:hover {
@@ -396,8 +396,8 @@ input[type="checkbox"] {
 
 #discord_category_color {
     width: 14px;
-	height: 14px;
-	padding: 1px;
+    height: 14px;
+    padding: 1px;
 }
 
 .toolbar-row {
@@ -460,7 +460,7 @@ input[type="checkbox"] {
 .tooltip .tooltiptext {
     visibility: hidden;
     min-width: 80px;
-	border-radius: 1px;
+    border-radius: 1px;
     background-color: #424255;
     color: #fff;
     text-align: center;
@@ -503,10 +503,10 @@ input[type="checkbox"] {
 }
 
 .labeltext {
-	display: block;
-	margin-top: 37px !important;
-	margin-left: -29px;
-	width: 120px;
+    display: block;
+    margin-top: 37px !important;
+    margin-left: -29px;
+    width: 120px;
 }
 
 .slider {
