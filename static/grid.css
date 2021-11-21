@@ -323,7 +323,7 @@ button:disabled:hover {
 	bottom: 0;
 	background: #232330;
 	height: 30px;
-	border-top: 1px red solid;
+	border-top: 1px #232330 solid;
 	width: 100%;
 }
 
