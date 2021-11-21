@@ -579,3 +579,8 @@ input:checked + .slider:before {
 .selected-category {
 	background-color: #5b5b7b !important;
 }
+
+.plz_be_longer_thx {
+	width: 300px !important;
+	margin-left: 3px !important;
+}
