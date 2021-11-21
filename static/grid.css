@@ -112,6 +112,11 @@ button:hover {
     width: 160px;
     height: 80px;
     color: #fff;
+	border-bottom: solid 1px #000;
+    border-top: solid 1px #656475;
+	border-radius: 1px;
+	/*border-right: solid 1px #000;
+	border-left: solid 1px #000;*/
 }
 
 .block p {
@@ -400,7 +405,7 @@ input[type="checkbox"] {
     left: calc(-1 * 1px);
     z-index: -1;
     width: calc(100% + 1px * 2);
-    height: calc(100% + 1px * 2);
+    height: 50px;
     background: linear-gradient(
             60deg,
             #5F86F2,
