@@ -45,7 +45,9 @@ input {
     border-radius: 1px;
 }
 
-/* working on popup */
+input:disabled {
+    background-color: #51515b;
+}
 
 #delete_popup {
     box-sizing: border-box;
@@ -93,8 +95,6 @@ input {
     margin-top: 10px;
 }
 
-/* popup above */
-
 textarea {
     width: 91%;
     height: 36px;
@@ -125,20 +125,18 @@ button {
 
 .active-button {
     border-top: solid 1px #000;
-	border-bottom: solid 1px #000;
-	background-color: #343448;
+    border-bottom: solid 1px #000;
+    background-color: #343448;
 }
 
 button:hover {
     border-top: solid 1px #000;
-	border-bottom: solid 1px #000;
-	background-color: #343448;
+    border-bottom: solid 1px #000;
+    background-color: #343448;
 }
 
 button:disabled {
-    border-bottom: solid 1px #000;
-    border-top: solid 1px #656475;
-	background-color: #404048;
+    background-color: #61616f;
 }
 
 .block {
@@ -151,8 +149,6 @@ button:disabled {
     border-bottom: solid 1px #000;
     border-top: solid 1px #656475;
     border-radius: 1px;
-    /*border-right: solid 1px #000;
-    border-left: solid 1px #000;*/
 }
 
 .block p {
@@ -183,6 +179,20 @@ button:disabled {
     border-right: 1px solid #45455b;
     color: #424255;
 }
+
+.edited-category-mark {
+    position: absolute;
+    font-weight: 700;
+    font-family: 'Roboto Mono', monospace;
+    line-height: 20px;
+    font-size: 28px;
+    float: right;
+    color: #888;
+    right: 18px;
+    display: none;
+}
+
+
 
 .block.has_solutions .marker_solutions {
     background-color: #6946C6;
@@ -288,14 +298,16 @@ button:disabled {
     width: 150px;
     height: 26px;
     margin-left: -6px;
+    font-size: 30px;
+    line-height: 1px;
 }
 
 #toolbar-buttons button {
     margin-left: 2px;
 }
 
-#toolbar-buttons button.changed:after {
-    content: " *";
+#toolbar-buttons button.changed span {
+    display: inline;
 }
 
 .markers-div {
@@ -362,10 +374,6 @@ button:disabled {
     margin: 0;
     margin-right: 3px;
     margin-top: 8px;
-}
-
-input[type="checkbox"] {
-
 }
 
 .category_list {
