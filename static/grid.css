@@ -123,9 +123,16 @@ button {
     border-radius: 1px;
 }
 
+.active-button {
+    border-top: solid 1px #000;
+	border-bottom: solid 1px #000;
+	background-color: #343448;
+}
+
 button:hover {
-    background-color: #363646;
-    border-top: solid 1px #111;
+    border-top: solid 1px #000;
+	border-bottom: solid 1px #000;
+	background-color: #343448;
 }
 
 .block {
