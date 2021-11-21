@@ -11,11 +11,12 @@ import discord_bot
 
 def protected(f):
     async def wrapper(request, *args, **kwargs):
-        key = request.query.get('key')
-        if db.get_config('key') != key:
-            return aiohttp.web.json_response({'error': 'invalid api key'}, status=403)
-        else:
+        try:
+            auth_method, token = request.headers.get('Authorization').split(' ', 1)
+            assert auth_method.lower() == 'bearer' and db.get_config('key') == token
             return await f(request, *args, **kwargs)
+        except (AttributeError, ValueError, AssertionError):
+            return aiohttp.web.json_response({'error': 'invalid api key'}, status=403)
     return wrapper
 
 

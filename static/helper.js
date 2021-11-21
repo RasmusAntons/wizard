@@ -11,7 +11,9 @@ let snapDistance = 20;
 const unsetValues = [null, undefined, ""];
 
 function promptKey() {
-    localStorage.setItem('key', prompt('key'));
+    const newKey = prompt('key');
+    if (newKey)
+        localStorage.setItem('key', newKey);
 }
 
 // https://stackoverflow.com/a/2117523
@@ -24,8 +26,7 @@ function uuidv4() {
 function apiCall(path, method, data) {
     const key = localStorage.getItem('key');
     const url = new URL(path, document.location.origin);
-    url.search = new URLSearchParams({'key': key}).toString();
-    const options = {};
+    const options = {headers: {'Authorization': `Bearer ${key}`}};
     if (method !== undefined)
         options.method = method;
     if (data !== undefined)
@@ -256,6 +257,7 @@ function loadCategories(cb) {
 document.addEventListener('DOMContentLoaded', e => {
     if (localStorage.getItem('key') === null) {
         promptKey();
+        console.log('suifsdiof');
     }
     //loadConfig();
     loadCategories(loadLevels);
