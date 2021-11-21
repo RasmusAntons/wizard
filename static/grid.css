@@ -443,7 +443,7 @@ input[type="checkbox"] {
     z-index: 1;
     top: 125%;
     left: 100%;
-    margin-left: -65px;
+    margin-left: -55px;
 }
 
 .tooltiptext:hover {
