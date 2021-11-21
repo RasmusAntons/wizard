@@ -328,11 +328,11 @@ button:disabled:hover {
 }
 
 #discordstuff button {
-	width: 20%;
+	width: 60%;
 }
 
 #discordstuff input {
-	width: 70%;
+	width: 220px;
 	margin-right: 4px;
 }
 
