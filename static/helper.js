@@ -271,16 +271,19 @@ document.addEventListener('DOMContentLoaded', e => {
             if (levelChanged.id) {
                 apiCall(`/api/levels/${levelId}`, 'PUT', levelChanged).then(r => {
                     if (r.message === 'ok') {
-                        levelsOriginal[levelChanged.id] = cloneObject(levelChanged);
+                        levelsOriginal[levelId] = cloneObject(levelChanged);
                         levelBlock.classList.toggle('edited', false);
+                        delete levelsChanged[levelId];
                     } else {
                         levelBlock.classList.toggle('error', true);
                     }
                 });
             } else {
-                apiCall(`/api/levels/${levelId}`, 'DELETE').then(r => {
+                apiCall(`/api/levels/${levelId}`, 'DELETE', levelChanged).then(r => {
                     if (r.error)
                         alert(r.error);
+                    else
+                        delete levelsChanged[levelId];
                 });
             }
         }
@@ -293,7 +296,11 @@ document.addEventListener('DOMContentLoaded', e => {
         pageOverlay.style.display = 'block';
         deletePopupName.textContent = levelsCurrent[selectedLevelId].name;
         document.getElementById('level_delete_ok_button').onclick = () => {
-            levelsCurrent[selectedLevelId] = {};
+            levelsCurrent[selectedLevelId] = {
+                delete_channel: document.getElementById('level_delete_channel').checked,
+                delete_role: document.getElementById('level_delete_role').checked,
+                delete_extra_role: document.getElementById('level_delete_extra_role').checked,
+            };
             levelsChanged[selectedLevelId] = levelsCurrent[selectedLevelId];
             levelBlocks[selectedLevelId].remove();
             selectedLevelId = undefined;

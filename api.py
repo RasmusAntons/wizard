@@ -102,6 +102,7 @@ async def delete_level(request):
     level = db.session.get(db.Level, level_id)
     if level is None:
         return aiohttp.web.json_response({'error': 'level does not exist'}, status=404)
+    body = await request.json() if request.content_length else None
     for solution in level.solutions:
         db.session.delete(solution)
     level.solutions.clear()
@@ -109,6 +110,28 @@ async def delete_level(request):
         db.session.delete(unlock)
     level.unlocks.clear()
     db.session.delete(level)
+    if body:
+        guild_id = db.get_config('guild')
+        category_id = db.get_config('level_channel_category')
+        if guild_id is None or category_id is None:
+            return aiohttp.web.json_response({'error': '"guild" not set"'}, status=400)
+        try:
+            guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+            if body.get('delete_channel'):
+                channel = guild.get_channel(level.discord_channel) or await guild.fetch_channel(level.discord_channel)
+                if channel:
+                    await channel.delete()
+            if body.get('delete_role'):
+                role = guild.get_role(level.discord_role) or await guild.fetch_role(level.discord_role)
+                if role:
+                    await role.delete()
+            if body.get('delete_channel'):
+                role = guild.get_channel(level.discord_channel) or await guild.fetch_channel(level.discord_channel)
+                if role:
+                    await role.delete()
+        except nextcord.HTTPException:
+            traceback.print_exc()
+            return aiohttp.web.json_response({'error': 'deleting discord resources failed'}, status=500)
     try:
         db.session.commit()
     except Exception as e:
