@@ -360,7 +360,7 @@ button:disabled:hover {
 	display: none;
 }
 
-#toolbar-configurations {
+#toolbar-settings {
 	margin-top: 17px;
 	background-color: #232330;
 	padding-top: 1px;
@@ -368,7 +368,7 @@ button:disabled:hover {
 	display: none;
 }
 
-#toolbar-configurations button {
+#toolbar-settings button {
 	width: 20%;
 	margin-right: 10px;
 	float: right;
@@ -376,7 +376,7 @@ button:disabled:hover {
 	margin-top: 7px;
 }
 
-#toolbar-configurations input {
+#toolbar-settings input {
 	width: 70%;
 	padding: 0;
 	margin: 0;

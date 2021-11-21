@@ -5,6 +5,9 @@
         <script src="/static/plain-draggable.min.js"></script>
         <script src="/static/leader-line.min.js"></script>
         <script src="/static/helper.js"></script>
+        <script src="/static/levels.js"></script>
+        <script src="/static/categories.js"></script>
+        <script src="/static/settings.js"></script>
         <title>helper</title>
     </head>
     <body>
@@ -15,9 +18,9 @@
                     <button>Create Line</button>
                 </div>
                 <button id="category-menu-button">Categories<span class="edited-category-mark">*</span></button>
-                <button id="configuration-menu-button">Configurations<span class="edited-category-mark">*</span></button>
+                <button id="settings-menu-button">Settings<span class="edited-category-mark">*</span></button>
                 <div class="toolbar-group">
-                    <button id="save_levels_button">Save<span class="edited-category-mark">*</span></button>
+                    <button id="save_button">Save<span class="edited-category-mark">*</span></button>
                 </div>
             </div>
             <div id="toolbar-level" class="toolbar-group">
@@ -86,7 +89,7 @@
                     <input type="color" id="discord_category_color" value="#ff0000">
                 </div>
             </div>
-            <div id="toolbar-configurations" class="toolbar-group">
+            <div id="toolbar-settings" class="toolbar-group">
                 <div class="toolbar-row">
                     <label for="bot_token">bot token</label>
                     <br>
