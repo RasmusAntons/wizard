@@ -24,7 +24,7 @@ class Level(Base):
     discord_channel = Column(String(18), nullable=True)
     discord_role = Column(String(18), nullable=True)
     extra_discord_role = Column(String(18), nullable=True)
-    category_id = Column(Integer, ForeignKey('category.id'))
+    category_id = Column(Integer, ForeignKey('category.id', ondelete='SET NULL'))
     category = relationship('Category')
     grid_x = Column(Integer, nullable=True)
     grid_y = Column(Integer, nullable=True)

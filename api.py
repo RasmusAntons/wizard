@@ -211,7 +211,7 @@ async def put_category(request):
 @protected
 async def delete_category(request):
     category_id = request.match_info.get('category_id')
-    category = db.session.get(db.Level, category_id)
+    category = db.session.get(db.Category, category_id)
     if category is None:
         return aiohttp.web.json_response({'error': 'category does not exist'}, status=404)
     db.session.delete(category)

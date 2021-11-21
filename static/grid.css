@@ -135,6 +135,12 @@ button:hover {
 	background-color: #343448;
 }
 
+button:disabled {
+    border-bottom: solid 1px #000;
+    border-top: solid 1px #656475;
+	background-color: #404048;
+}
+
 .block {
     box-sizing: border-box;
     background: #424255;
@@ -286,6 +292,10 @@ button:hover {
 
 #toolbar-buttons button {
     margin-left: 2px;
+}
+
+#toolbar-buttons button.changed:after {
+    content: " *";
 }
 
 .markers-div {

@@ -8,7 +8,9 @@ import db
 def init_db():
     db.Level.metadata.create_all(db.engine)
     db.Solution.metadata.create_all(db.engine)
+    db.Unlock.metadata.create_all(db.engine)
     db.ConfigOption.metadata.create_all(db.engine)
+    db.Category.metadata.create_all(db.engine)
     db.set_config('level_channel_category', '904784803860193370')
     db.set_config('guild', '904475213415202866')
     db.set_config('key', secrets.token_hex(16))

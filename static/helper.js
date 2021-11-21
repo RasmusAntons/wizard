@@ -1,12 +1,14 @@
 let levelsOriginal = {};
 let levelsCurrent = {};
 let levelsChanged = {};
+let selectedLevelId;
 let levelBlocks = {};
 let categoriesOriginal = {};
 let categoriesCurrent = {};
 let categoriesChanged = {};
+let selectedCategoryId = {};
+let categoryListItems = {};
 let levelCategoryListItems = {};
-let selectedLevelId;
 let snapDistance = 20;
 const unsetValues = [null, undefined, ""];
 
@@ -40,10 +42,10 @@ function apiCall(path, method, data) {
     });
 }
 
-function compareLevels(levelA, levelB) {
-    for (let key of Object.getOwnPropertyNames(levelA)) {
-        if (JSON.stringify(levelA[key]) !== JSON.stringify(levelB[key])) {
-            if (unsetValues.includes(levelA[key]) && unsetValues.includes(levelB[key])) {
+function compareObjects(objA, objB) {
+    for (let key of Object.getOwnPropertyNames(objA)) {
+        if (JSON.stringify(objA[key]) !== JSON.stringify(objB[key])) {
+            if (unsetValues.includes(objA[key]) && unsetValues.includes(objB[key])) {
                 continue;
             }
             return true;
@@ -56,14 +58,17 @@ function cloneObject(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
 
-let checkLevelChange = (level_id) => {
-    const isChanged = compareLevels(levelsOriginal[level_id], levelsCurrent[level_id]);
-    levelBlocks[level_id].classList.toggle('edited', isChanged);
-    if (isChanged)
-        levelsChanged[level_id] = levelsCurrent[level_id];
-    else
-        delete levelsChanged[level_id];
-};
+function checkLevelChange(levelId) {
+    const isChanged = compareObjects(levelsOriginal[levelId], levelsCurrent[levelId]);
+    levelBlocks[levelId].classList.toggle('edited', isChanged);
+    if (isChanged) {
+        levelsChanged[levelId] = levelsCurrent[levelId];
+        if (levelsChanged[levelId].id === undefined && levelsOriginal[levelId].unsaved)
+            delete levelsChanged[levelId];
+    } else {
+        delete levelsChanged[levelId];
+    }
+}
 
 function createLevelBlock(level, unsaved) {
     levelsOriginal[level.id] = level;
@@ -77,14 +82,14 @@ function createLevelBlock(level, unsaved) {
     document.getElementById('background').appendChild(levelBlock);
     const markersDiv = document.createElement("div");
     markersDiv.className = "markers-div";
-    if (level.category && categoriesOriginal[level.category]) {
-        const colour = '#' + categoriesOriginal[level.category].colour.toString(16).padStart(6, '0');
+    if (level.category && categoriesCurrent[level.category]) {
+        const colour = '#' + categoriesCurrent[level.category].colour.toString(16).padStart(6, '0');
         markersDiv.style.borderTopColor = colour;
     }
     levelBlock.appendChild(markersDiv);
     if (unsaved) {
         levelsOriginal[level.id].unsaved = true;
-        levelBlock.classList.add('edited');
+        checkLevelChange(level.id);
     }
 
     for (let [markerType, markerText] of [['solutions', 'S'], ['discord_channel', 'C'], ['discord_role', 'R'], ['unlocks', 'U'], ['extra_discord_role', 'E'], ['edited', '*']]) {
@@ -156,7 +161,6 @@ function createLevelBlock(level, unsaved) {
         for (let otherLevelCategoryListItem of levelCategoryList.getElementsByTagName('li')) {
             otherLevelCategoryListItem.classList.remove('selected-category');
         }
-        console.log(level.category);
         if (level.category)
             levelCategoryListItems[level.category].classList.add('selected-category');
     };
@@ -213,20 +217,81 @@ function loadLevels() {
     });
 }
 
+function checkCategoryChange(categoryId) {
+    if (categoryId) {
+        const isChanged = compareObjects(categoriesOriginal[categoryId], categoriesCurrent[categoryId]);
+        if (isChanged) {
+            categoriesChanged[categoryId] = categoriesCurrent[categoryId];
+            if (categoriesChanged[categoryId].id === undefined && categoriesOriginal[categoryId].unsaved)
+                delete categoriesChanged[categoryId];
+        } else {
+            delete categoriesChanged[categoryId];
+        }
+    }
+    document.getElementById('category-menu-button').classList.toggle('changed',
+        Object.keys(categoriesChanged).length);
+}
+
 function createCategory(category, unsaved) {
     const categoryList = document.getElementById('editable_category_list');
     categoriesOriginal[category.id] = category;
     categoriesCurrent[category.id] = cloneObject(category);
     const categoryListItem = document.createElement('li');
+    categoryListItems[category.id] = categoryListItem;
     categoryListItem.textContent = category.name;
+    categoryListItem.style.borderLeftColor = '#' + category.colour.toString(16).padStart(6, '0');
     categoryList.appendChild(categoryListItem);
     if (unsaved) {
         categoriesOriginal[category.id].unsaved = true;
+        checkCategoryChange(category.id);
     }
     categoryListItem.onclick = () => {
-        document.getElementById('discord_category_name').value = category.name;
-        document.getElementById('discord_category_id').value = category.discord_category;
-        document.getElementById('discord_category_color').value = '#' + category.colour.toString(16).padStart(6, '0');
+        selectedCategoryId = category.id;
+        const categoryNameInput = document.getElementById('discord_category_name');
+        categoryNameInput.value = category.name;
+        categoryNameInput.disabled = false;
+        categoryNameInput.oninput = categoryNameInput.onchange = () => {
+            categoryListItems[category.id].textContent = categoryNameInput.value;
+            levelCategoryListItems[category.id].textContent = categoryNameInput.value;
+            categoriesCurrent[category.id].name = categoryNameInput.value;
+            checkCategoryChange(category.id);
+        };
+        const categoryIdInput = document.getElementById('discord_category_id');
+        categoryIdInput.value = category.discord_category;
+        categoryIdInput.disabled = false;
+        categoryIdInput.oninput = categoryIdInput.onchange = () => {
+            categoriesCurrent[category.id].discord_category = categoryIdInput.value;
+            checkCategoryChange(category.id);
+        };
+        const categoryColourInput = document.getElementById('discord_category_color');
+        categoryColourInput.value = '#' + category.colour.toString(16).padStart(6, '0');
+        categoryColourInput.disabled = false;
+        categoryColourInput.onchange = () => {
+            const newColour = parseInt(categoryColourInput.value.substr(1), 16);
+            categoriesCurrent[category.id].colour = newColour;
+            categoryListItems[category.id].style.borderLeftColor = categoryColourInput.value;
+            levelCategoryListItems[category.id].style.borderLeftColor = categoryColourInput.value;
+            for (let level of Object.values(levelsCurrent)) {
+                if (level.category === category.id)
+                    levelBlocks[level.id].getElementsByClassName('markers-div')[0].style.borderTopColor = categoryColourInput.value;
+            }
+            checkCategoryChange(category.id);
+        };
+        const categoryRemoveButton = document.getElementById('remove_category_button');
+        categoryRemoveButton.disabled = false;
+        categoryRemoveButton.onclick = () => {
+            categoryListItems[category.id].remove();
+            levelCategoryListItems[category.id].remove();
+            categoriesCurrent[category.id] = {};
+            checkCategoryChange(category.id);
+            for (let level of Object.values(levelsCurrent)) {
+                if (level.category === category.id) {
+                    level.category = null;
+                    levelBlocks[level.id].getElementsByClassName('markers-div')[0].style.borderTopColor = '';
+                    checkLevelChange(level.id);
+                }
+            }
+        };
     };
     const levelCategoryList = document.getElementById('selectable_category_list');
     const levelCategoryListItem = categoryListItem.cloneNode(true);
@@ -234,7 +299,7 @@ function createCategory(category, unsaved) {
     levelCategoryListItem.onclick = () => {
         levelsCurrent[selectedLevelId].category = category.id;
         levelBlocks[selectedLevelId].getElementsByClassName('markers-div')[0].style.borderTopColor =
-            '#' + category.colour.toString(16).padStart(6, '0');
+            '#' + categoriesCurrent[category.id].colour.toString(16).padStart(6, '0');
         checkLevelChange(selectedLevelId);
         for (let otherLevelCategoryListItem of levelCategoryList.getElementsByTagName('li')) {
             otherLevelCategoryListItem.classList.remove('selected-category');
@@ -266,6 +331,23 @@ document.addEventListener('DOMContentLoaded', e => {
         discord_role: null, extra_discord_role: null, category: null, grid_location: [null, null]
     }, true);
     document.getElementById('save_levels_button').onclick = () => {
+        for (let [categoryId, categoryChanged] of Object.entries(categoriesChanged)) {
+            const method = categoryChanged.id ? 'PUT' : 'DELETE';
+            apiCall(`/api/categories/${categoryId}`, method, categoryChanged).then(r => {
+                if (r.message === 'ok') {
+                    if (categoryChanged.id) {
+                        categoriesOriginal[categoryId] = cloneObject(categoryChanged);
+                    } else {
+                        delete categoriesOriginal[categoryId];
+                        delete categoriesCurrent[categoryId];
+                    }
+                    delete categoriesChanged[categoryId];
+                    checkCategoryChange();
+                } else {
+                    alert(r.error);
+                }
+            });
+        }
         for (let [levelId, levelChanged] of Object.entries(levelsChanged)) {
             const levelBlock = levelBlocks[levelId];
             if (levelChanged.id) {
@@ -280,10 +362,13 @@ document.addEventListener('DOMContentLoaded', e => {
                 });
             } else {
                 apiCall(`/api/levels/${levelId}`, 'DELETE', levelChanged).then(r => {
-                    if (r.error)
+                    if (r.error) {
                         alert(r.error);
-                    else
+                    } else {
+                        delete levelsOriginal[levelId];
+                        delete levelsCurrent[levelId];
                         delete levelsChanged[levelId];
+                    }
                 });
             }
         }
@@ -316,9 +401,26 @@ document.addEventListener('DOMContentLoaded', e => {
         document.getElementById('toolbar-level').style.display = '';
         document.getElementById('toolbar-configurations').style.display = '';
         document.getElementById('toolbar-category').style.display = 'block';
+        const categoryNameInput = document.getElementById('discord_category_name');
+        categoryNameInput.disabled = true;
+        categoryNameInput.value = null;
+        const categoryIdInput = document.getElementById('discord_category_id');
+        categoryIdInput.disabled = true;
+        categoryIdInput.value = null;
+        const categoryColourInput = document.getElementById('discord_category_color');
+        categoryColourInput.value = null;
+        categoryColourInput.disabled = true;
+        const categoryRemoveButton = document.getElementById('remove_category_button');
+        categoryRemoveButton.disabled = true;
         for (let selectedLevel of document.querySelectorAll('.selected'))
             selectedLevel.classList.toggle('selected', false);
     };
+    document.getElementById('add_category_button').onclick = () => {
+        const categoryId = uuidv4();
+        createCategory({id: categoryId, name: '', discord_category: null, colour: 0x232330}, true);
+        categoryListItems[categoryId].click();
+
+    }
     document.getElementById('configuration-menu-button').onclick = () => {
         document.getElementById('toolbar-level').style.display = '';
         document.getElementById('toolbar-category').style.display = '';
