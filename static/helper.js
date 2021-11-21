@@ -6,7 +6,7 @@ let levelBlocks = {};
 let categoriesOriginal = {};
 let categoriesCurrent = {};
 let categoriesChanged = {};
-let selectedCategoryId = {};
+let selectedCategoryId;
 let categoryListItems = {};
 let levelCategoryListItems = {};
 let snapDistance = 20;
@@ -246,7 +246,10 @@ function createCategory(category, unsaved) {
         checkCategoryChange(category.id);
     }
     categoryListItem.onclick = () => {
+        if (selectedCategoryId)
+            categoryListItems[selectedCategoryId].classList.remove('selected-category');
         selectedCategoryId = category.id;
+        categoryListItem.classList.add('selected-category');
         const categoryNameInput = document.getElementById('discord_category_name');
         categoryNameInput.value = category.name;
         categoryNameInput.disabled = false;
@@ -401,6 +404,8 @@ document.addEventListener('DOMContentLoaded', e => {
         document.getElementById('toolbar-level').style.display = '';
         document.getElementById('toolbar-configurations').style.display = '';
         document.getElementById('toolbar-category').style.display = 'block';
+        if (selectedCategoryId)
+            categoryListItems[selectedCategoryId].classList.remove('selected-category');
         const categoryNameInput = document.getElementById('discord_category_name');
         categoryNameInput.disabled = true;
         categoryNameInput.value = null;
