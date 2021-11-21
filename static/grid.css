@@ -393,7 +393,7 @@ input[type="checkbox"] {
 }
 
 .selected::after {
-    opacity: 0.3 !important;
+    opacity: 0.15 !important;
     position: absolute;
     content: "";
     top: calc(-1 * 1px);
@@ -403,19 +403,18 @@ input[type="checkbox"] {
     height: calc(100% + 1px * 2);
     background: linear-gradient(
             60deg,
-            hsl(224, 85%, 66%),
-            hsl(269, 85%, 66%),
-            hsl(314, 85%, 66%),
-            hsl(359, 85%, 66%),
-            hsl(44, 85%, 66%),
-            hsl(89, 85%, 66%),
-            hsl(134, 85%, 66%),
-            hsl(179, 85%, 66%)
+            #5F86F2,
+            #A65FF2,
+            #F25FD0,
+            #F25F61,
+            #ABF25F,
+            #5FF281,
+            #5FF2F0
     );
     background-size: 300% 300%;
     background-position: 0 50%;
     border-radius: 0;
-    animation: moveGradient 4s alternate infinite;
+    animation: moveGradient 8s infinite;
 }
 
 @keyframes moveGradient {
