@@ -59,54 +59,74 @@ document.addEventListener('DOMContentLoaded', e => {
 	initCategories();
 	initSettings();
 	document.getElementById('save_button').onclick = () => {
+		const settingRequests = [];
 		if (Object.keys(settingsChanged).length) {
-			apiCall(`/api/settings`, 'PATCH', settingsChanged).then(r => {
-				settingsOriginal = cloneObject(settingsCurrent);
-				settingsChanged = {};
-				checkSettingChange();
-			});
+			settingRequests.push(
+				apiCall(`/api/settings`, 'PATCH', settingsChanged).then(r => {
+					settingsOriginal = cloneObject(settingsCurrent);
+					if ('key' in settingsChanged)
+						localStorage.setItem('key', settingsChanged['key']);
+					settingsChanged = {};
+					checkSettingChange();
+				})
+			);
 		}
-		for (let [categoryId, categoryChanged] of Object.entries(categoriesChanged)) {
-			const method = categoryChanged.id ? 'PUT' : 'DELETE';
-			apiCall(`/api/categories/${categoryId}`, method, categoryChanged).then(r => {
-				if (r.message === 'ok') {
-					if (categoryChanged.id) {
-						categoriesOriginal[categoryId] = cloneObject(categoryChanged);
-					} else {
-						delete categoriesOriginal[categoryId];
-						delete categoriesCurrent[categoryId];
-					}
-					delete categoriesChanged[categoryId];
-					checkCategoryChange();
-				} else {
-					alert(r.error);
-				}
-			});
-		}
-		for (let [levelId, levelChanged] of Object.entries(levelsChanged)) {
-			const levelBlock = levelBlocks[levelId];
-			if (levelChanged.id) {
-				apiCall(`/api/levels/${levelId}`, 'PUT', levelChanged).then(r => {
-					if (r.message === 'ok') {
-						levelsOriginal[levelId] = cloneObject(levelChanged);
-						levelBlock.classList.toggle('edited', false);
-						delete levelsChanged[levelId];
-					} else {
-						levelBlock.classList.toggle('error', true);
-					}
-				});
-			} else {
-				apiCall(`/api/levels/${levelId}`, 'DELETE', levelChanged).then(r => {
-					if (r.error) {
-						alert(r.error);
-					} else {
-						delete levelsOriginal[levelId];
-						delete levelsCurrent[levelId];
-						delete levelsChanged[levelId];
-					}
-				});
+		Promise.all(settingRequests).then(() => {
+			const categoryRequests = [];
+			for (let [categoryId, categoryChanged] of Object.entries(categoriesChanged)) {
+				const method = categoryChanged.id ? 'PUT' : 'DELETE';
+				categoryRequests.push(
+					apiCall(`/api/categories/${categoryId}`, method, categoryChanged).then(r => {
+						if (r.message === 'ok') {
+							if (categoryChanged.id) {
+								categoriesOriginal[categoryId] = cloneObject(categoryChanged);
+							} else {
+								delete categoriesOriginal[categoryId];
+								delete categoriesCurrent[categoryId];
+							}
+							delete categoriesChanged[categoryId];
+							checkCategoryChange();
+						} else {
+							alert(r.error);
+						}
+					})
+				);
 			}
-		}
+			Promise.all(categoryRequests).then(() => {
+				const levelRequests = [];
+				for (let [levelId, levelChanged] of Object.entries(levelsChanged)) {
+					const levelBlock = levelBlocks[levelId];
+					if (levelChanged.id) {
+						levelRequests.push(
+							apiCall(`/api/levels/${levelId}`, 'PUT', levelChanged).then(r => {
+								if (r.message === 'ok') {
+									levelsOriginal[levelId] = cloneObject(levelChanged);
+									levelBlock.classList.toggle('edited', false);
+									delete levelsChanged[levelId];
+								} else {
+									levelBlock.classList.toggle('error', true);
+								}
+							})
+						);
+					} else {
+						levelRequests.push(
+							apiCall(`/api/levels/${levelId}`, 'DELETE', levelChanged).then(r => {
+								if (r.error) {
+									alert(r.error);
+								} else {
+									delete levelsOriginal[levelId];
+									delete levelsCurrent[levelId];
+									delete levelsChanged[levelId];
+								}
+							})
+						);
+					}
+				}
+				Promise.all(levelRequests).then(() => {
+					console.log('save complete');
+				});
+			});
+		});
 	}
 
 	for (let [buttonId, inputId, targetKey] of [
