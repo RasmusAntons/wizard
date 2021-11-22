@@ -13,7 +13,7 @@ def protected(f):
     async def wrapper(request, *args, **kwargs):
         try:
             auth_method, token = request.headers.get('Authorization').split(' ', 1)
-            assert auth_method.lower() == 'bearer' and db.get_config('key') == token
+            assert auth_method.lower() == 'bearer' and db.get_setting('key') == token
             return await f(request, *args, **kwargs)
         except (AttributeError, ValueError, AssertionError):
             return aiohttp.web.json_response({'error': 'invalid api key'}, status=403)
@@ -29,32 +29,25 @@ async def get_favicon(request):
 
 
 @protected
-async def get_config(request):
-    config_options = db.session.query(db.ConfigOption).all()
+async def get_settings(request):
+    config_options = db.session.query(db.Setting).all()
     return aiohttp.web.json_response({config_option.key: config_option.value for config_option in config_options})
 
 
 @protected
-async def post_config(request):
+async def patch_settings(request):
     try:
         body = await request.json()
     except json.JSONDecodeError:
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
-    if not all(type(config_value) == str for config_value in body.values()):
-        return aiohttp.web.json_response({'error': 'config values must be strings'}, status=400)
+    if not all(config_value is None or type(config_value) == str for config_value in body.values()):
+        return aiohttp.web.json_response({'error': 'config values must be strings or null'}, status=400)
     for config_key, config_value in body.items():
-        db.session.merge(db.ConfigOption(key=config_key, value=config_value))
+        if config_value is not None:
+            db.session.merge(db.Setting(key=config_key, value=config_value))
+        else:
+            db.session.execute(db.Setting.__table__.delete().where(db.Setting.key == config_key))
     db.session.commit()
-    return aiohttp.web.json_response({'message': 'ok'})
-
-
-@protected
-async def delete_config(request):
-    config_key = request.match_info.get('config_key')
-    config_option = db.session.get(db.ConfigOption, config_key)
-    if config_option is None:
-        return aiohttp.web.json_response({'error': 'config option does not exist'}, status=404)
-    db.session.delete(config_option)
     return aiohttp.web.json_response({'message': 'ok'})
 
 
@@ -111,8 +104,8 @@ async def delete_level(request):
     level.unlocks.clear()
     db.session.delete(level)
     if body:
-        guild_id = db.get_config('guild')
-        category_id = db.get_config('level_channel_category')
+        guild_id = db.get_setting('guild')
+        category_id = db.get_setting('level_channel_category')
         if guild_id is None or category_id is None:
             return aiohttp.web.json_response({'error': '"guild" not set"'}, status=400)
         try:
@@ -149,8 +142,8 @@ async def post_channels(request):
     except (json.JSONDecodeError, KeyError):
         traceback.print_exc()
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
-    guild_id = db.get_config('guild')
-    category_id = db.get_config('level_channel_category')
+    guild_id = db.get_setting('guild')
+    category_id = db.get_setting('level_channel_category')
     if guild_id is None or category_id is None:
         return aiohttp.web.json_response({'error': '"guild" or "level_channel_category" not set"'}, status=400)
     try:
@@ -172,7 +165,7 @@ async def post_roles(request):
     except (json.JSONDecodeError, KeyError):
         traceback.print_exc()
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
-    guild_id = db.get_config('guild')
+    guild_id = db.get_setting('guild')
     if guild_id is None:
         return aiohttp.web.json_response({'error': '"guild" not set"'}, status=400)
     try:
@@ -222,9 +215,8 @@ async def delete_category(request):
 async def api_server():
     app = aiohttp.web.Application()
     app.add_routes([
-        aiohttp.web.get('/api/config/', get_config),
-        aiohttp.web.post('/api/config/', post_config),
-        aiohttp.web.delete('/api/config/{config_key}', delete_config),
+        aiohttp.web.get('/api/settings', get_settings),
+        aiohttp.web.patch('/api/settings', patch_settings),
         aiohttp.web.get('/api/levels/', get_levels),
         aiohttp.web.put('/api/levels/{level_id}', put_level),
         aiohttp.web.delete('/api/levels/{level_id}', delete_level),

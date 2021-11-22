@@ -75,7 +75,7 @@ class Category(Base):
         }
 
 
-class ConfigOption(Base):
-    __tablename__ = 'config_option'
+class Setting(Base):
+    __tablename__ = 'setting'
     key = Column(String, primary_key=True)
     value = Column(String, nullable=True)

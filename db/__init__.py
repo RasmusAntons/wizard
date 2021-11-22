@@ -1,7 +1,7 @@
 import sqlalchemy.orm
 import sqlalchemy.event
 import sqlalchemy.engine
-from .models import Level, Solution, Unlock, Category, ConfigOption
+from .models import Level, Solution, Unlock, Category, Setting
 
 
 @sqlalchemy.event.listens_for(sqlalchemy.engine.Engine, "connect")
@@ -16,11 +16,11 @@ Session = sqlalchemy.orm.sessionmaker(bind=engine)
 session: sqlalchemy.orm.Session = Session()
 
 
-def set_config(key, value):
-    config_option = ConfigOption(key=key, value=value)
-    session.add(config_option)
+def set_setting(key, value):
+    setting = Setting(key=key, value=value)
+    session.add(setting)
 
 
-def get_config(key, default=None):
-    config_option = session.query(ConfigOption).where(ConfigOption.key == key).first()
-    return config_option.value if config_option is not None else default
+def get_setting(key, default=None):
+    setting = session.query(Setting).where(Setting.key == key).first()
+    return setting.value if setting is not None else default

@@ -1,20 +1,19 @@
+settingsOriginal = {};
+settingsCurrent = {};
+
 function loadSettings() {
 	const optionsElem = document.getElementById('config');
 	while (optionsElem.firstChild)
 		optionsElem.removeChild(optionsElem.firstChild);
-	apiCall('/api/config/').then(config => {
-		for (const [key, value] of Object.entries(config)) {
+	apiCall('/api/settings').then(settings => {
+		for (const [key, value] of Object.entries(settings)) {
 			const p = document.createElement('p');
 			p.textContent = `${key}: ${value}`;
 			const editButton = document.createElement('button');
 			editButton.textContent = 'edit';
 			editButton.onclick = () =>
-				apiCall('/api/config/', 'POST', {[key]: prompt('value')}).then(loadSettings);
+				apiCall('/api/settings', 'PATCH', {[key]: prompt('value')}).then(loadSettings);
 			p.appendChild(editButton);
-			const deleteButton = document.createElement('button');
-			deleteButton.textContent = 'delete';
-			deleteButton.onclick = () => apiCall(`/api/config/${key}`, 'DELETE').then(loadSettings);
-			p.appendChild(deleteButton);
 			optionsElem.appendChild(p);
 		}
 	});

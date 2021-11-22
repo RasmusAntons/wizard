@@ -4,4 +4,4 @@ import db
 
 
 discord_bot.client.loop.create_task(api.api_server())
-discord_bot.client.run(db.get_config('bot_token'))
+discord_bot.client.run(db.get_setting('bot_token'))
