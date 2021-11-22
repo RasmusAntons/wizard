@@ -11,7 +11,6 @@ def init_db():
     db.Unlock.metadata.create_all(db.engine)
     db.Setting.metadata.create_all(db.engine)
     db.Category.metadata.create_all(db.engine)
-    db.set_setting('level_channel_category', '904784803860193370')
     db.set_setting('guild', '904475213415202866')
     db.set_setting('key', secrets.token_hex(16))
     db.set_setting('bot_token', getpass.getpass('Discord bot token: '))
