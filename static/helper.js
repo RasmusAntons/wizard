@@ -54,12 +54,18 @@ document.addEventListener('DOMContentLoaded', e => {
 	if (localStorage.getItem('key') === null) {
 		promptKey();
 	}
-	//loadConfig();
-	loadCategories(loadLevels);
+	loadSettings(loadCategories.bind(null, loadLevels));
 	initLevels();
 	initCategories();
 	initSettings();
 	document.getElementById('save_button').onclick = () => {
+		if (Object.keys(settingsChanged).length) {
+			apiCall(`/api/settings`, 'PATCH', settingsChanged).then(r => {
+				settingsOriginal = cloneObject(settingsCurrent);
+				settingsChanged = {};
+				checkSettingChange();
+			});
+		}
 		for (let [categoryId, categoryChanged] of Object.entries(categoriesChanged)) {
 			const method = categoryChanged.id ? 'PUT' : 'DELETE';
 			apiCall(`/api/categories/${categoryId}`, method, categoryChanged).then(r => {

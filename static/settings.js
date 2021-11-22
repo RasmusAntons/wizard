@@ -1,21 +1,46 @@
-settingsOriginal = {};
-settingsCurrent = {};
+let settingsOriginal = {};
+let settingsCurrent = {};
+let settingsChanged = {};
 
-function loadSettings() {
-	const optionsElem = document.getElementById('config');
-	while (optionsElem.firstChild)
-		optionsElem.removeChild(optionsElem.firstChild);
+const inputSettings = {'bot_token': 'text', 'key': 'text', 'guild': 'text', 'grid': 'check', 'tooltips': 'check'};
+
+function checkSettingChange(settingKey) {
+	if (settingKey) {
+		if (settingsOriginal[settingKey] !== settingsCurrent[settingKey])
+			settingsChanged[settingKey] = settingsCurrent[settingKey];
+		else
+			delete settingsChanged[settingKey];
+	}
+	document.getElementById('settings-menu-button').classList.toggle('changed',
+		Object.keys(settingsChanged).length);
+}
+
+function loadSettings(cb) {
 	apiCall('/api/settings').then(settings => {
-		for (const [key, value] of Object.entries(settings)) {
-			const p = document.createElement('p');
-			p.textContent = `${key}: ${value}`;
-			const editButton = document.createElement('button');
-			editButton.textContent = 'edit';
-			editButton.onclick = () =>
-				apiCall('/api/settings', 'PATCH', {[key]: prompt('value')}).then(loadSettings);
-			p.appendChild(editButton);
-			optionsElem.appendChild(p);
+		settingsOriginal = settings;
+		settingsCurrent = cloneObject(settings);
+		for (let [settingKey, settingType] of Object.entries(inputSettings)) {
+			const settingInput = document.getElementById(`setting_${settingKey}`);
+			if (settingType === 'text') {
+				if (settingKey in settings)
+					settingInput.value = settings[settingKey];
+				settingInput.oninput = settingInput.onchange = () => {
+					settingsCurrent[settingKey] = settingInput.value;
+					checkSettingChange(settingKey);
+				}
+			} else if (settingType === 'check') {
+				if (settingKey in settings) {
+					settingInput.checked = JSON.parse(settings[settingKey]);
+					settingInput.dispatchEvent(new Event('change'));
+				}
+				settingInput.addEventListener('change', () => {
+					settingsCurrent[settingKey] = JSON.stringify(settingInput.checked);
+					checkSettingChange(settingKey);
+				});
+			}
 		}
+		if (cb)
+			cb();
 	});
 }
 
@@ -24,25 +49,25 @@ function initSettings() {
 		document.getElementById('toolbar-level').style.display = '';
 		document.getElementById('toolbar-category').style.display = '';
 		document.getElementById('toolbar-settings').style.display = 'block';
-		document.getElementById('bot_token').type = 'password';
-		document.getElementById('unlock_key').type = 'password';
+		document.getElementById('setting_bot_token').type = 'password';
+		document.getElementById('setting_key').type = 'password';
 		for (let selectedLevel of document.querySelectorAll('.selected'))
 			selectedLevel.classList.toggle('selected', false);
 	};
 	document.getElementById('show_bot_token').onclick = () => {
-		const targetElem = document.getElementById('bot_token');
+		const targetElem = document.getElementById('setting_bot_token');
 		targetElem.type = (targetElem.type === 'password') ? 'text' : 'password';
 	}
 	document.getElementById('show_unlock_key').onclick = () => {
-		const targetElem = document.getElementById('unlock_key');
+		const targetElem = document.getElementById('setting_key');
 		targetElem.type = (targetElem.type === 'password') ? 'text' : 'password';
 	}
-	const enableGrid = document.getElementById('enable_grid');
+	const enableGrid = document.getElementById('setting_grid');
 	enableGrid.onchange = e => {
 		document.getElementById('main').style.fill = e.target.checked ? 'url(#bigGrid)' : '#1a1a21';
 	};
 	enableGrid.onchange({target: enableGrid});
-	const enableTooltips = document.getElementById('enable_tooltips');
+	const enableTooltips = document.getElementById('setting_tooltips');
 	const tooltipsStyle = document.createElement('style');
 	document.body.appendChild(tooltipsStyle);
 	enableTooltips.onchange = e => {

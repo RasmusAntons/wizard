@@ -124,11 +124,13 @@ function createLevelBlock(level, unsaved) {
 	draggable.autoScroll = {target: container};
 }
 
-function loadLevels() {
+function loadLevels(cb) {
 	apiCall('/api/levels/').then(levels => {
 		for (const [id, level] of Object.entries(levels)) {
 			createLevelBlock(level, false);
 		}
+		if (cb)
+			cb();
 	});
 }
 
