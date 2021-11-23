@@ -49,6 +49,48 @@ input:disabled {
 	background-color: #51515b;
 }
 
+#create_discord_name_popup {
+	box-sizing: border-box;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	margin-left: -200px;
+	height: 123px;
+	margin-top: -88px;
+	background: #2F2F40;
+	z-index: 10001;
+	color: white;
+	padding-left: 15px;
+	padding-right: 15px;
+	border-bottom: solid 1px #000;
+	border-top: solid 1px #656475;
+	border-radius: 1px;
+	line-height: 32px;
+	display: none;
+}
+
+#unsaved_changes_popup {
+	box-sizing: border-box;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	margin-left: -200px;
+	height: 115px;
+	margin-top: -88px;
+	background: #2F2F40;
+	z-index: 10001;
+	color: white;
+	padding-left: 15px;
+	padding-right: 15px;
+	border-bottom: solid 1px #000;
+	border-top: solid 1px #656475;
+	border-radius: 1px;
+	line-height: 32px;
+	display: none;
+}
+
 #delete_popup {
 	box-sizing: border-box;
 	position: fixed;
@@ -62,6 +104,8 @@ input:disabled {
 	z-index: 10001;
 	color: white;
 	padding-left: 15px;
+	padding-right: 15px;
+	margin-right: 150px;
 	border-bottom: solid 1px #000;
 	border-top: solid 1px #656475;
 	border-radius: 1px;
@@ -88,11 +132,19 @@ input:disabled {
 	margin-right: 13px;
 }
 
-#popup_buttons button {
-	width: 190px;
+.popup_buttons button {
+	width: 181px;
 	height: 26px;
-	margin-left: -6px;
 	margin-top: 10px;
+	margin-left: 0px;
+}
+
+#create_discord_name_popup input {
+	width: 369px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 textarea {
