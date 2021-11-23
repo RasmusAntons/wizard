@@ -31,6 +31,8 @@ function createLine(startLevelId, endLevelId) {
 		endPlugColor: endColour,
 		gradient: true
 	});
+	for (let levelBlock of Object.values(levelBlocks))
+		levelBlock.style.cursor = 'grab';
 }
 
 function createLevelBlock(level, unsaved) {
@@ -195,23 +197,9 @@ function initLevels() {
 		}
 	};
 	document.getElementById('add_line_button').onclick = () => {
-		let img = document.createElement('img');
-		img.src = 'https://1000marken.net/wp-content/uploads/2021/01/CSGO-Logo.png';
-		img.style.position = 'fixed';
-		img.style.top = '10%';
-		img.style.left = '25%';
-		img.style.width = '25%';
-		img.style.zIndex = '90000';
-		img.style.background = 'rgba(255,255,0,0.3)';
-		document.body.appendChild(img);
-		setTimeout(() => {
-			document.body.removeChild(img);
-		}, 2500);
-		console.log('CSGO-MODE');
 		currentLine = [];
-		for (let levelBlock of Object.values(levelBlocks)) {
+		for (let levelBlock of Object.values(levelBlocks))
 			levelBlock.style.cursor = 'crosshair';
-		}
 	};
 	document.getElementById('container').addEventListener('scroll', AnimEvent.add(function () {
 		for (let line of Object.values(lines))
