@@ -80,6 +80,8 @@ function createLevelBlock(level, unsaved) {
 	levelBlock.onmousedown = e => {
 		e.stopPropagation();
 		if (currentLine) {
+			if (currentLine.includes(level.id))
+				return;
 			currentLine.push(level.id);
 			if (currentLine.length === 2) {
 				createLine(currentLine[0], currentLine[1]);
