@@ -22,7 +22,7 @@ function checkLevelChange(levelId) {
 function createLine(startLevelId, endLevelId) {
 	const newLine = new LeaderLine(levelBlocks[startLevelId], levelBlocks[endLevelId], {
 		startPlugColor: '#' + categoriesCurrent[levelsCurrent[startLevelId].category].colour.toString(16).padStart(6, '0'),
-		endPlugColor: '#' + categoriesCurrent[levelsCurrent[startLevelId].category].colour.toString(16).padStart(6, '0'),
+		endPlugColor: '#' + categoriesCurrent[levelsCurrent[endLevelId].category].colour.toString(16).padStart(6, '0'),
 		gradient: true
 	});
 	lines[startLevelId + endLevelId] = newLine;
