@@ -20,12 +20,17 @@ function checkLevelChange(levelId) {
 }
 
 function createLine(startLevelId, endLevelId) {
-	const newLine = new LeaderLine(levelBlocks[startLevelId], levelBlocks[endLevelId], {
-		startPlugColor: '#' + categoriesCurrent[levelsCurrent[startLevelId].category].colour.toString(16).padStart(6, '0'),
-		endPlugColor: '#' + categoriesCurrent[levelsCurrent[endLevelId].category].colour.toString(16).padStart(6, '0'),
+	let startColour = '#424255';
+	let endColour =  '#424255';
+	if (levelsCurrent[startLevelId].category)
+		startColour = '#' + categoriesCurrent[levelsCurrent[startLevelId].category].colour.toString(16).padStart(6, '0');
+	if (levelsCurrent[endLevelId].category)
+		endColour = '#' + categoriesCurrent[levelsCurrent[endLevelId].category].colour.toString(16).padStart(6, '0');
+	lines[startLevelId + endLevelId] = new LeaderLine(levelBlocks[startLevelId], levelBlocks[endLevelId], {
+		startPlugColor: startColour,
+		endPlugColor: endColour,
 		gradient: true
 	});
-	lines[startLevelId + endLevelId] = newLine;
 }
 
 function createLevelBlock(level, unsaved) {
