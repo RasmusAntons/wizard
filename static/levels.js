@@ -3,6 +3,9 @@ let levelsCurrent = {};
 let levelsChanged = {};
 let selectedLevelId;
 let levelBlocks = {};
+let lines = {};
+let currentLine = null;
+
 
 function checkLevelChange(levelId) {
 	const isChanged = compareObjects(levelsOriginal[levelId], levelsCurrent[levelId]);
@@ -14,6 +17,15 @@ function checkLevelChange(levelId) {
 	} else {
 		delete levelsChanged[levelId];
 	}
+}
+
+function createLine(startLevelId, endLevelId) {
+	const newLine = new LeaderLine(levelBlocks[startLevelId], levelBlocks[endLevelId], {
+		startPlugColor: '#' + categoriesCurrent[levelsCurrent[startLevelId].category].colour.toString(16).padStart(6, '0'),
+		endPlugColor: '#' + categoriesCurrent[levelsCurrent[startLevelId].category].colour.toString(16).padStart(6, '0'),
+		gradient: true
+	});
+	lines[startLevelId + endLevelId] = newLine;
 }
 
 function createLevelBlock(level, unsaved) {
@@ -62,6 +74,14 @@ function createLevelBlock(level, unsaved) {
 	checkForMakers();
 	levelBlock.onmousedown = e => {
 		e.stopPropagation();
+		if (currentLine) {
+			currentLine.push(level.id);
+			if (currentLine.length === 2) {
+				createLine(currentLine[0], currentLine[1]);
+				currentLine = null;
+			}
+			return;
+		}
 		selectedLevelId = level.id;
 		for (let selectedLevel of document.querySelectorAll('.selected'))
 			selectedLevel.classList.toggle('selected', false);
@@ -116,10 +136,14 @@ function createLevelBlock(level, unsaved) {
 			position.left = snappedX;
 			position.top = snappedY;
 		}
+		for (let line of Object.values(lines))
+			line.position();
 	};
 	draggable.onDragEnd = function (position) {
 		levelsCurrent[level.id].grid_location = [position.left + container.scrollLeft, position.top + container.scrollTop];
 		checkLevelChange(level.id);
+		for (let line of Object.values(lines))
+			line.position();
 	}
 	draggable.autoScroll = {target: container};
 }
@@ -163,6 +187,29 @@ function initLevels() {
 			pageOverlay.style.display = '';
 		}
 	};
+	document.getElementById('add_line_button').onclick = () => {
+		let img = document.createElement('img');
+		img.src = 'https://1000marken.net/wp-content/uploads/2021/01/CSGO-Logo.png';
+		img.style.position = 'fixed';
+		img.style.top = '10%';
+		img.style.left = '25%';
+		img.style.width = '25%';
+		img.style.zIndex = '90000';
+		img.style.background = 'rgba(255,255,0,0.3)';
+		document.body.appendChild(img);
+		setTimeout(() => {
+			document.body.removeChild(img);
+		}, 2500);
+		console.log('CSGO-MODE');
+		currentLine = [];
+		for (let levelBlock of Object.values(levelBlocks)) {
+			levelBlock.style.cursor = 'crosshair';
+		}
+	};
+	document.getElementById('container').addEventListener('scroll', AnimEvent.add(function () {
+		for (let line of Object.values(lines))
+			line.position();
+	}));
 	document.getElementById('background').onmousedown = e => {
 		selectedLevelId = undefined;
 		document.getElementById('toolbar-level').style.display = '';
