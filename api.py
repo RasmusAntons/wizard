@@ -103,6 +103,8 @@ async def patch_levels(request):
         body = await request.json()
     except json.JSONDecodeError:
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
+    new_relations = {}
+    db_levels = {}
     for level_id, level_body in body.items():
         if level_body is None or level_body.get('id') is None:
             delete_channel = False if level_body is None else level_body.get('delete_channel')
@@ -114,6 +116,7 @@ async def patch_levels(request):
                 return error_response
         else:
             level = db.Level(id=level_id)
+            db_levels[level_id] = level
             level.name = level_body.get('name')
             level.discord_channel = level_body.get('discord_channel')
             level.discord_role = level_body.get('discord_role')
@@ -131,7 +134,21 @@ async def patch_levels(request):
                 for new_text in new_texts:
                     obj = cls(level_id=level_id, text=new_text)
                     db.session.add(obj)
+            if level_body.get('child_levels'):
+                new_relations[level_id] = level_body.get('child_levels')
             db.session.merge(level)
+    for parent_level_id, child_level_ids in new_relations.items():
+        parent_level = db_levels[parent_level_id]
+        existing_child_levels = [level for level in parent_level.child_levels]
+        for child_level_id in child_level_ids:
+            child_level = db_levels[child_level_id]
+            if child_level in existing_child_levels:
+                existing_child_levels.remove(child_level)
+            else:
+                parent_level.child_levels.append(child_level)
+        for removed_child_level in existing_child_levels:
+            parent_level.child_levels.remove(db_levels[removed_child_level])
+        db.session.merge(parent_level)
     try:
         db.session.commit()
     except Exception as e:

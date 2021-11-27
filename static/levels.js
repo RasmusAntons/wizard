@@ -19,18 +19,26 @@ function checkLevelChange(levelId) {
 	}
 }
 
-function createLine(startLevelId, endLevelId) {
-	let startColour = '#424255';
-	let endColour =  '#424255';
-	if (levelsCurrent[startLevelId].category)
-		startColour = '#' + categoriesCurrent[levelsCurrent[startLevelId].category].colour.toString(16).padStart(6, '0');
-	if (levelsCurrent[endLevelId].category)
-		endColour = '#' + categoriesCurrent[levelsCurrent[endLevelId].category].colour.toString(16).padStart(6, '0');
-	lines[startLevelId + endLevelId] = new LeaderLine(levelBlocks[startLevelId], levelBlocks[endLevelId], {
-		startPlugColor: startColour,
-		endPlugColor: endColour,
-		gradient: true
-	});
+function createLine(startLevelId, endLevelId, addToLevels) {
+	if (!(startLevelId + endLevelId in lines)) {
+		let startColour = '#424255';
+		let endColour = '#424255';
+		if (levelsCurrent[startLevelId].category)
+			startColour = '#' + categoriesCurrent[levelsCurrent[startLevelId].category].colour.toString(16).padStart(6, '0');
+		if (levelsCurrent[endLevelId].category)
+			endColour = '#' + categoriesCurrent[levelsCurrent[endLevelId].category].colour.toString(16).padStart(6, '0');
+		lines[startLevelId + endLevelId] = new LeaderLine(levelBlocks[startLevelId], levelBlocks[endLevelId], {
+			startPlugColor: startColour,
+			endPlugColor: endColour,
+			gradient: true
+		});
+		if (addToLevels) {
+			levelsCurrent[startLevelId].child_levels.push(endLevelId);
+			checkLevelChange(startLevelId);
+			levelsCurrent[endLevelId].parent_levels.push(startLevelId);
+			checkLevelChange(endLevelId);
+		}
+	}
 	for (let levelBlock of Object.values(levelBlocks))
 		levelBlock.style.cursor = 'grab';
 }
@@ -79,6 +87,14 @@ function createLevelBlock(level, unsaved) {
 			levelBlock.classList.toggle(`has_${discordIdType}`, !unsetValues.includes(levelsCurrent[level.id][discordIdType]));
 	}
 	checkForMakers();
+	for (let parentLevelId of level.parent_levels) {
+		if (parentLevelId in levelsCurrent && !(parentLevelId + level.id in lines))
+			createLine(parentLevelId, level.id, false);
+	}
+	for (let childLevelId of level.child_levels) {
+		if (childLevelId in levelsCurrent && !(level.id + childLevelId in lines))
+			createLine(level.id, childLevelId, false);
+	}
 	levelBlock.onmousedown = e => {
 		e.stopPropagation();
 		if (currentLine) {
@@ -86,7 +102,7 @@ function createLevelBlock(level, unsaved) {
 				return;
 			currentLine.push(level.id);
 			if (currentLine.length === 2) {
-				createLine(currentLine[0], currentLine[1]);
+				createLine(currentLine[0], currentLine[1], true);
 				currentLine = null;
 			}
 			return;
