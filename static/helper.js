@@ -114,11 +114,12 @@ document.addEventListener('DOMContentLoaded', e => {
 						}
 					}
 					levelsChanged = {};
+					console.log('reset levels changed');
 				}
 			});
 		} else {
 			levelRequest = new Promise(r => r());
 		}
-		settingRequest.then(categoryRequest).then(levelRequest).then(() => console.log('save complete'));
+		settingRequest.then(() => categoryRequest).then(() => levelRequest).then(() => checkChanges());
 	}
 });
