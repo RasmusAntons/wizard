@@ -114,7 +114,6 @@ document.addEventListener('DOMContentLoaded', e => {
 						}
 					}
 					levelsChanged = {};
-					console.log('reset levels changed');
 				}
 			});
 		} else {
