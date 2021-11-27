@@ -59,74 +59,59 @@ document.addEventListener('DOMContentLoaded', e => {
 	initCategories();
 	initSettings();
 	document.getElementById('save_button').onclick = () => {
-		const settingRequests = [];
+		let settingRequest, categoryRequest, levelRequest;
 		if (Object.keys(settingsChanged).length) {
-			settingRequests.push(
-				apiCall(`/api/settings`, 'PATCH', settingsChanged).then(r => {
-					settingsOriginal = cloneObject(settingsCurrent);
-					if ('key' in settingsChanged)
-						localStorage.setItem('key', settingsChanged['key']);
-					settingsChanged = {};
-					checkSettingChange();
-				})
-			);
-		}
-		Promise.all(settingRequests).then(() => {
-			const categoryRequests = [];
-			for (let [categoryId, categoryChanged] of Object.entries(categoriesChanged)) {
-				const method = categoryChanged.id ? 'PUT' : 'DELETE';
-				categoryRequests.push(
-					apiCall(`/api/categories/${categoryId}`, method, categoryChanged).then(r => {
-						if (r.message === 'ok') {
-							if (categoryChanged.id) {
-								categoriesOriginal[categoryId] = cloneObject(categoryChanged);
-							} else {
-								delete categoriesOriginal[categoryId];
-								delete categoriesCurrent[categoryId];
-							}
-							delete categoriesChanged[categoryId];
-							checkCategoryChange();
-						} else {
-							alert(r.error);
-						}
-					})
-				);
-			}
-			Promise.all(categoryRequests).then(() => {
-				const levelRequests = [];
-				for (let [levelId, levelChanged] of Object.entries(levelsChanged)) {
-					const levelBlock = levelBlocks[levelId];
-					if (levelChanged.id) {
-						levelRequests.push(
-							apiCall(`/api/levels/${levelId}`, 'PUT', levelChanged).then(r => {
-								if (r.message === 'ok') {
-									levelsOriginal[levelId] = cloneObject(levelChanged);
-									levelBlock.classList.toggle('edited', false);
-									delete levelsChanged[levelId];
-								} else {
-									levelBlock.classList.toggle('error', true);
-								}
-							})
-						);
-					} else {
-						levelRequests.push(
-							apiCall(`/api/levels/${levelId}`, 'DELETE', levelChanged).then(r => {
-								if (r.error) {
-									alert(r.error);
-								} else {
-									delete levelsOriginal[levelId];
-									delete levelsCurrent[levelId];
-									delete levelsChanged[levelId];
-								}
-							})
-						);
-					}
-				}
-				Promise.all(levelRequests).then(() => {
-					console.log('save complete');
-				});
+			settingRequest = apiCall(`/api/settings`, 'PATCH', settingsChanged).then(r => {
+				settingsOriginal = cloneObject(settingsCurrent);
+				if ('key' in settingsChanged)
+					localStorage.setItem('key', settingsChanged['key']);
+				settingsChanged = {};
+				checkSettingChange();
 			});
-		});
+		} else {
+			settingRequest = new Promise(r => r());
+		}
+		if (Object.keys(categoriesChanged).length > 0) {
+			categoryRequest = apiCall('/api/categories/', 'PATCH', categoriesChanged).then(r => {
+				if (r.error) {
+					alert(r.error);
+				} else {
+					for (let [categoryId, category] of Object.entries(categoriesChanged)) {
+						if (category.id) {
+							categoriesOriginal[categoryId] = cloneObject(category);
+						} else {
+							delete categoriesOriginal[categoryId];
+							delete categoriesCurrent[categoryId];
+						}
+					}
+					checkCategoryChange();
+					categoriesChanged = {};
+				}
+			});
+		} else {
+			categoryRequest = new Promise(r => r());
+		}
+		if (Object.keys(levelsChanged).length > 0) {
+			levelRequest = apiCall('/api/levels/', 'PATCH', levelsChanged).then(r => {
+				if (r.error) {
+					alert(r.error);
+				} else {
+					for (let [levelId, level] of Object.entries(levelsChanged)) {
+						if (level.id) {
+							levelsOriginal[levelId] = cloneObject(level);
+							levelBlocks[levelId].classList.toggle('edited', false);
+						} else {
+							delete levelsOriginal[levelId];
+							delete levelsCurrent[levelId];
+						}
+					}
+					levelsChanged = {};
+				}
+			});
+		} else {
+			levelRequest = new Promise(r => r());
+		}
+		settingRequest.then(categoryRequest).then(levelRequest).then(() => console.log('save complete'));
 	}
 
 	for (let [buttonId, inputId, targetKey] of [
