@@ -1,9 +1,9 @@
-import nextcord.ext
+import discord.ext
 import discord_ui
 import random
 
 
-client = nextcord.ext.commands.Bot("!")
+client = discord.ext.commands.Bot("!")
 ui = discord_ui.UI(client)
 
 

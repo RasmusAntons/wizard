@@ -1,9 +1,8 @@
 import json
 import traceback
-import uuid
 
 import aiohttp.web
-import nextcord
+import discord
 
 import db
 import discord_bot
@@ -80,7 +79,7 @@ async def delete_level(level_id, delete_channel=False, delete_role=False, delete
         try:
             guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
             if delete_channel and level.discord_channel:
-                channel = guild.get_channel(level.discord_channel) or await guild.fetch_channel(level.discord_channel)
+                channel = guild.get_channel(level.discord_channel)
                 if channel:
                     await channel.delete()
             if delete_role and level.discord_role:
@@ -88,10 +87,10 @@ async def delete_level(level_id, delete_channel=False, delete_role=False, delete
                 if role:
                     await role.delete()
             if delete_extra_role and level.extra_discord_role:
-                role = guild.get_channel(level.extra_discord_role) or await guild.fetch_channel(level.extra_discord_role)
+                role = guild.get_channel(level.extra_discord_role)
                 if role:
                     await role.delete()
-        except nextcord.HTTPException:
+        except discord.HTTPException:
             traceback.print_exc()
             return aiohttp.web.json_response({'error': 'deleting discord resources failed'}, status=500)
     return None
@@ -175,10 +174,10 @@ async def post_discord_channels(request):
         guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
         category = None
         if category_id is not None:
-            category = guild.get_channel(category_id) or await guild.fetch_channel(category_id)
-        assert category is None or category.type == nextcord.ChannelType.category
+            category = guild.get_channel(category_id)
+        assert category is None or category.type == discord.ChannelType.category
         channel = await guild.create_text_channel(name, category=category)
-    except nextcord.HTTPException:
+    except discord.HTTPException:
         traceback.print_exc()
         return aiohttp.web.json_response({'error': 'creating channel failed'}, status=500)
     return aiohttp.web.json_response({'id': str(channel.id)})
@@ -199,7 +198,7 @@ async def post_discord_roles(request):
     try:
         guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
         role = await guild.create_role(name=name)
-    except nextcord.HTTPException:
+    except discord.HTTPException:
         traceback.print_exc()
         return aiohttp.web.json_response({'error': 'creating role failed'}, status=500)
     return aiohttp.web.json_response({'id': str(role.id)})
@@ -223,7 +222,7 @@ async def post_discord_categories(request):
     try:
         guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
         category = await guild.create_category(name=name)
-    except nextcord.HTTPException:
+    except discord.HTTPException:
         traceback.print_exc()
         return aiohttp.web.json_response({'error': 'creating role failed'}, status=500)
     return aiohttp.web.json_response({'id': str(category.id)})
