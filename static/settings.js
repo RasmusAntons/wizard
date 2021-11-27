@@ -13,6 +13,7 @@ function checkSettingChange(settingKey) {
 	}
 	document.getElementById('settings-menu-button').classList.toggle('changed',
 		Object.keys(settingsChanged).length);
+	checkChanges();
 }
 
 function loadSettings(cb) {

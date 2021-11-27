@@ -18,6 +18,7 @@ function checkLevelChange(levelId) {
 	} else {
 		delete levelsChanged[levelId];
 	}
+	checkChanges();
 }
 
 function checkLevelMarkerChange(levelId) {

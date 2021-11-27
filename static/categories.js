@@ -18,6 +18,7 @@ function checkCategoryChange(categoryId) {
 	}
 	document.getElementById('category-menu-button').classList.toggle('changed',
 		Object.keys(categoriesChanged).length);
+	checkChanges();
 }
 
 function createCategory(category, unsaved) {

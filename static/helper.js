@@ -17,6 +17,14 @@ function uuidv4() {
 	);
 }
 
+function checkChanges() {
+	const haveSettingsChanged = Object.keys(settingsChanged).length > 0;
+	const haveCategoriesChanged = Object.keys(categoriesChanged).length > 0;
+	const haveLevelsChanged = Object.keys(levelsChanged).length > 0;
+	const hasSomethingChanged = haveSettingsChanged || haveCategoriesChanged || haveLevelsChanged;
+	document.getElementById('save_button').classList.toggle('changed', hasSomethingChanged);
+}
+
 function apiCall(path, method, data) {
 	const key = localStorage.getItem('key');
 	const url = new URL(path, document.location.origin);
