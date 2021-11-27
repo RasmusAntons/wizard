@@ -20,6 +20,15 @@ function checkLevelChange(levelId) {
 	}
 }
 
+function checkLevelMarkerChange(levelId) {
+	const levelBlock = levelBlocks[levelId];
+	const level = levelsCurrent[levelId];
+	for (let solutionType of ['solutions', 'unlocks'])
+		levelBlock.classList.toggle(`has_${solutionType}`, level[solutionType].length > 0);
+	for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role'])
+		levelBlock.classList.toggle(`has_${discordIdType}`, !unsetValues.includes(level[discordIdType]));
+}
+
 function createLine(startLevelId, endLevelId, addToLevels) {
 	if (endLevelId + startLevelId in lines)
 		deleteLine(endLevelId, startLevelId);
@@ -95,13 +104,7 @@ function createLevelBlock(level, unsaved) {
 		}
 		markersDiv.appendChild(markerDiv);
 	}
-	let checkForMakers = () => {
-		for (let solutionType of ['solutions', 'unlocks'])
-			levelBlock.classList.toggle(`has_${solutionType}`, levelsCurrent[level.id][solutionType].length > 0);
-		for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role'])
-			levelBlock.classList.toggle(`has_${discordIdType}`, !unsetValues.includes(levelsCurrent[level.id][discordIdType]));
-	}
-	checkForMakers();
+	checkLevelMarkerChange(level.id);
 	for (let parentLevelId of level.parent_levels) {
 		if (parentLevelId in levelsCurrent && !(parentLevelId + level.id in lines))
 			createLine(parentLevelId, level.id, false);
@@ -138,7 +141,7 @@ function createLevelBlock(level, unsaved) {
 			levelsCurrent[level.id].name = levelNameInput.value;
 			levelName.textContent = levelsCurrent[level.id].name;
 			checkLevelChange(level.id);
-			checkForMakers();
+			checkLevelMarkerChange(level.id);
 		};
 		for (let solutionType of ['solutions', 'unlocks']) {
 			const solutionsInput = document.getElementById(`level_${solutionType}`);
@@ -146,7 +149,7 @@ function createLevelBlock(level, unsaved) {
 			solutionsInput.oninput = solutionsInput.onchange = () => {
 				levelsCurrent[level.id][solutionType] = solutionsInput.value.split('\n').filter(e => e);
 				checkLevelChange(level.id);
-				checkForMakers()
+				checkLevelMarkerChange(level.id);
 			};
 		}
 		for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role']) {
@@ -155,7 +158,7 @@ function createLevelBlock(level, unsaved) {
 			discordIdInput.oninput = discordIdInput.onchange = () => {
 				levelsCurrent[level.id][discordIdType] = discordIdInput.value;
 				checkLevelChange(level.id);
-				checkForMakers()
+				checkLevelMarkerChange(level.id);
 			}
 		}
 		const levelCategoryList = document.getElementById('selectable_category_list');
@@ -246,6 +249,56 @@ function initLevels() {
 		for (let levelBlock of Object.values(levelBlocks))
 			levelBlock.style.cursor = 'crosshair';
 	};
+	for (let [buttonId, inputId, targetKey] of [
+		['level_create_channel', 'level_discord_channel', 'discord_channel'],
+		['level_create_role', 'level_discord_role', 'discord_role'],
+		['level_create_extra_role', 'level_extra_discord_role', 'discord_extra_role']
+	]) {
+		const buttonElem = document.getElementById(buttonId);
+		const inputElem = document.getElementById(inputId);
+		buttonElem.onclick = () => {
+			const targetLevelId = selectedLevelId;
+			const namePopup = document.getElementById('name_popup');
+			const pageOverlay = document.getElementById('page-overlay')
+			const okButton = document.getElementById('object_name_ok_button');
+			const cancelButton = document.getElementById('object_name_cancel_button');
+			namePopup.style.display = 'block';
+			pageOverlay.style.display = 'block';
+			document.getElementById('name_popup_name').textContent = levelsCurrent[selectedLevelId].name;
+			document.getElementById('name_popup_object').textContent = targetKey.replaceAll('_', ' ');
+			okButton.onclick = () => {
+				const objectName = document.getElementById('object_name').value;
+				if (!objectName)
+					return;
+				const data = {name: objectName};
+				if (levelsCurrent[targetLevelId].category) {
+					const category = categoriesCurrent[levelsCurrent[targetLevelId].category];
+					if (category.discord_category)
+						data['discord_category'] = category.discord_category;
+				}
+				const apiPath = (buttonId === 'level_create_channel') ? '/api/channels/' : '/api/roles/';
+				apiCall(apiPath, 'POST', data).then(r => {
+					if (r.error) {
+						alert(r.error);
+					} else {
+						levelsCurrent[targetLevelId][targetKey] = r.id;
+						if (selectedLevelId === targetLevelId)
+							inputElem.value = r.id;
+						levelBlocks[targetLevelId].classList.toggle('edited', true);
+						namePopup.style.display = '';
+						pageOverlay.style.display = '';
+						checkLevelChange(targetLevelId);
+						checkLevelMarkerChange(targetLevelId);
+					}
+				});
+				okButton.onclick = undefined;
+			};
+			cancelButton.onclick = () => {
+				namePopup.style.display = '';
+				pageOverlay.style.display = '';
+			};
+		};
+	}
 	document.getElementById('container').addEventListener('scroll', AnimEvent.add(function () {
 		for (let line of Object.values(lines))
 			line.position();

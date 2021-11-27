@@ -84,8 +84,8 @@ document.addEventListener('DOMContentLoaded', e => {
 							delete categoriesCurrent[categoryId];
 						}
 					}
-					checkCategoryChange();
 					categoriesChanged = {};
+					checkCategoryChange();
 				}
 			});
 		} else {
@@ -112,27 +112,5 @@ document.addEventListener('DOMContentLoaded', e => {
 			levelRequest = new Promise(r => r());
 		}
 		settingRequest.then(categoryRequest).then(levelRequest).then(() => console.log('save complete'));
-	}
-
-	for (let [buttonId, inputId, targetKey] of [
-		['level_create_channel', 'level_discord_channel', 'discord_channel'],
-		['level_create_role', 'level_discord_role', 'discord_role'],
-		['level_create_extra_role', 'level_extra_discord_role', 'discord_extra_role']
-	]) {
-		const buttonElem = document.getElementById(buttonId);
-		const inputElem = document.getElementById(inputId);
-		buttonElem.onclick = () => {
-			const targetLevelId = selectedLevelId;
-			const channelName = prompt('Channel name');
-			if (channelName === null)
-				return;
-			const apiPath = (buttonId === 'level_create_channel') ? '/api/channels/' : '/api/roles/';
-			apiCall(apiPath, 'POST', {'name': channelName}).then(r => {
-				levelsCurrent[targetLevelId][targetKey] = r.id;
-				if (selectedLevelId === targetLevelId)
-					inputElem.value = r.id;
-				levelBlocks[targetLevelId].classList.toggle('edited', true);
-			});
-		};
 	}
 });

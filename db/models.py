@@ -40,7 +40,7 @@ class Level(Base):
             'discord_channel': self.discord_channel,
             'discord_role': self.discord_role,
             'category': self.category_id,
-            'extra_discord_role': self.discord_role,
+            'extra_discord_role': self.extra_discord_role,
             'grid_location': (self.grid_x, self.grid_y)
         }
 

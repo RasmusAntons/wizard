@@ -49,7 +49,7 @@ input:disabled {
 	background-color: #51515b;
 }
 
-#create_discord_name_popup {
+#name_popup {
 	box-sizing: border-box;
 	position: fixed;
 	top: 50%;
@@ -139,7 +139,7 @@ input:disabled {
 	margin-left: 0px;
 }
 
-#create_discord_name_popup input {
+#popup input {
 	width: 369px;
 	margin-top: 10px;
 	margin-bottom: 10px;
