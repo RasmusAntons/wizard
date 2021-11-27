@@ -159,7 +159,7 @@ async def patch_levels(request):
 
 
 @protected
-async def post_channels(request):
+async def post_discord_channels(request):
     try:
         body = await request.json()
         name = body['name']
@@ -181,11 +181,11 @@ async def post_channels(request):
     except nextcord.HTTPException:
         traceback.print_exc()
         return aiohttp.web.json_response({'error': 'creating channel failed'}, status=500)
-    return aiohttp.web.json_response({'id': channel.id})
+    return aiohttp.web.json_response({'id': str(channel.id)})
 
 
 @protected
-async def post_roles(request):
+async def post_discord_roles(request):
     try:
         body = await request.json()
         name = body['name']
@@ -202,7 +202,31 @@ async def post_roles(request):
     except nextcord.HTTPException:
         traceback.print_exc()
         return aiohttp.web.json_response({'error': 'creating role failed'}, status=500)
-    return aiohttp.web.json_response({'id': role.id})
+    return aiohttp.web.json_response({'id': str(role.id)})
+
+
+@protected
+async def post_discord_categories(request):
+    """
+    TODO: post_discord_roles and post_discord_channels are almost identical, create decorator for all of these?
+    """
+    try:
+        body = await request.json()
+        name = body['name']
+    except (json.JSONDecodeError, KeyError):
+        traceback.print_exc()
+        return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
+    guild_id = db.get_setting('guild')
+    if guild_id is None:
+        traceback.print_exc()
+        return aiohttp.web.json_response({'error': '"guild" not set"'}, status=400)
+    try:
+        guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+        category = await guild.create_category(name=name)
+    except nextcord.HTTPException:
+        traceback.print_exc()
+        return aiohttp.web.json_response({'error': 'creating role failed'}, status=500)
+    return aiohttp.web.json_response({'id': str(category.id)})
 
 
 @protected
@@ -253,8 +277,9 @@ async def api_server():
         aiohttp.web.patch('/api/settings', patch_settings),
         aiohttp.web.get('/api/levels/', get_levels),
         aiohttp.web.patch('/api/levels/', patch_levels),
-        aiohttp.web.post('/api/channels/', post_channels),
-        aiohttp.web.post('/api/roles/', post_roles),
+        aiohttp.web.post('/api/discord/channels/', post_discord_channels),
+        aiohttp.web.post('/api/discord/roles/', post_discord_roles),
+        aiohttp.web.post('/api/discord/categories/', post_discord_categories),
         aiohttp.web.get('/api/categories/', get_categories),
         aiohttp.web.patch('/api/categories/', patch_categories),
         aiohttp.web.get('/', get_index),

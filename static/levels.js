@@ -263,7 +263,7 @@ function initLevels() {
 		buttonElem.onclick = () => {
 			const targetLevelId = selectedLevelId;
 			const namePopup = document.getElementById('name_popup');
-			const pageOverlay = document.getElementById('page-overlay')
+			const pageOverlay = document.getElementById('page-overlay');
 			const okButton = document.getElementById('object_name_ok_button');
 			const cancelButton = document.getElementById('object_name_cancel_button');
 			namePopup.style.display = 'block';
@@ -280,7 +280,7 @@ function initLevels() {
 					if (category.discord_category)
 						data['discord_category'] = category.discord_category;
 				}
-				const apiPath = (buttonId === 'level_create_channel') ? '/api/channels/' : '/api/roles/';
+				const apiPath = (buttonId === 'level_create_channel') ? '/api/discord/channels/' : '/api/discord/roles/';
 				apiCall(apiPath, 'POST', data).then(r => {
 					if (r.error) {
 						alert(r.error);
@@ -288,7 +288,6 @@ function initLevels() {
 						levelsCurrent[targetLevelId][targetKey] = r.id;
 						if (selectedLevelId === targetLevelId)
 							inputElem.value = r.id;
-						levelBlocks[targetLevelId].classList.toggle('edited', true);
 						namePopup.style.display = '';
 						pageOverlay.style.display = '';
 						checkLevelChange(targetLevelId);

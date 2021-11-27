@@ -48,11 +48,45 @@ function createCategory(category, unsaved) {
 			checkCategoryChange(category.id);
 		};
 		const categoryIdInput = document.getElementById('discord_category_id');
-		categoryIdInput.value = category.discord_category;
+		categoryIdInput.value = categoriesCurrent[category.id].discord_category;
 		categoryIdInput.disabled = false;
 		categoryIdInput.oninput = categoryIdInput.onchange = () => {
 			categoriesCurrent[category.id].discord_category = categoryIdInput.value;
 			checkCategoryChange(category.id);
+		};
+		const categoryCreateButton = document.getElementById('discord_category_create');
+		categoryCreateButton.disabled = false;
+		categoryCreateButton.onclick = () => {
+			const namePopup = document.getElementById('name_popup');
+			const pageOverlay = document.getElementById('page-overlay');
+			const okButton = document.getElementById('object_name_ok_button');
+			const cancelButton = document.getElementById('object_name_cancel_button');
+			namePopup.style.display = 'block';
+			pageOverlay.style.display = 'block';
+			document.getElementById('name_popup_name').textContent = categoriesCurrent[category.id].name;
+			document.getElementById('name_popup_object').textContent = 'discord category';
+			okButton.onclick = () => {
+				const objectName = document.getElementById('object_name').value;
+				if (!objectName)
+					return;
+				apiCall('/api/discord/categories/', 'POST', {'name': objectName}).then(r => {
+					if (r.error) {
+						alert(r.error);
+					} else {
+						categoriesCurrent[category.id].discord_category = r.id;
+						if (selectedCategoryId === category.id)
+							categoryIdInput.value = r.id;
+						namePopup.style.display = '';
+						pageOverlay.style.display = '';
+						checkCategoryChange(category.id);
+					}
+				});
+				okButton.onclick = undefined;
+			};
+			cancelButton.onclick = () => {
+				namePopup.style.display = '';
+				pageOverlay.style.display = '';
+			};
 		};
 		const categoryColourInput = document.getElementById('discord_category_color');
 		categoryColourInput.value = '#' + categoriesCurrent[category.id].colour.toString(16).padStart(6, '0');
@@ -145,6 +179,7 @@ function initCategories() {
 		categoryColourInput.disabled = true;
 		const categoryRemoveButton = document.getElementById('remove_category_button');
 		categoryRemoveButton.disabled = true;
+		document.getElementById('discord_category_create').disabled = true;
 		for (let selectedLevel of document.querySelectorAll('.selected'))
 			selectedLevel.classList.toggle('selected', false);
 	};

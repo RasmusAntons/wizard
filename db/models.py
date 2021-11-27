@@ -24,7 +24,7 @@ class Level(Base):
     discord_channel = Column(String(18), nullable=True)
     discord_role = Column(String(18), nullable=True)
     extra_discord_role = Column(String(18), nullable=True)
-    category_id = Column(Integer, ForeignKey('category.id', ondelete='SET NULL'))
+    category_id = Column(String(36), ForeignKey('category.id', ondelete='SET NULL'))
     category = relationship('Category')
     grid_x = Column(Integer, nullable=True)
     grid_y = Column(Integer, nullable=True)
@@ -37,10 +37,10 @@ class Level(Base):
             'child_levels': [child_level.id for child_level in self.child_levels],
             'solutions': [solution.text for solution in self.solutions],
             'unlocks': [unlock.text for unlock in self.unlocks],
-            'discord_channel': self.discord_channel,
-            'discord_role': self.discord_role,
+            'discord_channel': str(self.discord_channel) if self.discord_channel is not None else None,
+            'discord_role': str(self.discord_role) if self.discord_role is not None else None,
             'category': self.category_id,
-            'extra_discord_role': self.extra_discord_role,
+            'extra_discord_role': str(self.extra_discord_role) if self.extra_discord_role is not None else None,
             'grid_location': (self.grid_x, self.grid_y)
         }
 
@@ -70,7 +70,7 @@ class Category(Base):
         return {
             'id': self.id,
             'name': self.name,
-            'discord_category': self.discord_category,
+            'discord_category': str(self.discord_category) if self.discord_category is not None else None,
             'colour': self.colour
         }
 
