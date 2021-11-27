@@ -212,6 +212,10 @@ function initLevels() {
 		pageOverlay.style.display = 'block';
 		deletePopupName.textContent = levelsCurrent[selectedLevelId].name;
 		document.getElementById('level_delete_ok_button').onclick = () => {
+			for (let parentLevelId of levelsCurrent[selectedLevelId].parent_levels)
+				deleteLine(parentLevelId, selectedLevelId);
+			for (let chileLevelId of levelsCurrent[selectedLevelId].child_levels)
+				deleteLine(selectedLevelId, chileLevelId);
 			levelsCurrent[selectedLevelId] = {
 				delete_channel: document.getElementById('level_delete_channel').checked,
 				delete_role: document.getElementById('level_delete_role').checked,
