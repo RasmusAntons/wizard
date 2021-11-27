@@ -63,8 +63,17 @@ function createCategory(category, unsaved) {
 			categoryListItems[category.id].style.borderLeftColor = categoryColourInput.value;
 			levelCategoryListItems[category.id].style.borderLeftColor = categoryColourInput.value;
 			for (let level of Object.values(levelsCurrent)) {
-				if (level.category === category.id)
+				if (level.category === category.id) {
 					levelBlocks[level.id].getElementsByClassName('markers-div')[0].style.borderTopColor = categoryColourInput.value;
+					for (let parentLevelId of level.parent_levels) {
+						if (parentLevelId + level.id in lines)
+							lines[parentLevelId + level.id].endPlugColor = categoryColourInput.value;
+					}
+					for (let childLevelId of level.child_levels) {
+						if (selectedLevelId + childLevelId in lines)
+							lines[level.id + childLevelId].startPlugColor = categoryColourInput.value;
+					}
+				}
 			}
 			checkCategoryChange(category.id);
 		};
@@ -89,8 +98,16 @@ function createCategory(category, unsaved) {
 	levelCategoryListItems[category.id] = levelCategoryListItem;
 	levelCategoryListItem.onclick = () => {
 		levelsCurrent[selectedLevelId].category = category.id;
-		levelBlocks[selectedLevelId].getElementsByClassName('markers-div')[0].style.borderTopColor =
-			'#' + categoriesCurrent[category.id].colour.toString(16).padStart(6, '0');
+		const cssColour = '#' + categoriesCurrent[category.id].colour.toString(16).padStart(6, '0');
+		levelBlocks[selectedLevelId].getElementsByClassName('markers-div')[0].style.borderTopColor = cssColour;
+		for (let parentLevelId of levelsCurrent[selectedLevelId].parent_levels) {
+			if (parentLevelId + selectedLevelId in lines)
+				lines[parentLevelId + selectedLevelId].endPlugColor = cssColour;
+		}
+		for (let childLevelId of levelsCurrent[selectedLevelId].child_levels) {
+			if (selectedLevelId + childLevelId in lines)
+				lines[selectedLevelId + childLevelId].startPlugColor = cssColour;
+		}
 		checkLevelChange(selectedLevelId);
 		for (let otherLevelCategoryListItem of levelCategoryList.getElementsByTagName('li')) {
 			otherLevelCategoryListItem.classList.remove('selected-category');
