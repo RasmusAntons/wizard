@@ -57,6 +57,8 @@ function createLine(startLevelId, endLevelId, addToLevels) {
 
 function deleteLine(startLevelId, endLevelId) {
 	const line = lines[startLevelId + endLevelId];
+	if (!line && (endLevelId + startLevelId) in lines)
+		deleteLine(endLevelId, startLevelId);
 	if (line) {
 		levelsCurrent[startLevelId].child_levels = levelsCurrent[startLevelId].child_levels.filter(e => e !== endLevelId);
 		checkLevelChange(startLevelId);
@@ -65,6 +67,8 @@ function deleteLine(startLevelId, endLevelId) {
 		line.remove();
 		delete lines[startLevelId + endLevelId];
 	}
+	for (let levelBlock of Object.values(levelBlocks))
+		levelBlock.style.cursor = 'grab';
 }
 
 function createLevelBlock(level, unsaved) {
