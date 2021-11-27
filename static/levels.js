@@ -5,6 +5,7 @@ let selectedLevelId;
 let levelBlocks = {};
 let lines = {};
 let currentLine = null;
+let lineMode = null;
 
 
 function checkLevelChange(levelId) {
@@ -41,6 +42,18 @@ function createLine(startLevelId, endLevelId, addToLevels) {
 	}
 	for (let levelBlock of Object.values(levelBlocks))
 		levelBlock.style.cursor = 'grab';
+}
+
+function deleteLine(startLevelId, endLevelId) {
+	const line = lines[startLevelId + endLevelId];
+	if (line) {
+		levelsCurrent[startLevelId].child_levels = levelsCurrent[startLevelId].child_levels.filter(e => e !== endLevelId);
+		checkLevelChange(startLevelId);
+		levelsCurrent[endLevelId].parent_levels = levelsCurrent[endLevelId].parent_levels.filter(e => e !== startLevelId);
+		checkLevelChange(endLevelId);
+		line.remove();
+		delete lines[startLevelId + endLevelId];
+	}
 }
 
 function createLevelBlock(level, unsaved) {
@@ -102,7 +115,10 @@ function createLevelBlock(level, unsaved) {
 				return;
 			currentLine.push(level.id);
 			if (currentLine.length === 2) {
-				createLine(currentLine[0], currentLine[1], true);
+				if (lineMode === 'add')
+					createLine(currentLine[0], currentLine[1], true);
+				else if (lineMode === 'delete')
+					deleteLine(currentLine[0], currentLine[1], true);
 				currentLine = null;
 			}
 			return;
@@ -214,6 +230,13 @@ function initLevels() {
 	};
 	document.getElementById('add_line_button').onclick = () => {
 		currentLine = [];
+		lineMode = 'add';
+		for (let levelBlock of Object.values(levelBlocks))
+			levelBlock.style.cursor = 'crosshair';
+	};
+	document.getElementById('delete_line_button').onclick = () => {
+		currentLine = [];
+		lineMode = 'delete';
 		for (let levelBlock of Object.values(levelBlocks))
 			levelBlock.style.cursor = 'crosshair';
 	};
