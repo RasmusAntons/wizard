@@ -21,6 +21,8 @@ function checkLevelChange(levelId) {
 }
 
 function createLine(startLevelId, endLevelId, addToLevels) {
+	if (endLevelId + startLevelId in lines)
+		deleteLine(endLevelId, startLevelId);
 	if (!(startLevelId + endLevelId in lines)) {
 		let startColour = '#424255';
 		let endColour = '#424255';
