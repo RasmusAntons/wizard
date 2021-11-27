@@ -17,12 +17,13 @@ function uuidv4() {
 	);
 }
 
-function checkChanges() {
+function checkChanges(updateSaveButton) {
 	const haveSettingsChanged = Object.keys(settingsChanged).length > 0;
 	const haveCategoriesChanged = Object.keys(categoriesChanged).length > 0;
 	const haveLevelsChanged = Object.keys(levelsChanged).length > 0;
 	const hasSomethingChanged = haveSettingsChanged || haveCategoriesChanged || haveLevelsChanged;
 	document.getElementById('save_button').classList.toggle('changed', hasSomethingChanged);
+	return hasSomethingChanged;
 }
 
 function apiCall(path, method, data) {
@@ -119,6 +120,11 @@ document.addEventListener('DOMContentLoaded', e => {
 		} else {
 			levelRequest = new Promise(r => r());
 		}
-		settingRequest.then(() => categoryRequest).then(() => levelRequest).then(() => checkChanges());
+		settingRequest.then(() => categoryRequest).then(() => levelRequest).then(() => checkChanges(true));
 	}
+	window.onbeforeunload = function() {
+		if (checkChanges(false)) {
+			return "There are unsaved changes, pls stay? 🥺";
+		}
+	};
 });
