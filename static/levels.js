@@ -6,6 +6,7 @@ let levelBlocks = {};
 let lines = {};
 let currentLine = null;
 let lineMode = null;
+let levelCreationMode = false;
 
 
 function checkLevelChange(levelId) {
@@ -72,7 +73,7 @@ function deleteLine(startLevelId, endLevelId) {
 		levelBlock.style.cursor = 'grab';
 }
 
-function createLevelBlock(level, unsaved) {
+function createLevelBlock(level, unsaved, select) {
 	levelsOriginal[level.id] = level;
 	levelsCurrent[level.id] = cloneObject(level);
 	const levelBlock = document.createElement("div");
@@ -119,7 +120,8 @@ function createLevelBlock(level, unsaved) {
 			createLine(level.id, childLevelId, false);
 	}
 	levelBlock.onmousedown = e => {
-		e.stopPropagation();
+		if (e)
+			e.stopPropagation();
 		if (currentLine) {
 			if (currentLine.includes(level.id))
 				return;
@@ -199,6 +201,8 @@ function createLevelBlock(level, unsaved) {
 			line.position();
 	}
 	draggable.autoScroll = {target: container};
+	if (select)
+		levelBlock.onmousedown();
 }
 
 function loadLevels(cb) {
@@ -212,10 +216,11 @@ function loadLevels(cb) {
 }
 
 function initLevels() {
-	document.getElementById('add_level_button').onclick = () => createLevelBlock({
-		id: uuidv4(), name: '', parent_levels: [], child_levels: [], solutions: [], unlocks: [], discord_channel: null,
-		discord_role: null, extra_discord_role: null, category: null, grid_location: [null, null]
-	}, true);
+	const addLevelButton = document.getElementById('add_level_button');
+	addLevelButton.onclick = () => {
+		levelCreationMode = true;
+		addLevelButton.classList.add('active-button');
+	};
 	document.getElementById('delete_level_button').onclick = () => {
 		const deletePopup = document.getElementById('delete_popup');
 		const pageOverlay = document.getElementById('page-overlay')
@@ -314,6 +319,15 @@ function initLevels() {
 			line.position();
 	}));
 	document.getElementById('background').onmousedown = e => {
+		if (levelCreationMode) {
+			document.getElementById('add_level_button').classList.remove('active-button');
+			levelCreationMode = false;
+			createLevelBlock({
+				id: uuidv4(), name: '', parent_levels: [], child_levels: [], solutions: [], unlocks: [], discord_channel: null,
+				discord_role: null, extra_discord_role: null, category: null, grid_location: [e.layerX + 320, e.layerY]
+			}, true, true);
+			return;
+		}
 		selectedLevelId = undefined;
 		document.getElementById('toolbar-level').style.display = '';
 		document.getElementById('toolbar-category').style.display = '';
