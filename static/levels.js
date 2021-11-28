@@ -174,8 +174,10 @@ function createLevelBlock(level, unsaved, select) {
 		for (let otherLevelCategoryListItem of levelCategoryList.getElementsByTagName('li')) {
 			otherLevelCategoryListItem.classList.remove('selected-category');
 		}
-		if (level.category)
+		if (level.category) {
 			levelCategoryListItems[level.category].classList.add('selected-category');
+			levelCategoryListItems[level.category].scrollIntoView({block: "center"});
+		}
 	};
 	const container = document.getElementById('container');
 	const draggable = new PlainDraggable(levelBlock);
