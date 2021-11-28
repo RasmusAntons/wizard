@@ -223,6 +223,10 @@ button:disabled:hover {
 .block p {
 	margin-top: 15px;
 	margin-left: 7px;
+	word-wrap: break-word;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 /* remade svg to text below */
