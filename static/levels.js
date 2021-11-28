@@ -174,7 +174,7 @@ function createLevelBlock(level, unsaved, select) {
 		for (let otherLevelCategoryListItem of levelCategoryList.getElementsByTagName('li')) {
 			otherLevelCategoryListItem.classList.remove('selected-category');
 		}
-		const levelCategory = levelsCurrent[level.id];
+		const levelCategory = levelsCurrent[level.id].category;
 		if (levelCategory) {
 			levelCategoryListItems[levelCategory].classList.add('selected-category');
 			levelCategoryListItems[levelCategory].scrollIntoView({block: "center"});
