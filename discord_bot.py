@@ -3,7 +3,7 @@ import discord_ui
 
 import db
 import messages
-from discord_utils import can_user_solve
+from discord_utils import can_user_solve, can_user_unlock
 
 client = discord.ext.commands.Bot("!")
 slash_options = {'delete_unused': True}
