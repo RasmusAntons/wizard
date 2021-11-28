@@ -635,3 +635,16 @@ input:checked + .slider:before {
 .plz_be_longer_thx {
 	width: 292px !important;
 }
+
+#add_line_button {
+	width: 145px;
+}
+
+#delete_line_button {
+	width: 145px;
+	margin-left: -6px !important;
+}
+
+#category-menu-button {
+	margin-top: 15px;
+}

@@ -130,6 +130,8 @@ function createLevelBlock(level, unsaved) {
 				else if (lineMode === 'delete')
 					deleteLine(currentLine[0], currentLine[1], true);
 				currentLine = null;
+				document.getElementById('add_line_button').classList.remove('active-button');
+				document.getElementById('delete_line_button').classList.remove('active-button');
 			}
 			return;
 		}
@@ -242,15 +244,19 @@ function initLevels() {
 			pageOverlay.style.display = '';
 		}
 	};
-	document.getElementById('add_line_button').onclick = () => {
+	const addLineButton = document.getElementById('add_line_button');
+	addLineButton.onclick = () => {
 		currentLine = [];
 		lineMode = 'add';
+		addLineButton.classList.add('active-button');
 		for (let levelBlock of Object.values(levelBlocks))
 			levelBlock.style.cursor = 'crosshair';
 	};
-	document.getElementById('delete_line_button').onclick = () => {
+	const deleteLineButton = document.getElementById('delete_line_button');
+	deleteLineButton.onclick = () => {
 		currentLine = [];
 		lineMode = 'delete';
+		deleteLineButton.classList.add('active-button');
 		for (let levelBlock of Object.values(levelBlocks))
 			levelBlock.style.cursor = 'crosshair';
 	};
