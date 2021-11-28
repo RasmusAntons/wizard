@@ -56,7 +56,6 @@ input:disabled {
 	left: 50%;
 	width: 400px;
 	margin-left: -200px;
-	height: 123px;
 	margin-top: -88px;
 	background: #2F2F40;
 	z-index: 10001;
@@ -67,7 +66,17 @@ input:disabled {
 	border-top: solid 1px #656475;
 	border-radius: 1px;
 	line-height: 32px;
+	padding-bottom: 10px;
 	display: none;
+}
+
+#name_popup input {
+	width: 370px;
+}
+
+#name_popup span {
+	display: inline-block;
+	margin-top: 5px;
 }
 
 #unsaved_changes_popup {
