@@ -105,7 +105,7 @@ function createCategory(category, unsaved) {
 							lines[parentLevelId + level.id].endPlugColor = categoryColourInput.value;
 					}
 					for (let childLevelId of level.child_levels) {
-						if (selectedLevelId + childLevelId in lines)
+						if (level.id + childLevelId in lines)
 							lines[level.id + childLevelId].startPlugColor = categoryColourInput.value;
 					}
 				}
