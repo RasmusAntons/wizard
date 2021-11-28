@@ -1,5 +1,4 @@
 import argparse
-import secrets
 import getpass
 
 import db
@@ -11,8 +10,10 @@ def init_db():
     db.Unlock.metadata.create_all(db.engine)
     db.Setting.metadata.create_all(db.engine)
     db.Category.metadata.create_all(db.engine)
+    db.UserSolve.metadata.create_all(db.engine)
+    db.UserUnlock.metadata.create_all(db.engine)
     db.set_setting('guild', '904475213415202866')
-    db.set_setting('key', secrets.token_hex(16))
+    db.set_setting('key', getpass.getpass('Access key: '))
     db.set_setting('bot_token', getpass.getpass('Discord bot token: '))
     category = db.Category(name='Intro', colour=0xffb9fc)
     db.session.add(category)
@@ -26,7 +27,6 @@ def init_db():
     solution2 = db.Solution(level=level2, text='test2')
     db.session.add(solution2)
     db.session.commit()
-    print(f'Initialised database. key: {db.get_setting("key")}')
 
 
 if __name__ == '__main__':

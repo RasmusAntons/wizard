@@ -37,10 +37,10 @@ class Level(Base):
             'child_levels': [child_level.id for child_level in self.child_levels],
             'solutions': [solution.text for solution in self.solutions],
             'unlocks': [unlock.text for unlock in self.unlocks],
-            'discord_channel': str(self.discord_channel) if self.discord_channel is not None else None,
-            'discord_role': str(self.discord_role) if self.discord_role is not None else None,
+            'discord_channel': self.discord_channel if self.discord_channel is not None else None,
+            'discord_role': self.discord_role if self.discord_role is not None else None,
             'category': self.category_id,
-            'extra_discord_role': str(self.extra_discord_role) if self.extra_discord_role is not None else None,
+            'extra_discord_role': self.extra_discord_role if self.extra_discord_role is not None else None,
             'grid_location': (self.grid_x, self.grid_y)
         }
 
@@ -70,7 +70,7 @@ class Category(Base):
         return {
             'id': self.id,
             'name': self.name,
-            'discord_category': str(self.discord_category) if self.discord_category is not None else None,
+            'discord_category': self.discord_category if self.discord_category is not None else None,
             'colour': self.colour
         }
 
@@ -79,3 +79,17 @@ class Setting(Base):
     __tablename__ = 'setting'
     key = Column(String, primary_key=True)
     value = Column(String, nullable=True)
+
+
+class UserSolve(Base):
+    __tablename__ = 'user_solve'
+    user_id = Column(String(18), primary_key=True)
+    level_id = Column(String(36), ForeignKey(Level.id, ondelete='CASCADE'), primary_key=True)
+    level = relationship(Level)
+
+
+class UserUnlock(Base):
+    __tablename__ = 'user_unlock'
+    user_id = Column(String(18), primary_key=True)
+    level_id = Column(String(36), ForeignKey(Level.id, ondelete='CASCADE'), primary_key=True)
+    level = relationship(Level)
