@@ -120,6 +120,7 @@ async def patch_levels(request):
             level.extra_discord_role = level_body.get('extra_discord_role')
             level.category_id = level_body.get('category')
             level.grid_x, level.grid_y = level_body.get('grid_location')
+            db.session.merge(level)
             for key, cls in (('solutions', db.Solution), ('unlocks', db.Unlock)):
                 new_texts = set(level_body.get(key))
                 existing_texts = db.session.query(cls).where(cls.level_id == level_id)
