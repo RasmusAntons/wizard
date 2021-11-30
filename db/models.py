@@ -21,7 +21,7 @@ class Level(Base):
     parent_levels = relationship('Level', secondary=level_relation, backref='child_levels',
                                  primaryjoin=id == level_relation.c.parent_level,
                                  secondaryjoin=id == level_relation.c.child_level)
-    discord_channel = Column(String(18), nullable=True)
+    discord_channel = Column(String(18), nullable=True, index=True)
     discord_role = Column(String(18), nullable=True)
     extra_discord_role = Column(String(18), nullable=True)
     category_id = Column(String(36), ForeignKey('category.id', ondelete='SET NULL'))

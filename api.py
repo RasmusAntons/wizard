@@ -6,6 +6,7 @@ import discord
 
 import db
 import discord_bot
+from discord_utils import check_level
 
 
 def protected(f):
@@ -132,8 +133,7 @@ async def patch_levels(request):
                 for new_text in new_texts:
                     obj = cls(level_id=level_id, text=new_text)
                     db.session.add(obj)
-            if level_body.get('child_levels'):
-                new_relations[level_id] = level_body.get('child_levels')
+            new_relations[level_id] = level_body.get('child_levels', [])
             db.session.merge(level)
     for parent_level_id, child_level_ids in new_relations.items():
         parent_level = db.session.get(db.Level, parent_level_id)
@@ -149,6 +149,8 @@ async def patch_levels(request):
         for removed_child_level in existing_child_levels:
             parent_level.child_levels.remove(removed_child_level)
         db.session.merge(parent_level)
+    for level_id in body.keys():
+        await check_level(level_id)
     try:
         db.session.commit()
     except Exception as e:
