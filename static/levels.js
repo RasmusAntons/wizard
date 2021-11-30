@@ -177,7 +177,8 @@ function createLevelBlock(level, unsaved, select) {
 		const levelCategory = levelsCurrent[level.id].category;
 		if (levelCategory) {
 			levelCategoryListItems[levelCategory].classList.add('selected-category');
-			levelCategoryListItems[levelCategory].scrollIntoView({block: "center"});
+			// todo: scroll without scrolling toolbar etc.
+			// levelCategoryListItems[levelCategory].scrollIntoView({block: "center"});
 		}
 	};
 	const container = document.getElementById('container');
