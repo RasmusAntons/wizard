@@ -1,4 +1,4 @@
-On save, move channel to its category
+On save, move channel to its category in order
 
 A level is reached either:
 1. when all of its parent levels are solved if it doesn't have an unlock
