@@ -22,5 +22,5 @@ def set_setting(key, value):
 
 
 def get_setting(key, default=None):
-    setting = session.query(Setting).where(Setting.key == key).first()
+    setting = session.get(Setting, key)
     return setting.value if setting is not None else default

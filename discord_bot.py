@@ -36,7 +36,7 @@ async def solve_command(ctx, solution):
 
 
 @ui.slash.command('unlock', options=[discord_ui.SlashOption(str, 'unlock', 'The code to unlock a secret level you found.', required=True)])
-async def solve_command(ctx, unlock):
+async def unlock_command(ctx, unlock):
     if ctx.channel.type == discord.ChannelType.private:
         level_unlocks = db.session.query(db.Unlock).where(db.Unlock.text == unlock)
         for level_unlock in level_unlocks:
