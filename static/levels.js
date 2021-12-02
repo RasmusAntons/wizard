@@ -41,11 +41,19 @@ function createLine(startLevelId, endLevelId, addToLevels) {
 			startColour = '#' + categoriesCurrent[levelsCurrent[startLevelId].category].colour.toString(16).padStart(6, '0');
 		if (levelsCurrent[endLevelId].category)
 			endColour = '#' + categoriesCurrent[levelsCurrent[endLevelId].category].colour.toString(16).padStart(6, '0');
-		lines[startLevelId + endLevelId] = new LeaderLine(levelBlocks[startLevelId], levelBlocks[endLevelId], {
+		const line = new LeaderLine(levelBlocks[startLevelId], levelBlocks[endLevelId], {
 			startPlugColor: startColour,
 			endPlugColor: endColour,
 			gradient: true
 		});
+		line.lineElement = document.querySelector('body > .leader-line');
+		line.lineElement.style.visibility = 'hidden';
+		document.getElementById('background').appendChild(line.lineElement);
+		setTimeout(() => {
+			line.positionAdjusted();
+			line.lineElement.style.visibility = 'visible';
+		}, 0);
+		lines[startLevelId + endLevelId] = line;
 		if (addToLevels) {
 			levelsCurrent[startLevelId].child_levels.push(endLevelId);
 			checkLevelChange(startLevelId);
@@ -196,13 +204,13 @@ function createLevelBlock(level, unsaved, select) {
 			position.top = snappedY;
 		}
 		for (let line of Object.values(lines))
-			line.position();
+			line.positionAdjusted();
 	};
 	draggable.onDragEnd = function (position) {
 		levelsCurrent[level.id].grid_location = [position.left + container.scrollLeft, position.top + container.scrollTop];
 		checkLevelChange(level.id);
 		for (let line of Object.values(lines))
-			line.position();
+			line.positionAdjusted();
 	}
 	draggable.autoScroll = {target: container};
 	if (select)
@@ -220,6 +228,28 @@ function loadLevels(cb) {
 }
 
 function initLevels() {
+	const container = document.getElementById('container');
+	LeaderLine.prototype.positionAdjusted = function () {
+		if (this.offsetTop) {
+			const previousTop = this.lineElement.style.top;
+			const originalTop = Number(previousTop.substring(0, previousTop.length - 2)) - this.offsetTop;
+			this.lineElement.style.top = `${originalTop}px`;
+		}
+		if (this.offsetLeft) {
+			const previousLeft = this.lineElement.style.left;
+			const originalLeft = Number(previousLeft.substring(0, previousLeft.length - 2)) - this.offsetLeft;
+			this.lineElement.style.left = `${originalLeft}px`;
+		}
+		this.position();
+		const positionedTop = this.lineElement.style.top;
+		this.offsetTop = container.scrollTop;
+		let newTop = Number(positionedTop.substring(0, positionedTop.length - 2)) + this.offsetTop;
+		this.lineElement.style.top = `${newTop}px`;
+		const positionedLeft = this.lineElement.style.left;
+		this.offsetLeft = container.scrollLeft - 320;
+		let newLeft = Number(positionedLeft.substring(0, positionedLeft.length - 2)) + this.offsetLeft;
+		this.lineElement.style.left = `${newLeft}px`;
+	};
 	const addLevelButton = document.getElementById('add_level_button');
 	addLevelButton.onclick = () => {
 		levelCreationMode = true;
@@ -318,10 +348,6 @@ function initLevels() {
 			};
 		};
 	}
-	document.getElementById('container').addEventListener('scroll', AnimEvent.add(function () {
-		for (let line of Object.values(lines))
-			line.position();
-	}));
 	document.getElementById('background').onmousedown = e => {
 		if (levelCreationMode) {
 			document.getElementById('add_level_button').classList.remove('active-button');
