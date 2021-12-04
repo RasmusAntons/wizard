@@ -6,7 +6,8 @@ import discord
 
 import db
 import discord_bot
-from discord_utils import check_level
+import discord_utils
+from discord_utils import move_level_to_category
 
 
 def protected(f):
@@ -150,7 +151,8 @@ async def patch_levels(request):
             parent_level.child_levels.remove(removed_child_level)
         db.session.merge(parent_level)
     for level_id in body.keys():
-        await check_level(level_id)
+        await move_level_to_category(level_id)
+    await discord_utils.update_role_permissions()
     try:
         db.session.commit()
     except Exception as e:

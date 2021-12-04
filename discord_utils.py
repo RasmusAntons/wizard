@@ -39,11 +39,13 @@ def get_child_ids_recursively(level):
     return child_ids
 
 
-async def check_level(level_id):
+async def move_level_to_category(level_id):
     level = db.session.get(db.Level, level_id)
     if level.discord_channel and level.category and level.category.discord_category:
-        discord_channel = discord_bot.client.get_channel(level.discord_channel) or await discord_bot.client.fetch_channel(level.discord_channel)
-        discord_category = discord_bot.client.get_channel(level.category.discord_category) or await discord_bot.client.fetch_channel(level.category.discord_category)
+        discord_channel = discord_bot.client.get_channel(int(level.discord_channel)) \
+                          or await discord_bot.client.fetch_channel(level.discord_channel)
+        discord_category = discord_bot.client.get_channel(int(level.category.discord_category)) \
+                           or await discord_bot.client.fetch_channel(level.category.discord_category)
         if discord_category.type == discord.ChannelType.category:
             child_ids = get_child_ids_recursively(level)
             position = None
@@ -60,3 +62,30 @@ async def check_level(level_id):
                 await discord_channel.edit(category=discord_category, position=position)
             else:
                 await discord_channel.edit(category=discord_category)
+
+
+def get_parent_levels_recursively(level):
+    parent_levels = {level}
+    for parent_level in level.parent_levels:
+        if parent_level not in parent_levels:
+            parent_levels |= get_parent_levels_recursively(parent_level)
+    return parent_levels
+
+
+async def update_role_permissions():
+    levels = [level for level in db.session.query(db.Level).all()]
+    channel_permissions = {level.discord_channel: {} for level in levels if level.discord_channel}
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id)
+    if guild is None:
+        raise Exception(f'guild not set or wrong: {guild_id}')
+    for level in db.session.query(db.Level).all():
+        if not level.discord_role:
+            continue
+        for parent_level in get_parent_levels_recursively(level):
+            if parent_level.discord_channel:
+                role = guild.get_role(int(level.discord_role))
+                channel_permissions[parent_level.discord_channel][role] = discord.PermissionOverwrite(read_messages=True)
+    for channel_id, permissions in channel_permissions.items():
+        channel = guild.get_channel(int(channel_id))
+        await channel.edit(overwrites=permissions)
