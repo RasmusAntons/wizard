@@ -2,6 +2,7 @@ import argparse
 import getpass
 
 import db
+import main
 
 
 def init_db():
@@ -33,6 +34,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='action')
     initdb_parser = subparsers.add_parser('initdb')
+    run_parser = subparsers.add_parser('run')
+    run_parser.add_argument('--offline', action='store_true')
     args = parser.parse_args()
     if args.action == 'initdb':
         init_db()
+    elif args.action == 'run':
+        main.run(offline=args.offline)
