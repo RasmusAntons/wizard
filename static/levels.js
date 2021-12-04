@@ -74,6 +74,7 @@ function deleteLine(startLevelId, endLevelId) {
 		checkLevelChange(startLevelId);
 		levelsCurrent[endLevelId].parent_levels = levelsCurrent[endLevelId].parent_levels.filter(e => e !== startLevelId);
 		checkLevelChange(endLevelId);
+		document.body.appendChild(line.lineElement);
 		line.remove();
 		delete lines[startLevelId + endLevelId];
 	}
