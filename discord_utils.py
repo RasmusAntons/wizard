@@ -1,4 +1,5 @@
 import discord
+from sqlalchemy import and_
 
 import db
 import discord_bot
@@ -7,10 +8,10 @@ import discord_bot
 def has_user_reached(level, user_id):
     if level.unlocks:
         return db.session.query(db.UserUnlock) \
-            .where(db.UserUnlock.level_id == level.id and db.UserUnlock.user_id == user_id).scalar()
+            .where(and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)).scalar()
     for parent_level in level.parent_levels:
         has_solved = db.session.query(db.UserSolve) \
-            .where(db.UserSolve.level_id == parent_level.id and db.UserUnlock.user_id == user_id).scalar()
+            .where(and_(db.UserSolve.level_id == parent_level.id, db.UserUnlock.user_id == user_id)).scalar()
         if not has_solved:
             return False
     return True
@@ -18,14 +19,14 @@ def has_user_reached(level, user_id):
 
 def can_user_solve(level, user_id):
     if db.session.query(db.UserSolve) \
-            .where(db.UserSolve.level_id == level.id and db.UserUnlock.user_id == user_id).scalar():
+            .where(and_(db.UserSolve.level_id == level.id, db.UserSolve.user_id == user_id)).scalar():
         return False
     return has_user_reached(level, user_id)
 
 
 def can_user_unlock(level, user_id):
     if db.session.query(db.UserUnlock) \
-            .where(db.UserUnlock.level_id == level.id and db.UserUnlock.user_id == user_id).scalar():
+            .where(and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)).scalar():
         return False
     for parent_level in level.parent_levels:
         if not has_user_reached(parent_level, user_id):
