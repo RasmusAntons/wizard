@@ -115,9 +115,11 @@ def get_parent_levels_recursively(level):
 
 async def update_role_permissions():
     levels = [level for level in db.session.query(db.Level).all()]
-    channel_permissions = {level.discord_channel: {} for level in levels if level.discord_channel}
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id)
+    channel_permissions = {level.discord_channel: {
+        guild.default_role: discord.PermissionOverwrite(read_messages=False)
+    } for level in levels if level.discord_channel}
     if guild is None:
         raise Exception(f'guild not set or wrong: {guild_id}')
     for level in db.session.query(db.Level).all():
