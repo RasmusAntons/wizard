@@ -11,7 +11,7 @@ def has_user_reached(level, user_id):
             .where(and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)).scalar()
     for parent_level in level.parent_levels:
         has_solved = db.session.query(db.UserSolve) \
-            .where(and_(db.UserSolve.level_id == parent_level.id, db.UserUnlock.user_id == user_id)).scalar()
+            .where(and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == user_id)).scalar()
         if not has_solved:
             return False
     return True
@@ -43,6 +43,7 @@ async def add_role_to_user(user_id, role_id):
     if member is None:
         raise Exception(f'failed to find member')
     role = guild.get_role(int(role_id))
+    print(f'assigning role {role.name} to user {member.name}')
     await member.add_roles(role)
 
 
