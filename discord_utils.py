@@ -122,7 +122,7 @@ async def update_role_permissions():
         if not level.discord_role:
             continue
         for parent_level in get_parent_levels_recursively(level):
-            if parent_level.discord_channel:
+            if parent_level.discord_channel and parent_level.discord_channel in channel_permissions.keys():
                 role = guild.get_role(int(level.discord_role))
                 channel_permissions[parent_level.discord_channel][role] = discord.PermissionOverwrite(read_messages=True)
     for channel_id, permissions in channel_permissions.items():

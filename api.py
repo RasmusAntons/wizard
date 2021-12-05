@@ -79,17 +79,17 @@ async def delete_level(level_id, delete_channel=False, delete_role=False, delete
             traceback.print_exc()
             return aiohttp.web.json_response({'error': '"guild" not set"'}, status=400)
         try:
-            guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+            guild = discord_bot.client.get_guild(int(guild_id))
             if delete_channel and level.discord_channel:
-                channel = guild.get_channel(level.discord_channel)
+                channel = guild.get_channel(int(level.discord_channel))
                 if channel:
                     await channel.delete()
             if delete_role and level.discord_role:
-                role = guild.get_role(level.discord_role) or await guild.fetch_role(level.discord_role)
+                role = guild.get_role(int(level.discord_role))
                 if role:
                     await role.delete()
             if delete_extra_role and level.extra_discord_role:
-                role = guild.get_channel(level.extra_discord_role)
+                role = guild.get_channel(int(level.extra_discord_role))
                 if role:
                     await role.delete()
         except discord.HTTPException:
@@ -150,8 +150,9 @@ async def patch_levels(request):
         for removed_child_level in existing_child_levels:
             parent_level.child_levels.remove(removed_child_level)
         db.session.merge(parent_level)
-    for level_id in body.keys():
-        await move_level_to_category(level_id)
+    for level_id, level in body.items():
+        if level.get('id') is not None:
+            await move_level_to_category(level_id)
     await discord_utils.update_role_permissions()
     try:
         db.session.commit()
@@ -176,10 +177,10 @@ async def post_discord_channels(request):
         traceback.print_exc()
         return aiohttp.web.json_response({'error': '"guild" not set"'}, status=400)
     try:
-        guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+        guild = discord_bot.client.get_guild(int(guild_id))
         category = None
         if category_id is not None:
-            category = guild.get_channel(category_id)
+            category = guild.get_channel(int(category_id))
         assert category is None or category.type == discord.ChannelType.category
         channel = await guild.create_text_channel(name, category=category)
     except discord.HTTPException:
@@ -201,7 +202,7 @@ async def post_discord_roles(request):
         traceback.print_exc()
         return aiohttp.web.json_response({'error': '"guild" not set"'}, status=400)
     try:
-        guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+        guild = discord_bot.client.get_guild(int(guild_id))
         role = await guild.create_role(name=name)
     except discord.HTTPException:
         traceback.print_exc()
@@ -225,7 +226,7 @@ async def post_discord_categories(request):
         traceback.print_exc()
         return aiohttp.web.json_response({'error': '"guild" not set"'}, status=400)
     try:
-        guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+        guild = discord_bot.client.get_guild(int(guild_id))
         category = await guild.create_category(name=name)
     except discord.HTTPException:
         traceback.print_exc()
