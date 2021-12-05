@@ -127,4 +127,5 @@ async def update_role_permissions():
                 channel_permissions[parent_level.discord_channel][role] = discord.PermissionOverwrite(read_messages=True)
     for channel_id, permissions in channel_permissions.items():
         channel = guild.get_channel(int(channel_id))
-        await channel.edit(overwrites=permissions)
+        if channel is not None:
+            await channel.edit(overwrites=permissions)
