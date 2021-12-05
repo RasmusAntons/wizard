@@ -50,7 +50,7 @@ function createLine(startLevelId, endLevelId, addToLevels) {
 		line.lineElement.style.visibility = 'hidden';
 		document.getElementById('background').appendChild(line.lineElement);
 		setTimeout(() => {
-			line.positionAdjusted();
+			line.position();
 			line.lineElement.style.visibility = 'visible';
 		}, 0);
 		lines[startLevelId + endLevelId] = line;
@@ -205,13 +205,13 @@ function createLevelBlock(level, unsaved, select) {
 			position.top = snappedY;
 		}
 		for (let line of Object.values(lines))
-			line.positionAdjusted();
+			line.position();
 	};
 	draggable.onDragEnd = function (position) {
 		levelsCurrent[level.id].grid_location = [position.left + container.scrollLeft, position.top + container.scrollTop];
 		checkLevelChange(level.id);
 		for (let line of Object.values(lines))
-			line.positionAdjusted();
+			line.position();
 	}
 	draggable.autoScroll = {target: container};
 	if (select)
@@ -230,7 +230,8 @@ function loadLevels(cb) {
 
 function initLevels() {
 	const container = document.getElementById('container');
-	LeaderLine.prototype.positionAdjusted = function () {
+	LeaderLine.prototype._position = LeaderLine.prototype.position;
+	LeaderLine.prototype.position = function () {
 		if (this.offsetTop) {
 			const previousTop = this.lineElement.style.top;
 			const originalTop = Number(previousTop.substring(0, previousTop.length - 2)) - this.offsetTop;
@@ -241,7 +242,7 @@ function initLevels() {
 			const originalLeft = Number(previousLeft.substring(0, previousLeft.length - 2)) - this.offsetLeft;
 			this.lineElement.style.left = `${originalLeft}px`;
 		}
-		this.position();
+		this._position();
 		const positionedTop = this.lineElement.style.top;
 		this.offsetTop = container.scrollTop;
 		let newTop = Number(positionedTop.substring(0, positionedTop.length - 2)) + this.offsetTop;
@@ -251,6 +252,14 @@ function initLevels() {
 		let newLeft = Number(positionedLeft.substring(0, positionedLeft.length - 2)) + this.offsetLeft;
 		this.lineElement.style.left = `${newLeft}px`;
 	};
+	window.addEventListener('resize', () => {
+		container.scrollBy(1, 1);
+		for (let line of Object.values(lines))
+			line.position();
+		setTimeout(() => {
+			container.scrollBy(-1, -1);
+		}, 0);
+	});
 	const addLevelButton = document.getElementById('add_level_button');
 	addLevelButton.onclick = () => {
 		levelCreationMode = true;
