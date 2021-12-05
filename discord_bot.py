@@ -3,7 +3,7 @@ import discord_ui
 
 import db
 import messages
-from discord_utils import can_user_solve, can_user_unlock
+from discord_utils import can_user_solve, can_user_unlock, add_role_to_user, remove_parent_roles_from_user
 
 client = discord.ext.commands.Bot("!")
 slash_options = {'delete_unused': True}
@@ -28,6 +28,12 @@ async def solve_command(ctx, solution):
                 await ctx.respond(messages.confirm_solve.format(level_name=level.name))
                 db.session.add(db.UserSolve(user_id=str(ctx.author.id), level=level))
                 db.session.commit()
+                if level.extra_discord_role:
+                    await add_role_to_user(ctx.author.id, level.extra_discord_role)
+                for child_level in level.child_levels:
+                    if child_level.discord_role:
+                        await add_role_to_user(ctx.author.id, child_level.discord_role)
+                        await remove_parent_roles_from_user(ctx.author.id, level)
                 break
         else:
             await ctx.respond(messages.reject_solve)
@@ -45,6 +51,8 @@ async def unlock_command(ctx, unlock):
                 await ctx.respond(messages.confirm_unlock.format(level_name=level.name))
                 db.session.add(db.UserUnlock(user_id=str(ctx.author.id), level=level))
                 db.session.commit()
+                if level.discord_role:
+                    await add_role_to_user(ctx.author.id, level.discord_role)
                 break
         else:
             await ctx.respond(messages.reject_unlock)

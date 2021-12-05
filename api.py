@@ -271,6 +271,7 @@ async def patch_categories(request):
         traceback.print_exc()
         db.session.rollback()
         return aiohttp.web.json_response({'error': str(e)}, status=500)
+    # todo: move levels to category if category channel changed
     return aiohttp.web.json_response({'message': 'ok'})
 
 

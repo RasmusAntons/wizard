@@ -4,10 +4,7 @@ import db
 import discord_bot
 
 
-def can_user_solve(level, user_id):
-    if db.session.query(db.UserSolve) \
-            .where(db.UserSolve.level_id == level.id and db.UserUnlock.user_id == user_id).scalar():
-        return False
+def has_user_reached(level, user_id):
     if level.unlocks:
         return db.session.query(db.UserUnlock) \
             .where(db.UserUnlock.level_id == level.id and db.UserUnlock.user_id == user_id).scalar()
@@ -19,16 +16,58 @@ def can_user_solve(level, user_id):
     return True
 
 
+def can_user_solve(level, user_id):
+    if db.session.query(db.UserSolve) \
+            .where(db.UserSolve.level_id == level.id and db.UserUnlock.user_id == user_id).scalar():
+        return False
+    return has_user_reached(level, user_id)
+
+
 def can_user_unlock(level, user_id):
     if db.session.query(db.UserUnlock) \
             .where(db.UserUnlock.level_id == level.id and db.UserUnlock.user_id == user_id).scalar():
         return False
     for parent_level in level.parent_levels:
-        has_solved = db.session.query(db.UserSolve) \
-            .where(db.UserSolve.level_id == parent_level.id and db.UserUnlock.user_id == user_id).scalar()
-        if not has_solved:
+        if not has_user_reached(parent_level, user_id):
             return False
     return True
+
+
+async def add_role_to_user(user_id, role_id):
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id)
+    if guild is None:
+        raise Exception(f'guild not set or wrong: {guild_id}')
+    member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))
+    if member is None:
+        raise Exception(f'failed to find member')
+    role = guild.get_role(int(role_id))
+    await member.add_roles(role)
+
+
+def get_parent_levels_until_role_or_unlock(level):
+    if level.unlocks:
+        return set()
+    elif level.discord_role:
+        return {level}
+    return {get_parent_levels_until_role_or_unlock(parent_level) for parent_level in level.parent_levels}
+
+
+async def remove_parent_roles_from_user(user_id, level):
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id)
+    if guild is None:
+        raise Exception(f'guild not set or wrong: {guild_id}')
+    member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))
+    if member is None:
+        raise Exception(f'failed to find member')
+    roles = []
+    for parent_level in get_parent_levels_until_role_or_unlock(level):
+        role = guild.get_role(int(parent_level.discord_role))
+        if role is not None:
+            roles.append(role)
+    if roles:
+        await member.remove_roles(*roles)
 
 
 def get_child_ids_recursively(level):
