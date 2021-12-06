@@ -13,3 +13,8 @@ You have all extra roles of levels that have been solved
 You have all roles of reached levels that don't have a child path to a reached level with a role and without unlocks
 
 A role has read permissions for all parent levels (recursive)
+
+# Development
+## Environment Setup
+### Conda / Forge
+`conda env create -f conda_env.yaml`
