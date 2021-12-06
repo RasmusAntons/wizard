@@ -1,0 +1,8 @@
+name: wizard
+dependencies:
+  - python=3.9
+  - pip:
+    - sqlalchemy
+    - discord.py
+    - discord_ui
+    - aiohttp
