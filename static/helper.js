@@ -60,6 +60,8 @@ function cloneObject(obj) {
 }
 
 document.addEventListener('DOMContentLoaded', e => {
+	const savingPopup = document.getElementById('saving_popup');
+	const pageOverlay = document.getElementById('page-overlay')
 	if (localStorage.getItem('key') === null) {
 		promptKey();
 	}
@@ -69,6 +71,8 @@ document.addEventListener('DOMContentLoaded', e => {
 	initSettings();
 	document.getElementById('save_button').onclick = () => {
 		let settingRequest, categoryRequest, levelRequest;
+		savingPopup.style.display = 'block';
+		pageOverlay.style.display = 'block';
 		if (Object.keys(settingsChanged).length) {
 			settingRequest = apiCall(`/api/settings`, 'PATCH', settingsChanged).then(r => {
 				settingsOriginal = cloneObject(settingsCurrent);
@@ -120,7 +124,11 @@ document.addEventListener('DOMContentLoaded', e => {
 		} else {
 			levelRequest = new Promise(r => r());
 		}
-		settingRequest.then(() => categoryRequest).then(() => levelRequest).then(() => checkChanges(true));
+		settingRequest.then(() => categoryRequest).then(() => levelRequest).then(() => {
+			checkChanges(true);
+			savingPopup.style.display = '';
+			pageOverlay.style.display = '';
+		});
 	}
 	window.onbeforeunload = function() {
 		if (checkChanges(false)) {
