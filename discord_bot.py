@@ -32,7 +32,7 @@ async def solve_command(ctx, solution):
                 remove_parent_roles_from = set()
                 if level.extra_discord_role:
                     await add_role_to_user(ctx.author.id, level.extra_discord_role)
-                    # todo: remove discord_role?
+                    remove_parent_roles_from.add(level)
                 for child_level in level.child_levels:
                     if child_level.discord_role and discord_utils.has_user_reached(child_level, ctx.author.id):
                         await add_role_to_user(ctx.author.id, child_level.discord_role)
