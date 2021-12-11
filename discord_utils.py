@@ -105,12 +105,20 @@ async def move_level_to_category(level_id):
                 await discord_channel.edit(category=discord_category)
 
 
-def get_parent_levels_recursively(level):
+def get_parent_levels_recursively(level, context=None):
+    if context is None:
+        context = set()
     parent_levels = {level}
     for parent_level in level.parent_levels:
-        if parent_level not in parent_levels:
-            parent_levels |= get_parent_levels_recursively(parent_level)
+        if parent_level in context:
+            raise ValueError('loop in level dependencies')
+        parent_levels |= get_parent_levels_recursively(parent_level, parent_levels | context)
     return parent_levels
+
+
+def check_loops():
+    for level in db.session.query(db.Level).all():
+        get_parent_levels_recursively(level)
 
 
 async def update_role_permissions():

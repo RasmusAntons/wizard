@@ -7,7 +7,7 @@ import discord
 import db
 import discord_bot
 import discord_utils
-from discord_utils import move_level_to_category
+from discord_utils import move_level_to_category, check_loops
 
 
 def protected(f):
@@ -150,11 +150,12 @@ async def patch_levels(request):
         for removed_child_level in existing_child_levels:
             parent_level.child_levels.remove(removed_child_level)
         db.session.merge(parent_level)
-    for level_id, level in body.items():
-        if level.get('id') is not None:
-            await move_level_to_category(level_id)
-    await discord_utils.update_role_permissions()
     try:
+        check_loops()
+        for level_id, level in body.items():
+            if level.get('id') is not None:
+                await move_level_to_category(level_id)
+        await discord_utils.update_role_permissions()
         db.session.commit()
     except Exception as e:
         db.session.rollback()
