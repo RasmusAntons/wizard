@@ -123,12 +123,17 @@ async def update_role_permissions():
     if guild is None:
         raise Exception(f'guild not set or wrong: {guild_id}')
     for level in db.session.query(db.Level).all():
-        if not level.discord_role:
+        role = guild.get_role(int(level.discord_role)) if level.discord_role else None
+        extra_role = guild.get_role(int(level.extra_discord_role)) if level.extra_discord_role else None
+        if role is None and extra_role is None:
             continue
         for parent_level in get_parent_levels_recursively(level):
             if parent_level.discord_channel and parent_level.discord_channel in channel_permissions.keys():
-                role = guild.get_role(int(level.discord_role))
-                channel_permissions[parent_level.discord_channel][role] = discord.PermissionOverwrite(read_messages=True)
+                for r in (role, extra_role):
+                    if r is None:
+                        continue
+                    parent_chid = parent_level.discord_channel
+                    channel_permissions[parent_chid][r] = discord.PermissionOverwrite(read_messages=True)
     for channel_id, permissions in channel_permissions.items():
         channel = guild.get_channel(int(channel_id))
         if channel is not None:
