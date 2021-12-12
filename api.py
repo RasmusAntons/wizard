@@ -7,7 +7,6 @@ import discord
 import db
 import discord_bot
 import discord_utils
-from discord_utils import move_level_to_category, check_loops
 
 
 def protected(f):
@@ -136,6 +135,7 @@ async def patch_levels(request):
                     db.session.add(obj)
             new_relations[level_id] = level_body.get('child_levels', [])
             db.session.merge(level)
+    affected_child_levels = set()
     for parent_level_id, child_level_ids in new_relations.items():
         parent_level = db.session.get(db.Level, parent_level_id)
         existing_child_levels = [level for level in parent_level.child_levels]
@@ -147,15 +147,19 @@ async def patch_levels(request):
             else:
                 child_level = db.session.get(db.Level, child_level_id)
                 parent_level.child_levels.append(child_level)
+                affected_child_levels.add(child_level)
         for removed_child_level in existing_child_levels:
             parent_level.child_levels.remove(removed_child_level)
+            affected_child_levels.add(removed_child_level)
         db.session.merge(parent_level)
     try:
-        check_loops()
+        discord_utils.check_loops()
         for level_id, level in body.items():
             if level.get('id') is not None:
-                await move_level_to_category(level_id)
+                await discord_utils.move_level_to_category(level_id)
         await discord_utils.update_role_permissions()
+        for child_level in affected_child_levels:
+            await discord_utils.update_level_roles_on_relation_change(child_level)
         db.session.commit()
     except Exception as e:
         db.session.rollback()

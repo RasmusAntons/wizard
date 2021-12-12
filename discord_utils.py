@@ -72,6 +72,30 @@ async def remove_parent_roles_from_user(user_id, level):
         await member.remove_roles(*roles)
 
 
+async def update_level_roles_on_user_solve(user_id, level):
+    remove_parent_roles_from = set()
+    if level.extra_discord_role:
+        await add_role_to_user(user_id, level.extra_discord_role)
+        remove_parent_roles_from.add(level)
+    for child_level in level.child_levels:
+        if child_level.discord_role and has_user_reached(child_level, user_id):
+            await add_role_to_user(user_id, child_level.discord_role)
+            for parent_level in child_level.parent_levels:
+                remove_parent_roles_from.add(parent_level)
+    for parent_level in remove_parent_roles_from:
+        await remove_parent_roles_from_user(user_id, parent_level)
+
+
+async def update_level_roles_on_relation_change(level):
+    if not level.parent_levels or not level.discord_role or level.unlocks:
+        return
+    first_parent = level.parent_levels[0]
+    user_solves = db.session.query(db.UserSolve.user_id).where(db.UserSolve.level_id == first_parent.id).distinct()
+    for user_solve in user_solves:
+        if has_user_reached(level, user_solve.user_id):
+            await add_role_to_user(user_solve.user_id, level.discord_role)
+
+
 def get_child_ids_recursively(level):
     child_ids = {level.id}
     for child_level in level.child_levels:
