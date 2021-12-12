@@ -312,7 +312,7 @@ function initLevels() {
 	for (let [buttonId, inputId, targetKey] of [
 		['level_create_channel', 'level_discord_channel', 'discord_channel'],
 		['level_create_role', 'level_discord_role', 'discord_role'],
-		['level_create_extra_role', 'level_extra_discord_role', 'discord_extra_role']
+		['level_create_extra_role', 'level_extra_discord_role', 'extra_discord_role']
 	]) {
 		const buttonElem = document.getElementById(buttonId);
 		const inputElem = document.getElementById(inputId);
