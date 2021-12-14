@@ -1,6 +1,6 @@
 # **wizard** • Documentation
 
-Bot for managing automatic channel access on web puzzle discords.
+Bot for managing automatic channel access on Discord (for web-puzzle communities).
 
 ## User Interface
 
