@@ -48,10 +48,10 @@ async def add_role_to_user(user_id, role_id):
 
 
 def get_parent_levels_until_role_or_unlock(level):
-    if level.unlocks:
-        return set()
-    elif level.discord_role:
+    if level.discord_role:
         return {level}
+    elif level.unlocks:
+        return set()
     return {get_parent_levels_until_role_or_unlock(parent_level) for parent_level in level.parent_levels}
 
 
@@ -94,6 +94,8 @@ async def update_level_roles_on_relation_change(level):
     for user_solve in user_solves:
         if has_user_reached(level, user_solve.user_id):
             await add_role_to_user(user_solve.user_id, level.discord_role)
+            for parent_level in level.parent_levels:
+                await remove_parent_roles_from_user(user_solve.user_id, parent_level)
 
 
 def get_child_ids_recursively(level):
