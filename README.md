@@ -1,17 +1,21 @@
-# **wizard** • Bot Documentation
+# **wizard** • Documentation
 
-[ToC]
-
-## Overview
-
-user edits database with ui then bot reads it and does discord stuff wow
+Bot for managing automatic channel access on web puzzle discords.
 
 ## User Interface
 
 ![](https://i.imgur.com/SWmSiMt.png)
 
-1 - botan
-2 - draggable level building blocks
+1 - buttons:
+* **create level** will create a new block at the cursor's position once clicked on the grid.
+* **create line** will create a line once two blocks are clicked. the direction of the line depends on the order of blocks you clicked.
+* **delete line** will delete the line between the two blocks you click on.
+* **categories** will open the categories menu.
+* **settings** will open the settings menu.
+* **save** does a very mysterious thing.
+
+2 - grid:
+* contains draggable level building blocks and lines.
 
 ---
 
@@ -23,13 +27,13 @@ once a block has been clicked on (2), the panel comes up (1)
 
 ![](https://i.imgur.com/JX7RYlh.png)
 
-category stuff
+category menu: create and edit level categories
 
 ---
 
 ![](https://i.imgur.com/5WJegX8.png)
 
-settings stuff
+settings menu: typically a one time setup but can be changed at any time. 
 
 ---
 
