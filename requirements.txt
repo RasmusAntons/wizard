@@ -2,3 +2,4 @@ sqlalchemy
 discord.py
 discord_ui
 aiohttp
+alembic

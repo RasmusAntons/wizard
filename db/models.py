@@ -21,6 +21,7 @@ class Level(Base):
     parent_levels = relationship('Level', secondary=level_relation, backref='child_levels',
                                  primaryjoin=id == level_relation.c.parent_level,
                                  secondaryjoin=id == level_relation.c.child_level)
+    nickname_suffix = Column(String, nullable=True)
     discord_channel = Column(String(18), nullable=True, index=True)
     discord_role = Column(String(18), nullable=True)
     extra_discord_role = Column(String(18), nullable=True)
@@ -37,10 +38,11 @@ class Level(Base):
             'child_levels': [child_level.id for child_level in self.child_levels],
             'solutions': [solution.text for solution in self.solutions],
             'unlocks': [unlock.text for unlock in self.unlocks],
-            'discord_channel': self.discord_channel if self.discord_channel is not None else None,
-            'discord_role': self.discord_role if self.discord_role is not None else None,
+            'nickname_suffix': self.nickname_suffix if self.nickname_suffix else None,
+            'discord_channel': self.discord_channel if self.discord_channel else None,
+            'discord_role': self.discord_role if self.discord_role else None,
             'category': self.category_id,
-            'extra_discord_role': self.extra_discord_role if self.extra_discord_role is not None else None,
+            'extra_discord_role': self.extra_discord_role if self.extra_discord_role else None,
             'grid_location': (self.grid_x, self.grid_y)
         }
 
