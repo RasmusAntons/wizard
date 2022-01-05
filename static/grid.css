@@ -682,3 +682,80 @@ input:checked + .slider:before {
 #category-menu-button {
 	margin-top: 15px;
 }
+
+#toolbar-nicknames {
+    margin-top: 17px;
+	background-color: #232330;
+	padding-top: 1px;
+	padding-bottom: 25px;
+}
+
+/* new discord stuff */
+
+#discord_container {
+	box-sizing: border-box;
+	border-radius: 10px;
+	border: 1px solid #222;
+	width: 292px;
+	font-size: 14px;
+	background-color: #36393F;
+	text-align: left !important;
+	padding: 10px;
+	margin: 0 auto;
+}
+
+#discord_container span {
+	font-family: sans-serif;
+}
+
+.discord_message {
+	color: #fff;
+	margin-top: 2px;
+	margin-bottom: -20px;
+}
+
+.discord_message div {
+	display: inline-block;
+}
+
+.discord_message img {
+	width: 40px;
+	border-radius: 50%;
+	margin-right: 5px;
+}
+
+.discord_user {
+	position: relative;
+	top: -25;
+	color: pink;
+}
+
+.discord_message:nth-of-type(2) .discord_username {
+	color: #bbaeee;
+}
+
+.discord_message:nth-of-type(3) .discord_username {
+	color: #f3ffc2;
+}
+
+.discord_text {
+	position: relative;
+	margin-left: 53px;
+	color: #dcddde;
+	top: -20px;
+}
+
+.discord_time {
+	color: #777;
+	font-size: 11px;
+	margin-left: 5px;
+}
+
+.discord_warning {
+    width: 270px;
+    margin: 0 auto;
+    padding: 7px;
+    border-radius: 1px;
+    border-left: solid 5px #656475;
+    background-color: #2f2f40;
+}
