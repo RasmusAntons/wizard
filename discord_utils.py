@@ -1,4 +1,4 @@
-import discord
+import nextcord
 from sqlalchemy import and_
 
 import db
@@ -113,7 +113,7 @@ async def move_level_to_category(level_id):
                           or await discord_bot.client.fetch_channel(level.discord_channel)
         discord_category = discord_bot.client.get_channel(int(level.category.discord_category)) \
                            or await discord_bot.client.fetch_channel(level.category.discord_category)
-        if discord_category.type == discord.ChannelType.category:
+        if discord_category.type == nextcord.ChannelType.category:
             child_ids = get_child_ids_recursively(level)
             position = None
             found_child = False
@@ -152,7 +152,7 @@ async def update_role_permissions():
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id)
     channel_permissions = {level.discord_channel: {
-        guild.default_role: discord.PermissionOverwrite(read_messages=False)
+        guild.default_role: nextcord.PermissionOverwrite(read_messages=False)
     } for level in levels if level.discord_channel}
     if guild is None:
         raise Exception(f'guild not set or wrong: {guild_id}')
@@ -167,7 +167,7 @@ async def update_role_permissions():
                     if r is None:
                         continue
                     parent_chid = parent_level.discord_channel
-                    channel_permissions[parent_chid][r] = discord.PermissionOverwrite(read_messages=True)
+                    channel_permissions[parent_chid][r] = nextcord.PermissionOverwrite(read_messages=True)
     for channel_id, permissions in channel_permissions.items():
         channel = guild.get_channel(int(channel_id))
         if channel is not None:

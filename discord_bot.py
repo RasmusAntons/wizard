@@ -1,14 +1,11 @@
-import discord.ext
-import discord_ui
+import nextcord
 
 import db
 import discord_utils
 import messages
 from discord_utils import can_user_solve, can_user_unlock, add_role_to_user, remove_parent_roles_from_user
 
-client = discord.ext.commands.Bot("!")
-slash_options = {'delete_unused': True}
-ui = discord_ui.UI(client, slash_options=slash_options)
+client = nextcord.Client()
 
 
 @client.event
@@ -16,12 +13,9 @@ async def on_ready():
     print(f'logged in as {client.user}')
 
 
-toppings = ['banana', 'giraffe', 'tomato', 'artichoke', 'corn', 'spinach', 'french fries', 'olive']
-
-
-@ui.slash.command('solve', options=[discord_ui.SlashOption(str, 'solution', 'The solution of the level you solved.', required=True)])
-async def solve_command(ctx, solution):
-    if ctx.channel.type == discord.ChannelType.private:
+@client.slash_command('solve')
+async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solution of the level you solved.')):
+    if ctx.channel.type == nextcord.ChannelType.private:
         level_solutions = db.session.query(db.Solution).where(db.Solution.text == solution)
         for level_solution in level_solutions:
             level = level_solution.level
@@ -32,14 +26,14 @@ async def solve_command(ctx, solution):
                 await discord_utils.update_level_roles_on_user_solve(ctx.author.id, level)
                 break
         else:
-            await ctx.respond(messages.reject_solve)
+            await ctx.send(messages.reject_solve)
     else:
-        await ctx.respond(messages.use_in_dms, hidden=True)
+        await ctx.send(messages.use_in_dms, ephemeral=True)
 
 
-@ui.slash.command('unlock', options=[discord_ui.SlashOption(str, 'unlock', 'The code to unlock a secret level you found.', required=True)])
-async def unlock_command(ctx, unlock):
-    if ctx.channel.type == discord.ChannelType.private:
+@client.slash_command('unlock')
+async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to unlock a secret level you found.')):
+    if ctx.channel.type == nextcord.ChannelType.private:
         level_unlocks = db.session.query(db.Unlock).where(db.Unlock.text == unlock)
         for level_unlock in level_unlocks:
             level = level_unlock.level
@@ -51,6 +45,6 @@ async def unlock_command(ctx, unlock):
                     await add_role_to_user(ctx.author.id, level.discord_role)
                 break
         else:
-            await ctx.respond(messages.reject_unlock)
+            await ctx.send(messages.reject_unlock)
     else:
-        await ctx.respond(messages.use_in_dms, hidden=True)
+        await ctx.send(messages.use_in_dms, ephemeral=True)

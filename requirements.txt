@@ -1,5 +1,4 @@
 sqlalchemy
-discord.py
-discord_ui
+nextcord
 aiohttp
 alembic
