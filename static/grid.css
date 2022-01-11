@@ -47,6 +47,7 @@ input {
 
 input:disabled {
 	background-color: #51515b;
+	cursor: not-allowed;
 }
 
 #name_popup {
@@ -221,13 +222,13 @@ button:hover {
 button:disabled {
 	background-color: #61616f;
 	color: #1a1a21;
+	cursor: not-allowed;
 }
 
 button:disabled:hover {
 	border-top: solid 1px #656475;
 	border-bottom: solid 1px #000;
 	background-color: #61616f;
-	cursor: default;
 }
 
 .block {
