@@ -98,6 +98,12 @@ async def update_level_roles_on_relation_change(level):
                 await remove_parent_roles_from_user(user_solve.user_id, parent_level)
 
 
+async def update_nickname_prefix(user_id):
+    user_solves = db.session.query(db.UserSolve.level_id).where(db.UserSolve.user_id == user_id).distinct()
+    solved_levels = db.session.query(db.Level).join(db.UserSolve, db.Level.id == db.UserSolve.level_id).where(db.UserSolve.user_id == user_id)
+    print([solved_level.name for solved_level in solved_levels])
+
+
 def get_child_ids_recursively(level):
     child_ids = {level.id}
     for child_level in level.child_levels:

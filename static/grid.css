@@ -458,11 +458,15 @@ button:disabled:hover {
 	display: none;
 }
 
-#toolbar-settings button {
+#toolbar-settings button:not(#nicknames-menu-button) {
 	width: 61px;
 	margin-top: 7px;
 	float: right;
 	margin-right: 13px;
+}
+
+#nicknames-menu-button {
+	margin-top: 20px;
 }
 
 #toolbar-settings input {
@@ -471,6 +475,14 @@ button:disabled:hover {
 	margin: 0;
 	margin-right: -3px;
 	margin-top: 8px;
+}
+
+#toolbar-nicknames {
+	margin-top: 17px;
+	background-color: #232330;
+	padding-top: 1px;
+	padding-bottom: 25px;
+	display: none;
 }
 
 .category_list {

@@ -11,6 +11,7 @@ client = nextcord.Client()
 @client.event
 async def on_ready():
     print(f'logged in as {client.user}')
+    await discord_utils.update_nickname_prefix('177438227563675648')
 
 
 @client.slash_command('solve')

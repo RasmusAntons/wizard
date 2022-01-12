@@ -2,7 +2,10 @@ let settingsOriginal = {};
 let settingsCurrent = {};
 let settingsChanged = {};
 
-const inputSettings = {'bot_token': 'text', 'key': 'text', 'guild': 'text', 'grid': 'check', 'tooltips': 'check'};
+const inputSettings = {
+	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'grid': 'check', 'tooltips': 'check',
+	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text'
+};
 
 function checkSettingChange(settingKey) {
 	if (settingKey) {
@@ -49,12 +52,17 @@ function initSettings() {
 	document.getElementById('settings-menu-button').onclick = () => {
 		document.getElementById('toolbar-level').style.display = '';
 		document.getElementById('toolbar-category').style.display = '';
+		document.getElementById('toolbar-nicknames').style.display = '';
 		document.getElementById('toolbar-settings').style.display = 'block';
 		document.getElementById('setting_bot_token').type = 'password';
 		document.getElementById('setting_key').type = 'password';
 		for (let selectedLevel of document.querySelectorAll('.selected'))
 			selectedLevel.classList.toggle('selected', false);
 	};
+	document.getElementById('nicknames-menu-button').onclick = () => {
+		document.getElementById('toolbar-settings').style.display = '';
+		document.getElementById('toolbar-nicknames').style.display = 'block';
+	}
 	document.getElementById('show_bot_token').onclick = () => {
 		const targetElem = document.getElementById('setting_bot_token');
 		targetElem.type = (targetElem.type === 'password') ? 'text' : 'password';

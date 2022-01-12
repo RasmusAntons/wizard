@@ -166,6 +166,7 @@ function initCategories() {
 	document.getElementById('category-menu-button').onclick = () => {
 		document.getElementById('toolbar-level').style.display = '';
 		document.getElementById('toolbar-settings').style.display = '';
+		document.getElementById('toolbar-nicknames').style.display = '';
 		document.getElementById('toolbar-category').style.display = 'block';
 		if (selectedCategoryId)
 			categoryListItems[selectedCategoryId].classList.remove('selected-category');

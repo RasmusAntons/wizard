@@ -153,6 +153,7 @@ function createLevelBlock(level, unsaved, select) {
 		document.getElementById('toolbar-level').style.display = 'block';
 		document.getElementById('toolbar-category').style.display = '';
 		document.getElementById('toolbar-settings').style.display = '';
+		document.getElementById('toolbar-nicknames').style.display = '';
 		const levelNameInput = document.getElementById('level_name');
 		levelNameInput.value = levelsCurrent[level.id].name;
 		levelNameInput.oninput = levelNameInput.onchange = () => {
@@ -372,6 +373,7 @@ function initLevels() {
 		document.getElementById('toolbar-level').style.display = '';
 		document.getElementById('toolbar-category').style.display = '';
 		document.getElementById('toolbar-settings').style.display = '';
+		document.getElementById('toolbar-nicknames').style.display = '';
 		for (let selectedLevel of document.querySelectorAll('.selected'))
 			selectedLevel.classList.toggle('selected', false);
 	};
