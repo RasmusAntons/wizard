@@ -25,6 +25,7 @@ function checkLevelChange(levelId) {
 function checkLevelMarkerChange(levelId) {
 	const levelBlock = levelBlocks[levelId];
 	const level = levelsCurrent[levelId];
+	levelBlock.classList.toggle('has_nickname_suffix', level.nickname_suffix);
 	for (let solutionType of ['solutions', 'unlocks'])
 		levelBlock.classList.toggle(`has_${solutionType}`, level[solutionType].length > 0);
 	for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role'])
@@ -103,7 +104,7 @@ function createLevelBlock(level, unsaved, select) {
 		levelsOriginal[level.id].unsaved = true;
 		checkLevelChange(level.id);
 	}
-	for (let [markerType, markerText] of [['solutions', 'S'], ['discord_channel', 'C'], ['discord_role', 'R'], ['unlocks', 'U'], ['extra_discord_role', 'E'], ['edited', '*']]) {
+	for (let [markerType, markerText] of [['nickname_suffix', 'N'], ['solutions', 'S'], ['discord_channel', 'C'], ['discord_role', 'R'], ['unlocks', 'U'], ['extra_discord_role', 'E'], ['edited', '*']]) {
 		const markerDiv = document.createElement('div');
 		const markerSpan = document.createElement('span');
 		markerSpan.classList.add('marker');
@@ -159,6 +160,13 @@ function createLevelBlock(level, unsaved, select) {
 		levelNameInput.oninput = levelNameInput.onchange = () => {
 			levelsCurrent[level.id].name = levelNameInput.value;
 			levelName.textContent = levelsCurrent[level.id].name;
+			checkLevelChange(level.id);
+			checkLevelMarkerChange(level.id);
+		};
+		const levelNicknameSuffixInput = document.getElementById('level_nickname_suffix');
+		levelNicknameSuffixInput.value = levelsCurrent[level.id].nickname_suffix;
+		levelNicknameSuffixInput.oninput = levelNicknameSuffixInput.onchange = () => {
+			levelsCurrent[level.id].nickname_suffix = levelNicknameSuffixInput.value;
 			checkLevelChange(level.id);
 			checkLevelMarkerChange(level.id);
 		};

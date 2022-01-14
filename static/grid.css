@@ -288,7 +288,16 @@ button:disabled:hover {
 	display: none;
 }
 
-
+.block.has_nickname_suffix .marker_nickname_suffix {
+	background-color: #4a412a;
+	border-top: 1px solid #524c3c;
+	border-left: 1px solid #524c3c;
+	border-bottom: 1px solid #4a412a;
+	border-right: 1px solid #4a412a;
+	border-bottom: none;
+	border-right: none;
+	color: white;
+}
 
 .block.has_solutions .marker_solutions {
 	background-color: #6946C6;
