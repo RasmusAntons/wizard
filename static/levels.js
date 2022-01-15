@@ -286,16 +286,24 @@ function initLevels() {
 				deleteLine(parentLevelId, selectedLevelId);
 			for (let chileLevelId of levelsCurrent[selectedLevelId].child_levels)
 				deleteLine(selectedLevelId, chileLevelId);
-			levelsCurrent[selectedLevelId] = {
-				delete_channel: document.getElementById('level_delete_channel').checked,
-				delete_role: document.getElementById('level_delete_role').checked,
-				delete_extra_role: document.getElementById('level_delete_extra_role').checked,
-			};
-			levelsChanged[selectedLevelId] = levelsCurrent[selectedLevelId];
+			if (levelsOriginal[selectedLevelId].unsaved) {
+				delete levelsOriginal[selectedLevelId];
+				delete levelsCurrent[selectedLevelId];
+				delete levelsChanged[selectedLevelId];
+				checkChanges(true);
+			} else {
+				levelsCurrent[selectedLevelId] = {
+					delete_channel: document.getElementById('level_delete_channel').checked,
+					delete_role: document.getElementById('level_delete_role').checked,
+					delete_extra_role: document.getElementById('level_delete_extra_role').checked,
+				};
+				levelsChanged[selectedLevelId] = levelsCurrent[selectedLevelId];
+			}
 			levelBlocks[selectedLevelId].remove();
 			selectedLevelId = undefined;
 			deletePopup.style.display = '';
 			pageOverlay.style.display = '';
+			document.getElementById('toolbar-level').style.display = '';
 		}
 		document.getElementById('level_delete_cancel_button').onclick = () => {
 			deletePopup.style.display = '';
