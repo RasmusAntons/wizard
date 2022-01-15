@@ -19,6 +19,24 @@ function checkSettingChange(settingKey) {
 	checkChanges(true);
 }
 
+function nick(nickName, prefix, separator, suffix, levels) {
+    const s = `${prefix}${levels.join(separator)}${suffix}`;
+    return nickName.substring(0, 32 - s.length) + s.substring(0, 32);
+}
+
+function updateNicknamePreview() {
+	const discordContainer = document.getElementById('discord_container');
+	const discordUsernames = discordContainer.querySelectorAll('.discord_username');
+	const baseNames = {0: 'Catz', 1: 'weaver', 2: 'owlbotowlbotowlbotowlbotowlbotow'};
+	const levels = {0: ['10'], 1: ['27', 'c', 'γ'], 2: ['50']};
+	const prefix = settingsCurrent['nickname_prefix'];
+	const suffix = settingsCurrent['nickname_suffix'];
+	const separator = settingsCurrent['nickname_separator'];
+	for (let [i, discordUsername] of discordUsernames.entries()) {
+		discordUsername.textContent = nick(baseNames[i], prefix, separator, suffix, levels[i]);
+	}
+}
+
 function loadSettings(cb) {
 	apiCall('/api/settings').then(settings => {
 		settingsOriginal = settings;
@@ -31,6 +49,8 @@ function loadSettings(cb) {
 				settingInput.oninput = settingInput.onchange = () => {
 					settingsCurrent[settingKey] = settingInput.value;
 					checkSettingChange(settingKey);
+					if (settingKey.startsWith('nickname'))
+						updateNicknamePreview();
 				}
 			} else if (settingType === 'check') {
 				if (settingKey in settings) {
@@ -43,6 +63,7 @@ function loadSettings(cb) {
 				});
 			}
 		}
+		updateNicknamePreview();
 		if (cb)
 			cb();
 	});
