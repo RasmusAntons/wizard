@@ -380,8 +380,9 @@ function initLevels() {
 			document.getElementById('add_level_button').classList.remove('active-button');
 			levelCreationMode = false;
 			createLevelBlock({
-				id: uuidv4(), name: '', parent_levels: [], child_levels: [], solutions: [], unlocks: [], discord_channel: null,
-				discord_role: null, extra_discord_role: null, category: null, grid_location: [e.layerX + 320, e.layerY]
+				id: uuidv4(), name: '', nickname_suffix: '', parent_levels: [], child_levels: [], solutions: [],
+				unlocks: [], discord_channel: null, discord_role: null, extra_discord_role: null, category: null,
+				grid_location: [e.layerX + 320, e.layerY]
 			}, true, true);
 			return;
 		}
