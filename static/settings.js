@@ -4,7 +4,7 @@ let settingsChanged = {};
 
 const inputSettings = {
 	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'grid': 'check', 'tooltips': 'check',
-	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text'
+	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check'
 };
 
 function checkSettingChange(settingKey) {
@@ -32,8 +32,12 @@ function updateNicknamePreview() {
 	const prefix = settingsCurrent['nickname_prefix'];
 	const suffix = settingsCurrent['nickname_suffix'];
 	const separator = settingsCurrent['nickname_separator'];
+	const enable = settingsCurrent['nickname_enable'];
 	for (let [i, discordUsername] of discordUsernames.entries()) {
-		discordUsername.textContent = nick(baseNames[i], prefix, separator, suffix, levels[i]);
+		if (enable === 'true')
+			discordUsername.textContent = nick(baseNames[i], prefix, separator, suffix, levels[i]);
+		else
+			discordUsername.textContent = baseNames[i];
 	}
 }
 
@@ -60,6 +64,8 @@ function loadSettings(cb) {
 				settingInput.addEventListener('change', () => {
 					settingsCurrent[settingKey] = JSON.stringify(settingInput.checked);
 					checkSettingChange(settingKey);
+					if (settingKey.startsWith('nickname'))
+						updateNicknamePreview();
 				});
 			}
 		}
