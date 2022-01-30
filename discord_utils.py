@@ -1,5 +1,5 @@
 import nextcord
-from sqlalchemy import and_
+from sqlalchemy import and_, exists
 
 import db
 import discord_bot
@@ -15,6 +15,40 @@ def has_user_reached(level, user_id):
         if not has_solved:
             return False
     return True
+
+
+def get_solvable_levels(user_id):
+    levels = []
+    for level in db.session.query(db.Level).all():
+        if can_user_solve(level, user_id):
+            levels.append(level)
+    return levels
+
+
+def get_user_level_suffixes(user_id):
+    levels = list(get_solvable_levels(user_id))
+    levels.sort(key=lambda l: l.name)
+    return [level.nickname_suffix for level in levels if level.nickname_suffix]
+
+
+async def update_user_nickname(user_id):
+    level_suffixes = get_user_level_suffixes(user_id)
+    prefix = db.get_setting('prefix', ' [')
+    separator = db.get_setting('separator', ', ')
+    suffix = db.get_setting('suffix', ']')
+    name_suffix = f'{prefix}{separator.join(level_suffixes)}{suffix}'
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+    member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))
+    if not member:
+        print(f'member {user_id} not found in guild {guild.name}')
+        return
+    if level_suffixes:
+        nick = member.name[:32 - min(0, len(name_suffix))] + name_suffix[:32]
+    else:
+        nick = member.name
+    print(f'updating nickname for {member.name} to {nick} in {guild.name}')
+    await member.edit(nick=nick)
 
 
 def can_user_solve(level, user_id):
@@ -50,9 +84,11 @@ async def add_role_to_user(user_id, role_id):
 def get_parent_levels_until_role_or_unlock(level):
     if level.discord_role:
         return {level}
-    elif level.unlocks:
-        return set()
-    return {get_parent_levels_until_role_or_unlock(parent_level) for parent_level in level.parent_levels}
+    res = set()
+    if not level.unlocks:
+        for parent_level in level.parent_levels:
+            res.update(get_parent_levels_until_role_or_unlock(parent_level))
+    return res
 
 
 async def remove_parent_roles_from_user(user_id, level):

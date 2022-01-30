@@ -3,7 +3,8 @@ import nextcord
 import db
 import discord_utils
 import messages
-from discord_utils import can_user_solve, can_user_unlock, add_role_to_user, remove_parent_roles_from_user
+from discord_utils import (can_user_solve, can_user_unlock, add_role_to_user, remove_parent_roles_from_user,
+                           get_user_level_suffixes, update_user_nickname)
 
 client = nextcord.Client()
 
@@ -20,12 +21,12 @@ async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solu
         level_solutions = db.session.query(db.Solution).where(db.Solution.text == solution)
         for level_solution in level_solutions:
             level = level_solution.level
-            if can_user_solve(level, str(ctx.author.id)):
-                await ctx.respond(messages.confirm_solve.format(level_name=level.name))
-                db.session.add(db.UserSolve(user_id=str(ctx.author.id), level=level))
+            if can_user_solve(level, str(ctx.user.id)):
+                await ctx.send(messages.confirm_solve.format(level_name=level.name))
+                db.session.add(db.UserSolve(user_id=str(ctx.user.id), level=level))
                 db.session.commit()
-                await discord_utils.update_level_roles_on_user_solve(ctx.author.id, level)
-                break
+                await discord_utils.update_level_roles_on_user_solve(ctx.user.id, level)
+                await update_user_nickname(ctx.user.id)
         else:
             await ctx.send(messages.reject_solve)
     else:
