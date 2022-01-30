@@ -39,12 +39,12 @@ async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to
         level_unlocks = db.session.query(db.Unlock).where(db.Unlock.text == unlock)
         for level_unlock in level_unlocks:
             level = level_unlock.level
-            if can_user_unlock(level, str(ctx.author.id)):
-                await ctx.respond(messages.confirm_unlock.format(level_name=level.name))
-                db.session.add(db.UserUnlock(user_id=str(ctx.author.id), level=level))
+            if can_user_unlock(level, str(ctx.user.id)):
+                await ctx.send(messages.confirm_unlock.format(level_name=level.name))
+                db.session.add(db.UserUnlock(user_id=str(ctx.user.id), level=level))
                 db.session.commit()
                 if level.discord_role:
-                    await add_role_to_user(ctx.author.id, level.discord_role)
+                    await add_role_to_user(ctx.user.id, level.discord_role)
                 break
         else:
             await ctx.send(messages.reject_unlock)
