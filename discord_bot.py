@@ -27,6 +27,7 @@ async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solu
                 db.session.commit()
                 await discord_utils.update_level_roles_on_user_solve(ctx.user.id, level)
                 await update_user_nickname(ctx.user.id)
+                break
         else:
             await ctx.send(messages.reject_solve)
     else:
@@ -45,6 +46,7 @@ async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to
                 db.session.commit()
                 if level.discord_role:
                     await add_role_to_user(ctx.user.id, level.discord_role)
+                await update_user_nickname(ctx.user.id)
                 break
         else:
             await ctx.send(messages.reject_unlock)
