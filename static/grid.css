@@ -731,13 +731,12 @@ input:checked + .slider:before {
 
 #discord_container span {
 	font-family: sans-serif;
-	display: inline-block;
 }
 
 .discord_message {
 	color: #fff;
 	margin-top: 2px;
-	margin-bottom: -20px;
+	margin-bottom: -30px;
 }
 
 .discord_message div {
@@ -757,7 +756,7 @@ input:checked + .slider:before {
 	top: -40px;
 	word-wrap: break-word;
 	text-overflow: ellipsis;
-	width: 200px;
+	width: 218px;
 	line-height: 20px;
 }
 
@@ -787,6 +786,7 @@ input:checked + .slider:before {
 .discord_time {
 	color: #777;
 	font-size: 11px;
+	white-space: nowrap;
 }
 
 .discord_warning {
