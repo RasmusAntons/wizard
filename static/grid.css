@@ -728,6 +728,7 @@ input:checked + .slider:before {
 	padding: 10px;
 	margin: 0 auto;
 	margin-top: -7px;
+	border: 1px outset #8e8e8e85;
 }
 
 #discord_container span {
