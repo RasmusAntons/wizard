@@ -727,6 +727,7 @@ input:checked + .slider:before {
 	text-align: left !important;
 	padding: 10px;
 	margin: 0 auto;
+	margin-top: -7px;
 }
 
 #discord_container span {
