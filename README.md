@@ -19,7 +19,7 @@ Allows the user to create or delete a dependancy line by clicking on two level b
 
 Opens a menu allowing the user to create and edit level categories. Categories visually compartmentalize related levels blocks into groups.
 
-![categories menu](https://cdn.discordapp.com/attachments/513014307978739714/937696770501255168/unknown.png)
+![categories menu](https://cdn.discordapp.com/attachments/513014307978739714/937715012011720744/unknown.png)
 
 Categories can also be linked to Discord categories.
 
