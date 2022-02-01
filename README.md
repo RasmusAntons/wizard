@@ -92,7 +92,7 @@ Users can unlock a level by calling the `/unlock` command with one of its unlock
 - Install python (>=3.9)
 - Check out the git `git clone https://github.com/RasmusAntons/wizard.git cd wizard`
 - Create a new venv `python -m venv venv` `. venv/bin/activate`
-- Install requirements pip install -r requirements.txt
+- Install requirements `pip install -r requirements.txt`
 - Initialise the database
 - `python manage.py initdb` Enter an access key for the admin site and discord bot token whan asked.
 - Run the server `python manage.py run`
