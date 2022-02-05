@@ -190,9 +190,9 @@ async def post_discord_channels(request):
             category = guild.get_channel(int(category_id))
         assert category is None or category.type == discord.ChannelType.category
         channel = await guild.create_text_channel(name, category=category)
-    except discord.HTTPException:
+    except discord.HTTPException as e:
         traceback.print_exc()
-        return aiohttp.web.json_response({'error': 'creating channel failed'}, status=500)
+        return aiohttp.web.json_response({'error': f'creating channel failed: {e.text}'}, status=500)
     return aiohttp.web.json_response({'id': str(channel.id)})
 
 
@@ -211,9 +211,9 @@ async def post_discord_roles(request):
     try:
         guild = discord_bot.client.get_guild(int(guild_id))
         role = await guild.create_role(name=name)
-    except discord.HTTPException:
+    except discord.HTTPException as e:
         traceback.print_exc()
-        return aiohttp.web.json_response({'error': 'creating role failed'}, status=500)
+        return aiohttp.web.json_response({'error': f'creating role failed: {e.text}'}, status=500)
     return aiohttp.web.json_response({'id': str(role.id)})
 
 
@@ -235,9 +235,9 @@ async def post_discord_categories(request):
     try:
         guild = discord_bot.client.get_guild(int(guild_id))
         category = await guild.create_category(name=name)
-    except discord.HTTPException:
+    except discord.HTTPException as e:
         traceback.print_exc()
-        return aiohttp.web.json_response({'error': 'creating role failed'}, status=500)
+        return aiohttp.web.json_response({'error': f'creating category failed: {e.text}'}, status=500)
     return aiohttp.web.json_response({'id': str(category.id)})
 
 
