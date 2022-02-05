@@ -241,6 +241,7 @@ button:disabled:hover {
 	border-bottom: solid 1px #000;
 	border-top: solid 1px #656475;
 	border-radius: 1px;
+	z-index: 1;
 }
 
 .block p {
