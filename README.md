@@ -89,6 +89,7 @@ Users can unlock a level by calling the `/unlock` command with one of its unlock
 ## Installation
 > Note: Command examples are for Linux, it'll be different on Windows or if you use Conda.
 - Register a discord application with a bot.
+- Enable the `server members intent` option in your bot's configurations
 - Install python (>=3.9)
 - Check out the git `git clone https://github.com/RasmusAntons/wizard.git cd wizard`
 - Create a new venv `python -m venv venv` `. venv/bin/activate`
