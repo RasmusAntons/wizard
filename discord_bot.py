@@ -28,7 +28,7 @@ async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solu
         level_solutions = db.session.query(db.Solution).where(db.Solution.text == solution)
         for level_solution in level_solutions:
             level = level_solution.level
-            if can_user_solve(level, str(ctx.user.id)):
+            if discord_utils.can_user_solve(level, str(ctx.user.id)):
                 await ctx.send(messages.confirm_solve.format(level_name=level.name))
                 db.session.add(db.UserSolve(user_id=str(ctx.user.id), level=level))
                 db.session.commit()
@@ -47,7 +47,7 @@ async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to
         level_unlocks = db.session.query(db.Unlock).where(db.Unlock.text == unlock)
         for level_unlock in level_unlocks:
             level = level_unlock.level
-            if can_user_unlock(level, str(ctx.user.id)):
+            if discord_utils.can_user_unlock(level, str(ctx.user.id)):
                 await ctx.send(messages.confirm_unlock.format(level_name=level.name))
                 db.session.add(db.UserUnlock(user_id=str(ctx.user.id), level=level))
                 db.session.commit()
