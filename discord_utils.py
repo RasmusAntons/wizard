@@ -1,3 +1,5 @@
+import unicodedata
+
 import nextcord
 from sqlalchemy import and_, exists
 
@@ -61,6 +63,8 @@ async def update_user_nickname(user_id):
         nick = member.name[:32 - min(0, len(name_suffix))] + name_suffix[:32]
     else:
         nick = member.name
+    if member.nick == nick:
+        return
     print(f'updating nickname for {member.name} to {nick} in {guild.name}')
     try:
         await member.edit(nick=nick)
