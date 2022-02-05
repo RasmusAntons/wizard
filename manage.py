@@ -17,6 +17,7 @@ def init_db():
     db.set_setting('nickname_prefix', ' [')
     db.set_setting('nickname_separator', ', ')
     db.set_setting('nickname_suffix', ']')
+    db.set_setting('nickname_enable', 'true')
     db.set_setting('key', getpass.getpass('Access key: '))
     db.set_setting('bot_token', getpass.getpass('Discord bot token: '))
     category = db.Category(name='Intro', colour=0xffb9fc)
