@@ -51,7 +51,13 @@ async def patch_settings(request):
             db.session.merge(db.Setting(key=config_key, value=config_value))
         else:
             db.session.execute(db.Setting.__table__.delete().where(db.Setting.key == config_key))
-    db.session.commit()
+    try:
+        await discord_utils.update_all_user_nicknames()
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        traceback.print_exc()
+        return aiohttp.web.json_response({'error': str(e)}, status=500)
     return aiohttp.web.json_response({'message': 'ok'})
 
 
