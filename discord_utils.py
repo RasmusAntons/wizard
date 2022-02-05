@@ -156,6 +156,8 @@ def get_parent_levels_until_role_or_unlock(level):
     res = set()
     if not level.unlocks:
         for parent_level in level.parent_levels:
+            if parent_level.extra_discord_role:
+                continue
             res.update(get_parent_levels_until_role_or_unlock(parent_level))
     return res
 

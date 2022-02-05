@@ -159,8 +159,9 @@ async def patch_levels(request):
             if level.get('id') is not None:
                 await discord_utils.move_level_to_category(level_id)
         await discord_utils.update_role_permissions()
-        for child_level in affected_child_levels:
-            await discord_utils.update_level_roles_on_relation_change(child_level)
+        if affected_child_levels:
+            await discord_utils.update_all_user_roles()
+            await discord_utils.update_all_user_nicknames()
         db.session.commit()
     except Exception as e:
         db.session.rollback()
