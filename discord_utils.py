@@ -31,6 +31,20 @@ def get_user_level_suffixes(user_id):
     return [level.nickname_suffix for level in levels if level.nickname_suffix]
 
 
+def get_used_role_ids():
+    roles = set()
+    for level in db.session.query(db.Level).all():
+        if level.discord_role:
+            roles.add(level.discord_role)
+        if level.extra_discord_role:
+            roles.add(level.extra_discord_role)
+    return roles
+
+
+def get_starting_levels():
+    return db.session.query(db.Level).where(~db.Level.parent_levels.any())
+
+
 async def update_user_nickname(user_id):
     level_suffixes = get_user_level_suffixes(user_id)
     prefix = db.get_setting('prefix', ' [')
@@ -48,7 +62,62 @@ async def update_user_nickname(user_id):
     else:
         nick = member.name
     print(f'updating nickname for {member.name} to {nick} in {guild.name}')
-    await member.edit(nick=nick)
+    try:
+        await member.edit(nick=nick)
+    except nextcord.Forbidden:
+        print(f'missing permission to update nickname for {member.name}')
+
+
+async def update_all_user_nicknames():
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+    for member in guild.members:
+        if member.bot:
+            continue
+        await update_user_nickname(str(member.id))
+
+
+async def update_user_roles(user_id, used_role_ids=None):
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+    if used_role_ids is None:
+        used_role_ids = get_used_role_ids()
+    solved_level_ids = set(
+        map(lambda l: l.level_id, db.session.query(db.UserSolve.level_id).where(db.UserSolve.user_id == user_id)))
+
+    member = guild.get_member(int(user_id)) or await guild.fetch_member(user_id)
+    roles_user_has = set(map(lambda r: str(r.id), member.roles)) & used_role_ids
+    roles_user_should_have = set()
+
+    for starting_level in get_starting_levels():
+        if starting_level.discord_role and can_user_solve(starting_level, user_id):
+            roles_user_should_have.add(starting_level.discord_role)
+    for solved_level_id in solved_level_ids:
+        level = db.session.get(db.Level, solved_level_id)
+        if level.extra_discord_role:
+            roles_user_should_have.add(level.extra_discord_role)
+        for child_level in level.child_levels:
+            if child_level.id in solved_level_ids:
+                continue
+            for parent_level in get_parent_levels_until_role_or_unlock(child_level):
+                roles_user_should_have.add(parent_level.discord_role)
+
+    role_ids_to_add = roles_user_should_have - roles_user_has
+    roles_to_add = list(map(lambda r: guild.get_role(int(r)), role_ids_to_add))
+    role_ids_to_remove = roles_user_has - roles_user_should_have
+    roles_to_remove = list(map(lambda r: guild.get_role(int(r)), role_ids_to_remove))
+    await member.add_roles(*roles_to_add)
+    await member.remove_roles(*roles_to_remove)
+
+
+async def update_all_user_roles():
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+    used_role_ids = get_used_role_ids()
+    for member in guild.members:
+        if member.bot:
+            continue
+        await update_user_roles(str(member.id), used_role_ids=used_role_ids)
 
 
 def can_user_solve(level, user_id):
@@ -89,55 +158,6 @@ def get_parent_levels_until_role_or_unlock(level):
         for parent_level in level.parent_levels:
             res.update(get_parent_levels_until_role_or_unlock(parent_level))
     return res
-
-
-async def remove_parent_roles_from_user(user_id, level):
-    guild_id = int(db.get_setting('guild'))
-    guild = discord_bot.client.get_guild(guild_id)
-    if guild is None:
-        raise Exception(f'guild not set or wrong: {guild_id}')
-    member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))
-    if member is None:
-        raise Exception(f'failed to find member')
-    roles = []
-    for parent_level in get_parent_levels_until_role_or_unlock(level):
-        role = guild.get_role(int(parent_level.discord_role))
-        if role is not None:
-            roles.append(role)
-    if roles:
-        await member.remove_roles(*roles)
-
-
-async def update_level_roles_on_user_solve(user_id, level):
-    remove_parent_roles_from = set()
-    if level.extra_discord_role:
-        await add_role_to_user(user_id, level.extra_discord_role)
-        remove_parent_roles_from.add(level)
-    for child_level in level.child_levels:
-        if child_level.discord_role and has_user_reached(child_level, user_id):
-            await add_role_to_user(user_id, child_level.discord_role)
-            for parent_level in child_level.parent_levels:
-                remove_parent_roles_from.add(parent_level)
-    for parent_level in remove_parent_roles_from:
-        await remove_parent_roles_from_user(user_id, parent_level)
-
-
-async def update_level_roles_on_relation_change(level):
-    if not level.parent_levels or not level.discord_role or level.unlocks:
-        return
-    first_parent = level.parent_levels[0]
-    user_solves = db.session.query(db.UserSolve.user_id).where(db.UserSolve.level_id == first_parent.id).distinct()
-    for user_solve in user_solves:
-        if has_user_reached(level, user_solve.user_id):
-            await add_role_to_user(user_solve.user_id, level.discord_role)
-            for parent_level in level.parent_levels:
-                await remove_parent_roles_from_user(user_solve.user_id, parent_level)
-
-
-async def update_nickname_prefix(user_id):
-    user_solves = db.session.query(db.UserSolve.level_id).where(db.UserSolve.user_id == user_id).distinct()
-    solved_levels = db.session.query(db.Level).join(db.UserSolve, db.Level.id == db.UserSolve.level_id).where(db.UserSolve.user_id == user_id)
-    print([solved_level.name for solved_level in solved_levels])
 
 
 def get_child_ids_recursively(level):
@@ -192,7 +212,7 @@ def check_loops():
 async def update_role_permissions():
     levels = [level for level in db.session.query(db.Level).all()]
     guild_id = int(db.get_setting('guild'))
-    guild = discord_bot.client.get_guild(guild_id)
+    guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     channel_permissions = {level.discord_channel: {
         guild.default_role: nextcord.PermissionOverwrite(read_messages=False)
     } for level in levels if level.discord_channel}

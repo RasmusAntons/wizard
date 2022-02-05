@@ -3,16 +3,23 @@ import nextcord
 import db
 import discord_utils
 import messages
-from discord_utils import (can_user_solve, can_user_unlock, add_role_to_user, remove_parent_roles_from_user,
-                           get_user_level_suffixes, update_user_nickname)
 
-client = nextcord.Client()
+intents = nextcord.Intents.default()
+intents.members = True
+client = nextcord.Client(intents=intents)
 
 
 @client.event
 async def on_ready():
     print(f'logged in as {client.user}')
-    await discord_utils.update_nickname_prefix('177438227563675648')
+    await discord_utils.update_all_user_roles()
+    await discord_utils.update_all_user_nicknames()
+
+
+@client.event
+async def on_member_join(member):
+    await discord_utils.update_user_roles(member.id)
+    await discord_utils.update_user_nickname(member.id)
 
 
 @client.slash_command('solve')
@@ -25,8 +32,8 @@ async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solu
                 await ctx.send(messages.confirm_solve.format(level_name=level.name))
                 db.session.add(db.UserSolve(user_id=str(ctx.user.id), level=level))
                 db.session.commit()
-                await discord_utils.update_level_roles_on_user_solve(ctx.user.id, level)
-                await update_user_nickname(ctx.user.id)
+                await discord_utils.update_user_roles(ctx.user.id)
+                await discord_utils.update_user_nickname(ctx.user.id)
                 break
         else:
             await ctx.send(messages.reject_solve)
@@ -44,9 +51,8 @@ async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to
                 await ctx.send(messages.confirm_unlock.format(level_name=level.name))
                 db.session.add(db.UserUnlock(user_id=str(ctx.user.id), level=level))
                 db.session.commit()
-                if level.discord_role:
-                    await add_role_to_user(ctx.user.id, level.discord_role)
-                await update_user_nickname(ctx.user.id)
+                await update_user_roles
+                await discord_utils.update_user_nickname(ctx.user.id)
                 break
         else:
             await ctx.send(messages.reject_unlock)
