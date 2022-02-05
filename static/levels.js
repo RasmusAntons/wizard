@@ -290,7 +290,6 @@ function initLevels() {
 				delete levelsOriginal[selectedLevelId];
 				delete levelsCurrent[selectedLevelId];
 				delete levelsChanged[selectedLevelId];
-				checkChanges(true);
 			} else {
 				levelsCurrent[selectedLevelId] = {
 					delete_channel: document.getElementById('level_delete_channel').checked,
@@ -299,6 +298,7 @@ function initLevels() {
 				};
 				levelsChanged[selectedLevelId] = levelsCurrent[selectedLevelId];
 			}
+			checkChanges(true);
 			levelBlocks[selectedLevelId].remove();
 			selectedLevelId = undefined;
 			deletePopup.style.display = '';
