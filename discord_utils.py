@@ -48,10 +48,12 @@ def get_starting_levels():
 
 
 async def update_user_nickname(user_id):
+    if db.get_setting('nickname_enable', 'false') != 'true':
+        return
     level_suffixes = get_user_level_suffixes(user_id)
-    prefix = db.get_setting('prefix', ' [')
-    separator = db.get_setting('separator', ', ')
-    suffix = db.get_setting('suffix', ']')
+    prefix = db.get_setting('nickname_prefix', ' [')
+    separator = db.get_setting('nickname_separator', ', ')
+    suffix = db.get_setting('nickname_suffix', ']')
     name_suffix = f'{prefix}{separator.join(level_suffixes)}{suffix}'
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
@@ -73,6 +75,8 @@ async def update_user_nickname(user_id):
 
 
 async def update_all_user_nicknames():
+    if db.get_setting('nickname_enable', 'false') != 'true':
+        return
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     for member in guild.members:
