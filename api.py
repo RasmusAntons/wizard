@@ -88,9 +88,9 @@ async def delete_level(level_id, delete_channel=False, delete_role=False, delete
                 if role:
                     await role.delete()
             if delete_extra_role and level.extra_discord_role:
-                role = guild.get_channel(int(level.extra_discord_role))
-                if role:
-                    await role.delete()
+                extra_role = guild.get_role(int(level.extra_discord_role))
+                if extra_role:
+                    await extra_role.delete()
         except discord.HTTPException:
             traceback.print_exc()
             return aiohttp.web.json_response({'error': 'deleting discord resources failed'}, status=500)
@@ -136,7 +136,6 @@ async def patch_levels(request):
                     db.session.add(obj)
             new_relations[level_id] = level_body.get('child_levels', [])
             db.session.merge(level)
-    affected_child_levels = set()
     for parent_level_id, child_level_ids in new_relations.items():
         parent_level = db.session.get(db.Level, parent_level_id)
         existing_child_levels = [level for level in parent_level.child_levels]
@@ -148,10 +147,8 @@ async def patch_levels(request):
             else:
                 child_level = db.session.get(db.Level, child_level_id)
                 parent_level.child_levels.append(child_level)
-                affected_child_levels.add(child_level)
         for removed_child_level in existing_child_levels:
             parent_level.child_levels.remove(removed_child_level)
-            affected_child_levels.add(removed_child_level)
         db.session.merge(parent_level)
     try:
         discord_utils.check_loops()
@@ -159,9 +156,8 @@ async def patch_levels(request):
             if level.get('id') is not None:
                 await discord_utils.move_level_to_category(level_id)
         await discord_utils.update_role_permissions()
-        if affected_child_levels:
-            await discord_utils.update_all_user_roles()
-            await discord_utils.update_all_user_nicknames()
+        await discord_utils.update_all_user_roles()
+        await discord_utils.update_all_user_nicknames()
         db.session.commit()
     except Exception as e:
         db.session.rollback()
