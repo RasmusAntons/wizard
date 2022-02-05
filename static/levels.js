@@ -22,6 +22,10 @@ function checkLevelChange(levelId) {
 	checkChanges(true);
 }
 
+function roundLocation(val) {
+	return Math.round(val / snapDistance) * snapDistance;
+}
+
 function checkLevelMarkerChange(levelId) {
 	const levelBlock = levelBlocks[levelId];
 	const level = levelsCurrent[levelId];
@@ -206,8 +210,8 @@ function createLevelBlock(level, unsaved, select) {
 	if (level.grid_location[1] !== null)
 		draggable.top = level.grid_location[1] - container.scrollTop;
 	draggable.onDrag = function (position) {
-		const snappedX = Math.round((container.scrollLeft + position.left) / snapDistance) * snapDistance - container.scrollLeft;
-		const snappedY = Math.round((container.scrollTop + position.top) / snapDistance) * snapDistance - container.scrollTop;
+		const snappedX = roundLocation(container.scrollLeft + position.left) - container.scrollLeft;
+		const snappedY = roundLocation(container.scrollTop + position.top) - container.scrollTop;
 		position.snapped = snappedX !== position.left || snappedY !== position.top;
 		if (position.snapped) {
 			position.left = snappedX;
@@ -217,7 +221,10 @@ function createLevelBlock(level, unsaved, select) {
 			line.position();
 	};
 	draggable.onDragEnd = function (position) {
-		levelsCurrent[level.id].grid_location = [position.left + container.scrollLeft, position.top + container.scrollTop];
+		levelsCurrent[level.id].grid_location = [
+			roundLocation(position.left + container.scrollLeft),
+			roundLocation(position.top + container.scrollTop)
+		];
 		checkLevelChange(level.id);
 		for (let line of Object.values(lines))
 			line.position();
@@ -382,7 +389,7 @@ function initLevels() {
 			createLevelBlock({
 				id: uuidv4(), name: '', nickname_suffix: '', parent_levels: [], child_levels: [], solutions: [],
 				unlocks: [], discord_channel: null, discord_role: null, extra_discord_role: null, category: null,
-				grid_location: [e.layerX + 320, e.layerY]
+				grid_location: [roundLocation(e.layerX) + 320, roundLocation(e.layerY)]
 			}, true, true);
 			return;
 		}
