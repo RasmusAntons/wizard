@@ -53,6 +53,7 @@ async def patch_settings(request):
             db.session.execute(db.Setting.__table__.delete().where(db.Setting.key == config_key))
     try:
         await discord_utils.update_all_user_nicknames()
+        await discord_utils.update_all_user_roles()
         db.session.commit()
     except Exception as e:
         db.session.rollback()

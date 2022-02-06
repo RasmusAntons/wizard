@@ -33,6 +33,16 @@ def get_user_level_suffixes(user_id):
     return [level.nickname_suffix for level in levels if level.nickname_suffix]
 
 
+def has_user_solved_everything(user_id):
+    unsolved_level = db.session.query(db.Level).where(
+        and_(
+            exists().where(db.Level.id == db.Solution.level_id),
+            ~exists().where(and_(db.UserSolve.user_id == user_id, db.Level.id == db.UserSolve.level_id))
+        )
+    ).first()
+    return unsolved_level is None
+
+
 def get_used_role_ids():
     roles = set()
     for level in db.session.query(db.Level).all():
@@ -40,6 +50,9 @@ def get_used_role_ids():
             roles.add(level.discord_role)
         if level.extra_discord_role:
             roles.add(level.extra_discord_role)
+    completionist_role = db.get_setting('completionist_role')
+    if completionist_role:
+        roles.add(completionist_role)
     return roles
 
 
@@ -50,11 +63,14 @@ def get_starting_levels():
 async def update_user_nickname(user_id):
     if db.get_setting('nickname_enable', 'false') != 'true':
         return
-    level_suffixes = get_user_level_suffixes(user_id)
-    prefix = db.get_setting('nickname_prefix', ' [')
-    separator = db.get_setting('nickname_separator', ', ')
-    suffix = db.get_setting('nickname_suffix', ']')
-    name_suffix = f'{prefix}{separator.join(level_suffixes)}{suffix}'
+    if db.get_setting('completionist_enable_nickname', 'false') == 'true' and has_user_solved_everything(user_id):
+        name_suffix = db.get_setting('completionist_badge', '*')
+    else:
+        level_suffixes = get_user_level_suffixes(user_id)
+        prefix = db.get_setting('nickname_prefix', ' [')
+        separator = db.get_setting('nickname_separator', ', ')
+        suffix = db.get_setting('nickname_suffix', ']')
+        name_suffix = f'{prefix}{separator.join(level_suffixes)}{suffix}' if level_suffixes else ''
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))
@@ -68,7 +84,7 @@ async def update_user_nickname(user_id):
         user = db.User(id=user_id, name=member.name)
         db.session.merge(user)
     user.nick = user.name or member.name
-    if level_suffixes:
+    if name_suffix:
         user.nick = user.nick[:32 - max(0, len(name_suffix))] + name_suffix[:32]
     db.session.commit()
     if member.nick == user.nick:
@@ -117,6 +133,11 @@ async def update_user_roles(user_id, used_role_ids=None):
                 continue
             for parent_level in get_parent_levels_until_role_or_unlock(child_level):
                 roles_user_should_have.add(parent_level.discord_role)
+
+    if db.get_setting('completionist_enable_role', 'false') == 'true' and has_user_solved_everything(user_id):
+        completionist_role = db.get_setting('completionist_role')
+        if completionist_role:
+            roles_user_should_have.add(completionist_role)
 
     role_ids_to_add = roles_user_should_have - roles_user_has
     roles_to_add = list(map(lambda r: guild.get_role(int(r)), role_ids_to_add))

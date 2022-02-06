@@ -4,7 +4,9 @@ let settingsChanged = {};
 
 const inputSettings = {
 	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'grid': 'check', 'tooltips': 'check',
-	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check'
+	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check',
+	'completionist_enable_nickname': 'check', 'completionist_badge': 'text',
+	'completionist_enable_role': 'check', 'completionist_role': 'text'
 };
 
 function checkSettingChange(settingKey) {
@@ -80,6 +82,7 @@ function initSettings() {
 		document.getElementById('toolbar-level').style.display = '';
 		document.getElementById('toolbar-category').style.display = '';
 		document.getElementById('toolbar-nicknames').style.display = '';
+		document.getElementById('toolbar-completionist').style.display = '';
 		document.getElementById('toolbar-settings').style.display = 'block';
 		document.getElementById('setting_bot_token').type = 'password';
 		document.getElementById('setting_key').type = 'password';
@@ -89,15 +92,50 @@ function initSettings() {
 	document.getElementById('nicknames-menu-button').onclick = () => {
 		document.getElementById('toolbar-settings').style.display = '';
 		document.getElementById('toolbar-nicknames').style.display = 'block';
-	}
+	};
+	document.getElementById('completionist-menu-button').onclick = () => {
+		document.getElementById('toolbar-settings').style.display = '';
+		document.getElementById('toolbar-completionist').style.display = 'block';
+	};
+	const completionistCreateRole = document.getElementById('setting_completionist_create_role');
+	completionistCreateRole.onclick = () => {
+		const namePopup = document.getElementById('name_popup');
+		const pageOverlay = document.getElementById('page-overlay');
+		const okButton = document.getElementById('object_name_ok_button');
+		const cancelButton = document.getElementById('object_name_cancel_button');
+		namePopup.style.display = 'block';
+		pageOverlay.style.display = 'block';
+		document.getElementById('name_popup_name').textContent = 'completionist';
+		document.getElementById('name_popup_object').textContent = 'discord role';
+		okButton.onclick = () => {
+			const objectName = document.getElementById('object_name').value;
+			if (!objectName)
+				return;
+			apiCall('/api/discord/roles/', 'POST', {'name': objectName}).then(r => {
+				if (r.error) {
+					alert(r.error);
+				} else {
+					if (selectedCategoryId === category.id)
+						document.getElementById('setting_completionist_role').value = r.id;
+					namePopup.style.display = '';
+					pageOverlay.style.display = '';
+				}
+			});
+			okButton.onclick = undefined;
+		};
+		cancelButton.onclick = () => {
+			namePopup.style.display = '';
+			pageOverlay.style.display = '';
+		};
+	};
 	document.getElementById('show_bot_token').onclick = () => {
 		const targetElem = document.getElementById('setting_bot_token');
 		targetElem.type = (targetElem.type === 'password') ? 'text' : 'password';
-	}
+	};
 	document.getElementById('show_unlock_key').onclick = () => {
 		const targetElem = document.getElementById('setting_key');
 		targetElem.type = (targetElem.type === 'password') ? 'text' : 'password';
-	}
+	};
 	const enableGrid = document.getElementById('setting_grid');
 	enableGrid.onchange = e => {
 		document.getElementById('main').style.fill = e.target.checked ? 'url(#bigGrid)' : '#1a1a21';

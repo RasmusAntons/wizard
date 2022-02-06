@@ -489,7 +489,7 @@ button:disabled:hover {
 	margin-top: 8px;
 }
 
-#toolbar-nicknames {
+#toolbar-nicknames, #toolbar-completionist {
 	margin-top: 17px;
 	background-color: #232330;
 	padding-top: 1px;
