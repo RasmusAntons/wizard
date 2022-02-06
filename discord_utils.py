@@ -61,6 +61,8 @@ async def update_user_nickname(user_id):
     if not member:
         print(f'member {user_id} not found in guild {guild.name}')
         return
+    if member.bot:
+        return
     user = db.session.get(db.User, user_id)
     if user is None:
         user = db.User(id=user_id, name=member.name)
