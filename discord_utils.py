@@ -10,10 +10,10 @@ import discord_bot
 def has_user_reached(level, user_id):
     if level.unlocks:
         return db.session.query(db.UserUnlock) \
-            .where(and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)).scalar()
+            .where(and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)).scalar() is not None
     for parent_level in level.parent_levels:
         has_solved = db.session.query(db.UserSolve) \
-            .where(and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == user_id)).scalar()
+            .where(and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == user_id)).scalar() is not None
         if not has_solved:
             return False
     return True
@@ -133,6 +133,11 @@ async def update_user_roles(user_id, used_role_ids=None):
                 continue
             for parent_level in get_parent_levels_until_role_or_unlock(child_level):
                 roles_user_should_have.add(parent_level.discord_role)
+            for grand_child_level in child_level.child_levels:
+                if grand_child_level.unlocks and grand_child_level.discord_role:
+                    if grand_child_level.id in solved_level_ids or not can_user_solve(grand_child_level, user_id):
+                        continue
+                    roles_user_should_have.add(grand_child_level.discord_role)
 
     if db.get_setting('completionist_enable_role', 'false') == 'true' and has_user_solved_everything(user_id):
         completionist_role = db.get_setting('completionist_role')
