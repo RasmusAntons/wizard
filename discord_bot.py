@@ -53,8 +53,8 @@ async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solu
                 await ctx.send(messages.confirm_solve.format(level_name=level.name))
                 db.session.add(db.UserSolve(user_id=str(ctx.user.id), level=level))
                 db.session.commit()
-                await discord_utils.update_user_roles(ctx.user.id)
-                await discord_utils.update_user_nickname(ctx.user.id)
+                await discord_utils.update_user_roles(str(ctx.user.id))
+                await discord_utils.update_user_nickname(str(ctx.user.id))
                 break
         else:
             await ctx.send(messages.reject_solve)
@@ -72,8 +72,8 @@ async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to
                 await ctx.send(messages.confirm_unlock.format(level_name=level.name))
                 db.session.add(db.UserUnlock(user_id=str(ctx.user.id), level=level))
                 db.session.commit()
-                await update_user_roles
-                await discord_utils.update_user_nickname(ctx.user.id)
+                await discord_utils.update_user_roles(str(ctx.user.id))
+                await discord_utils.update_user_nickname(str(ctx.user.id))
                 break
         else:
             await ctx.send(messages.reject_unlock)
