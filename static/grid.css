@@ -432,7 +432,16 @@ button:disabled:hover {
 	width: 60px;
 }
 
+#setting_completionist_create_role {
+	width: 60px;
+}
+
 #discordstuff input {
+	width: 220px;
+	margin-right: 4px;
+}
+
+#setting_completionist_role {
 	width: 220px;
 	margin-right: 4px;
 }
