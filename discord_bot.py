@@ -18,8 +18,22 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
+    db.session.merge(db.User(id=str(member.id), name=member.name))
+    db.session.commit()
     await discord_utils.update_user_roles(member.id)
     await discord_utils.update_user_nickname(member.id)
+
+
+@client.event
+async def on_member_update(before, after):
+    if before.display_name != after.display_name:
+        print(f'{after.name} changed their nick from {before.display_name} to {after.display_name}')
+        user = db.session.get(db.User, str(after.id))
+        if after.display_name == user.nick:
+            return
+        user.name = after.display_name
+        db.session.commit()
+        await discord_utils.update_user_nickname(str(after.id))
 
 
 @client.slash_command('solve')

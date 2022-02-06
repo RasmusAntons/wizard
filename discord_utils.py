@@ -61,15 +61,20 @@ async def update_user_nickname(user_id):
     if not member:
         print(f'member {user_id} not found in guild {guild.name}')
         return
+    user = db.session.get(db.User, user_id)
+    if user is None:
+        user = db.User(id=user_id, name=member.name)
+        db.session.merge(user)
     if level_suffixes:
-        nick = member.name[:32 - min(0, len(name_suffix))] + name_suffix[:32]
+        user.nick = user.name[:32 - max(0, len(name_suffix))] + name_suffix[:32]
     else:
-        nick = member.name
-    if member.nick == nick:
+        user.nick = user.name
+    db.session.commit()
+    if member.nick == user.nick:
         return
-    print(f'updating nickname for {member.name} to {nick} in {guild.name}')
+    print(f'updating nickname for {member.name} to {user.nick} in {guild.name}')
     try:
-        await member.edit(nick=nick)
+        await member.edit(nick=user.nick)
     except nextcord.Forbidden:
         print(f'missing permission to update nickname for {member.name}')
 

@@ -83,6 +83,13 @@ class Setting(Base):
     value = Column(String, nullable=True)
 
 
+class User(Base):
+    __tablename__ = 'user'
+    id = Column(String(18), primary_key=True)
+    name = Column(String(32))
+    nick = Column(String(32))
+
+
 class UserSolve(Base):
     __tablename__ = 'user_solve'
     user_id = Column(String(18), primary_key=True)
