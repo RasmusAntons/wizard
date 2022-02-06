@@ -469,14 +469,15 @@ button:disabled:hover {
 	display: none;
 }
 
-#toolbar-settings button:not(#nicknames-menu-button) {
+#toolbar-settings button:not(#nicknames-menu-button):not(#completionist-menu-button) {
 	width: 61px;
 	margin-top: 7px;
 	float: right;
 	margin-right: 13px;
 }
 
-#nicknames-menu-button {
+#nicknames-menu-button,
+#completionist-menu-button {
 	margin-top: 20px;
 }
 
