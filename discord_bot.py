@@ -18,7 +18,7 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    db.session.merge(db.User(id=str(member.id), name=member.name))
+    db.session.merge(db.User(id=str(member.id), name=member.nick))
     db.session.commit()
     await discord_utils.update_user_roles(member.id)
     await discord_utils.update_user_nickname(member.id)
@@ -26,13 +26,20 @@ async def on_member_join(member):
 
 @client.event
 async def on_member_update(before, after):
-    if before.display_name != after.display_name:
-        print(f'{after.name} changed their nick from {before.display_name} to {after.display_name}')
+    if before.nick != after.nick:
+        print(f'{after.name} changed their nick from {before.nick} to {after.nick}')
         user = db.session.get(db.User, str(after.id))
-        if after.display_name == user.nick:
+        if after.nick == user.nick:
             return
-        user.name = after.display_name
+        user.name = after.nick
         db.session.commit()
+        await discord_utils.update_user_nickname(str(after.id))
+
+
+@client.event
+async def on_user_update(before, after):
+    if before.name != after.name:
+        print(f'{after.name} changed their name from {before.name} to {after.name}')
         await discord_utils.update_user_nickname(str(after.id))
 
 

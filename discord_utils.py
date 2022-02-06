@@ -65,10 +65,9 @@ async def update_user_nickname(user_id):
     if user is None:
         user = db.User(id=user_id, name=member.name)
         db.session.merge(user)
+    user.nick = user.name or member.name
     if level_suffixes:
-        user.nick = user.name[:32 - max(0, len(name_suffix))] + name_suffix[:32]
-    else:
-        user.nick = user.name
+        user.nick = user.nick[:32 - max(0, len(name_suffix))] + name_suffix[:32]
     db.session.commit()
     if member.nick == user.nick:
         return
