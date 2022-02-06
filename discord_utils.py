@@ -111,7 +111,7 @@ async def update_user_roles(user_id, used_role_ids=None):
         if level.extra_discord_role:
             roles_user_should_have.add(level.extra_discord_role)
         for child_level in level.child_levels:
-            if child_level.id in solved_level_ids:
+            if child_level.id in solved_level_ids or not can_user_solve(child_level, user_id):
                 continue
             for parent_level in get_parent_levels_until_role_or_unlock(child_level):
                 roles_user_should_have.add(parent_level.discord_role)
