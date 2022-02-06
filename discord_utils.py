@@ -100,6 +100,8 @@ async def update_user_roles(user_id, used_role_ids=None):
         map(lambda l: l.level_id, db.session.query(db.UserSolve.level_id).where(db.UserSolve.user_id == user_id)))
 
     member = guild.get_member(int(user_id)) or await guild.fetch_member(user_id)
+    if member is None or member.bot:
+        return
     roles_user_has = set(map(lambda r: str(r.id), member.roles)) & used_role_ids
     roles_user_should_have = set()
 
