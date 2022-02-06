@@ -115,8 +115,9 @@ function initSettings() {
 				if (r.error) {
 					alert(r.error);
 				} else {
-					if (selectedCategoryId === category.id)
-						document.getElementById('setting_completionist_role').value = r.id;
+					document.getElementById('setting_completionist_role').value = r.id;
+					settingsCurrent['completionist_role'] = r.id;
+					checkSettingChange('completionist_role');
 					namePopup.style.display = '';
 					pageOverlay.style.display = '';
 				}
