@@ -61,16 +61,16 @@ def get_starting_levels():
 
 
 async def update_user_nickname(user_id):
-    if db.get_setting('nickname_enable', 'false') != 'true':
-        return
     if db.get_setting('completionist_enable_nickname', 'false') == 'true' and has_user_solved_everything(user_id):
         name_suffix = db.get_setting('completionist_badge', '*')
-    else:
+    elif db.get_setting('nickname_enable', 'false') == 'true':
         level_suffixes = get_user_level_suffixes(user_id)
         prefix = db.get_setting('nickname_prefix', ' [')
         separator = db.get_setting('nickname_separator', ', ')
         suffix = db.get_setting('nickname_suffix', ']')
         name_suffix = f'{prefix}{separator.join(level_suffixes)}{suffix}' if level_suffixes else ''
+    else:
+        name_suffix = None
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))
