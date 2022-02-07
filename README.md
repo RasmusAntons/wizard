@@ -44,6 +44,14 @@ Nicknames are a way to display your current progress over Discord. These statuse
 
 The menu contains a real-time Discord preview of what nickname look like with the current settings.
 
+![completionist](https://cdn.discordapp.com/attachments/513014307978739714/940290959948795954/unknown.png)
+
+The completionist menu provides rewards for players who have solved every level block that has at least one solution.
+
+![completionist-menu](https://cdn.discordapp.com/attachments/513014307978739714/940291495582375936/unknown.png)
+
+To give a sense of freedom from a puzzle, the nickname badge removes the currently set prefix, separator, and suffix. You can of course manually add them back if you want.
+
 ![save](https://cdn.discordapp.com/attachments/513014307978739714/937702495873036328/unknown.png)
 
 The save button will only save once the edited marker ![edited marker](https://cdn.discordapp.com/attachments/513014307978739714/937702781387673620/edited.png) appears on it.
@@ -99,6 +107,3 @@ Users can unlock a level by calling the `/unlock` command with one of its unlock
 - Run the server `python manage.py run`
 - Login on the admin interface Go to `http://localhost:8000` in your browser and enter the access key.
 > Note: Or install with Conda using `conda_env.yaml`
-
-
-
