@@ -11,6 +11,7 @@ def init_db():
     db.Unlock.metadata.create_all(db.engine)
     db.Setting.metadata.create_all(db.engine)
     db.Category.metadata.create_all(db.engine)
+    db.User.metadata.create_all(db.engine)
     db.UserSolve.metadata.create_all(db.engine)
     db.UserUnlock.metadata.create_all(db.engine)
     db.set_setting('guild', '904475213415202866')
