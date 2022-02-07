@@ -97,8 +97,6 @@ async def update_user_nickname(user_id):
 
 
 async def update_all_user_nicknames():
-    if db.get_setting('nickname_enable', 'false') != 'true':
-        return
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     for member in guild.members:
