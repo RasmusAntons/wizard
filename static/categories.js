@@ -40,7 +40,7 @@ function createCategory(category, unsaved) {
 		selectedCategoryId = category.id;
 		categoryListItem.classList.add('selected-category');
 		const categoryNameInput = document.getElementById('discord_category_name');
-		categoryNameInput.value = category.name;
+		categoryNameInput.value = categoriesCurrent[category];
 		categoryNameInput.disabled = false;
 		categoryNameInput.oninput = categoryNameInput.onchange = () => {
 			categoryListItems[category.id].textContent = categoryNameInput.value;
