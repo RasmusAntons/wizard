@@ -6,7 +6,8 @@ const inputSettings = {
 	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'grid': 'check', 'tooltips': 'check',
 	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check',
 	'completionist_enable_nickname': 'check', 'completionist_badge': 'text',
-	'completionist_enable_role': 'check', 'completionist_role': 'text'
+	'completionist_enable_role': 'check', 'completionist_role': 'text',
+	'admin_enable_nickname': 'check', 'admin_badge': 'text', 'admin_role': 'text'
 };
 
 function checkSettingChange(settingKey) {
@@ -83,6 +84,7 @@ function initSettings() {
 		document.getElementById('toolbar-category').style.display = '';
 		document.getElementById('toolbar-nicknames').style.display = '';
 		document.getElementById('toolbar-completionist').style.display = '';
+		document.getElementById('toolbar-admin').style.display = '';
 		document.getElementById('toolbar-settings').style.display = 'block';
 		document.getElementById('setting_bot_token').type = 'password';
 		document.getElementById('setting_key').type = 'password';
@@ -96,6 +98,10 @@ function initSettings() {
 	document.getElementById('completionist-menu-button').onclick = () => {
 		document.getElementById('toolbar-settings').style.display = '';
 		document.getElementById('toolbar-completionist').style.display = 'block';
+	};
+	document.getElementById('admin-menu-button').onclick = () => {
+		document.getElementById('toolbar-settings').style.display = '';
+		document.getElementById('toolbar-admin').style.display = 'block';
 	};
 	const completionistCreateRole = document.getElementById('setting_completionist_create_role');
 	completionistCreateRole.onclick = () => {

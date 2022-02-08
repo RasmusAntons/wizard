@@ -195,6 +195,24 @@
                     <button id="setting_completionist_create_role">create</button>
                 </div>
             </div>
+            <div id="toolbar-admin" class="toolbar-group">
+                <div class="toolbar-row">
+                    <label class="switch">
+                        <span class="labeltext">admin nickname</span>
+                        <input type="checkbox" checked id="setting_admin_enable_nickname">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toolbar-row">
+                    <label for="setting_admin_badge">nickname badge</label>
+                    <input type="text" id="setting_admin_badge">
+                </div>
+                <div class="toolbar-row">
+                    <label for="setting_admin_role">discord role id</label>
+                    <br>
+                    <input type="text" maxlength="18" id="setting_admin_role">
+                </div>
+            </div>
             <div id="toolbar-settings" class="toolbar-group">
                 <div class="toolbar-row">
                     <label for="setting_bot_token">bot token</label>
@@ -233,6 +251,7 @@
                 </div>
                 <button id="nicknames-menu-button">Nicknames</button>
                 <button id="completionist-menu-button">Completionist</button>
+                <button id="admin-menu-button">Admin</button>
             </div>
         </div>
         <div id="container">

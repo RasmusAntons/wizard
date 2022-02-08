@@ -399,6 +399,7 @@ function initLevels() {
 		document.getElementById('toolbar-settings').style.display = '';
 		document.getElementById('toolbar-nicknames').style.display = '';
 		document.getElementById('toolbar-completionist').style.display = '';
+		document.getElementById('toolbar-admin').style.display = '';
 		for (let selectedLevel of document.querySelectorAll('.selected'))
 			selectedLevel.classList.toggle('selected', false);
 	};

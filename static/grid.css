@@ -478,16 +478,20 @@ button:disabled:hover {
 	display: none;
 }
 
-#toolbar-settings button:not(#nicknames-menu-button):not(#completionist-menu-button) {
+#toolbar-settings button:not(#nicknames-menu-button):not(#completionist-menu-button):not(#admin-menu-button) {
 	width: 61px;
 	margin-top: 7px;
 	float: right;
 	margin-right: 13px;
 }
 
-#nicknames-menu-button,
-#completionist-menu-button {
+#nicknames-menu-button {
 	margin-top: 20px;
+}
+
+#completionist-menu-button,
+#admin-menu-button {
+	margin-top: 10px;
 }
 
 #toolbar-settings input {
@@ -498,7 +502,7 @@ button:disabled:hover {
 	margin-top: 8px;
 }
 
-#toolbar-nicknames, #toolbar-completionist {
+#toolbar-nicknames, #toolbar-completionist, #toolbar-admin {
 	margin-top: 17px;
 	background-color: #232330;
 	padding-top: 1px;
