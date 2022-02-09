@@ -245,14 +245,14 @@ async def move_level_to_category(level_id):
                 await discord_channel.edit(category=discord_category)
 
 
-def get_parent_levels_recursively(level, context=None):
-    if context is None:
-        context = set()
+def get_parent_levels_recursively(level, initial_level=None):
+    if initial_level is None:
+        initial_level = level
     parent_levels = {level}
     for parent_level in level.parent_levels:
-        if parent_level in context:
+        if parent_level.id == initial_level.id:
             raise ValueError('loop in level dependencies')
-        parent_levels |= get_parent_levels_recursively(parent_level, parent_levels | context)
+        parent_levels |= get_parent_levels_recursively(parent_level, initial_level)
     return parent_levels
 
 
