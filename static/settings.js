@@ -7,7 +7,7 @@ const inputSettings = {
 	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check',
 	'completionist_enable_nickname': 'check', 'completionist_badge': 'text',
 	'completionist_enable_role': 'check', 'completionist_role': 'text',
-	'admin_enable_nickname': 'check', 'admin_badge': 'text', 'admin_role': 'text'
+	'admin_enable': 'check', 'admin_badge': 'text', 'admin_role': 'text'
 };
 
 function checkSettingChange(settingKey) {

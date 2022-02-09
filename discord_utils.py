@@ -80,7 +80,7 @@ async def update_user_nickname(user_id):
     if user is None:
         user = db.User(id=user_id, name=member.name)
         db.session.merge(user)
-    if db.get_setting('admin_enable_nickname') == 'true' and is_member_admin(member):
+    if db.get_setting('admin_enable') == 'true' and is_member_admin(member):
         name_suffix = db.get_setting('admin_badge', '')
     elif db.get_setting('completionist_enable_nickname') == 'true' and has_user_solved_everything(user_id):
         name_suffix = db.get_setting('completionist_badge', '*')
@@ -128,28 +128,29 @@ async def update_user_roles(user_id, used_role_ids=None):
     roles_user_has = set(map(lambda r: str(r.id), member.roles)) & used_role_ids
     roles_user_should_have = set()
 
-    for starting_level in get_starting_levels():
-        if starting_level.discord_role and can_user_solve(starting_level, user_id):
-            roles_user_should_have.add(starting_level.discord_role)
-    for solved_level_id in solved_level_ids:
-        level = db.session.get(db.Level, solved_level_id)
-        if level.extra_discord_role:
-            roles_user_should_have.add(level.extra_discord_role)
-        for child_level in level.child_levels:
-            if child_level.id in solved_level_ids or not can_user_solve(child_level, user_id):
-                continue
-            for parent_level in get_parent_levels_until_role_or_unlock(child_level):
-                roles_user_should_have.add(parent_level.discord_role)
-            for grand_child_level in child_level.child_levels:
-                if grand_child_level.unlocks and grand_child_level.discord_role:
-                    if grand_child_level.id in solved_level_ids or not can_user_solve(grand_child_level, user_id):
-                        continue
-                    roles_user_should_have.add(grand_child_level.discord_role)
+    if not (db.get_setting('admin_enable') == 'true' and is_member_admin(member)):
+        for starting_level in get_starting_levels():
+            if starting_level.discord_role and can_user_solve(starting_level, user_id):
+                roles_user_should_have.add(starting_level.discord_role)
+        for solved_level_id in solved_level_ids:
+            level = db.session.get(db.Level, solved_level_id)
+            if level.extra_discord_role:
+                roles_user_should_have.add(level.extra_discord_role)
+            for child_level in level.child_levels:
+                if child_level.id in solved_level_ids or not can_user_solve(child_level, user_id):
+                    continue
+                for parent_level in get_parent_levels_until_role_or_unlock(child_level):
+                    roles_user_should_have.add(parent_level.discord_role)
+                for grand_child_level in child_level.child_levels:
+                    if grand_child_level.unlocks and grand_child_level.discord_role:
+                        if grand_child_level.id in solved_level_ids or not can_user_solve(grand_child_level, user_id):
+                            continue
+                        roles_user_should_have.add(grand_child_level.discord_role)
 
-    if db.get_setting('completionist_enable_role') == 'true' and has_user_solved_everything(user_id):
-        completionist_role = db.get_setting('completionist_role')
-        if completionist_role:
-            roles_user_should_have.add(completionist_role)
+        if db.get_setting('completionist_enable_role') == 'true' and has_user_solved_everything(user_id):
+            completionist_role = db.get_setting('completionist_role')
+            if completionist_role:
+                roles_user_should_have.add(completionist_role)
 
     role_ids_to_add = roles_user_should_have - roles_user_has
     roles_to_add = list(map(lambda r: guild.get_role(int(r)), role_ids_to_add))
