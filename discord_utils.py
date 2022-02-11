@@ -2,6 +2,7 @@ import unicodedata
 
 import nextcord
 from sqlalchemy import and_, exists
+import sqlalchemy.testing
 
 import db
 import discord_bot
@@ -25,6 +26,15 @@ def get_solvable_levels(user_id):
         if can_user_solve(level, user_id):
             levels.append(level)
     return levels
+
+
+def get_solved_levels(user_id, name=None, start=''):
+    return db.session.query(db.Level).where(
+        and_(
+            db.Level.name == name if name else db.Level.name.startswith(start),
+            exists().where(and_(db.UserSolve.user_id == user_id, db.Level.id == db.UserSolve.level_id))
+        )
+    ).all()
 
 
 def get_user_level_suffixes(user_id):

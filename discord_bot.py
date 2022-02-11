@@ -43,7 +43,7 @@ async def on_user_update(before, after):
         await discord_utils.update_user_nickname(str(after.id))
 
 
-@client.slash_command('solve')
+@client.slash_command('solve', description='Solve')
 async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solution of the level you solved.')):
     if ctx.channel.type == nextcord.ChannelType.private:
         level_solutions = db.session.query(db.Solution).where(db.Solution.text == solution)
@@ -62,7 +62,7 @@ async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solu
         await ctx.send(messages.use_in_dms, ephemeral=True)
 
 
-@client.slash_command('unlock')
+@client.slash_command('unlock', description='Unlock')
 async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to unlock a secret level you found.')):
     if ctx.channel.type == nextcord.ChannelType.private:
         level_unlocks = db.session.query(db.Unlock).where(db.Unlock.text == unlock)
@@ -79,3 +79,36 @@ async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to
             await ctx.send(messages.reject_unlock)
     else:
         await ctx.send(messages.use_in_dms, ephemeral=True)
+
+
+@client.slash_command('recall', description='Recall a solved level')
+async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', required=True)):
+    if ctx.channel.type == nextcord.ChannelType.private:
+        solved_levels = discord_utils.get_solved_levels(ctx.user.id, name=level)
+        if len(solved_levels) == 0:
+            await ctx.send('No such level')
+        else:
+            await ctx.send('\n'.join([
+                f'Solution(s) for {l.name}: {", ".join(map(lambda s: s.text, l.solutions))}' for l in solved_levels
+            ]))
+    else:
+        await ctx.send(messages.use_in_dms, ephemeral=True)
+
+
+@recall_command.on_autocomplete('level')
+async def recall_autocomplete(ctx, level):
+    if ctx.channel.type == nextcord.ChannelType.private:
+        start = level or ''
+        solved_levels = discord_utils.get_solved_levels(ctx.user.id, start=start)
+        await ctx.response.send_autocomplete([l.name for l in solved_levels])
+    else:
+        await ctx.response.send_autocomplete([messages.use_in_dms])
+
+
+@client.slash_command('continue', description='List your current levels')
+async def continue_command(ctx):
+    current_levels = list(filter(lambda l: l.solutions, discord_utils.get_solvable_levels(ctx.user.id)))
+    if current_levels:
+        await ctx.send(f'Your current levels are: {", ".join(map(lambda l: l.name, current_levels))}')
+    else:
+        await ctx.send(f'You have solved everything')
