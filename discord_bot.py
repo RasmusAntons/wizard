@@ -107,8 +107,11 @@ async def recall_autocomplete(ctx, level):
 
 @client.slash_command('continue', description='List your current levels')
 async def continue_command(ctx):
-    current_levels = list(filter(lambda l: l.solutions, discord_utils.get_solvable_levels(ctx.user.id)))
-    if current_levels:
-        await ctx.send(f'Your current levels are: {", ".join(map(lambda l: l.name, current_levels))}')
+    if ctx.channel.type == nextcord.ChannelType.private:
+        current_levels = list(filter(lambda l: l.solutions, discord_utils.get_solvable_levels(ctx.user.id)))
+        if current_levels:
+            await ctx.send(f'Your current levels are: {", ".join(map(lambda l: l.name, current_levels))}')
+        else:
+            await ctx.send(f'You have solved everything')
     else:
-        await ctx.send(f'You have solved everything')
+        await ctx.send(messages.use_in_dms, ephemeral=True)
