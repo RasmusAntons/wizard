@@ -124,6 +124,7 @@ async def patch_levels(request):
             level = db.Level(id=level_id)
             level.name = level_body.get('name')
             level.nickname_suffix = level_body.get('nickname_suffix')
+            level.nickname_merge = level_body.get('nickname_merge')
             level.discord_channel = level_body.get('discord_channel')
             level.discord_role = level_body.get('discord_role')
             level.extra_discord_role = level_body.get('extra_discord_role')

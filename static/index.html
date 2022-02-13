@@ -26,7 +26,7 @@
                     <button id="save_button">Save<span class="edited-category-mark">*</span></button>
                 </div>
             </div>
-            <div id="toolbar-level" class="toolbar-group">
+            <div style="position: relative" id="toolbar-level" class="toolbar-group">
                 <div class="toolbar-row">
                     <label for="level_name">name</label>
                     <input type="text" id="level_name">
@@ -34,6 +34,11 @@
                 <div class="toolbar-row">
                     <label for="level_nickname_suffix">nickname suffix</label>
                     <input type="text" id="level_nickname_suffix">
+                    <label class="switch">
+                        <span class="labeltext">merge</span>
+                        <input type="checkbox" checked id="level_nickname_merge">
+                        <span class="slider"></span>
+                    </label>
                 </div>
                 <div class="toolbar-row">
                     <label for="level_solutions">solutions</label>

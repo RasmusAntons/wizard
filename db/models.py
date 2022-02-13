@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base, backref
 import uuid
 
@@ -22,6 +22,7 @@ class Level(Base):
                                  primaryjoin=id == level_relation.c.parent_level,
                                  secondaryjoin=id == level_relation.c.child_level)
     nickname_suffix = Column(String, nullable=True)
+    nickname_merge = Column(Boolean, nullable=True, default=False)
     discord_channel = Column(String(18), nullable=True, index=True)
     discord_role = Column(String(18), nullable=True)
     extra_discord_role = Column(String(18), nullable=True)
@@ -39,6 +40,7 @@ class Level(Base):
             'solutions': [solution.text for solution in self.solutions],
             'unlocks': [unlock.text for unlock in self.unlocks],
             'nickname_suffix': self.nickname_suffix if self.nickname_suffix else None,
+            'nickname_merge': self.nickname_merge,
             'discord_channel': self.discord_channel if self.discord_channel else None,
             'discord_role': self.discord_role if self.discord_role else None,
             'category': self.category_id,

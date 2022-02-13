@@ -40,7 +40,11 @@ def get_solved_levels(user_id, name=None, start=''):
 def get_user_level_suffixes(user_id):
     levels = list(get_solvable_levels(user_id))
     levels.sort(key=lambda l: l.name)
-    return [level.nickname_suffix for level in levels if level.nickname_suffix]
+    user_level_suffixes = []
+    for level in levels:
+        if level.nickname_suffix and (not level.nickname_merge or level.nickname_suffix not in user_level_suffixes):
+            user_level_suffixes.append(level.nickname_suffix)
+    return user_level_suffixes
 
 
 def has_user_solved_everything(user_id):

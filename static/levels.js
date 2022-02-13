@@ -34,6 +34,7 @@ function checkLevelMarkerChange(levelId) {
 		levelBlock.classList.toggle(`has_${solutionType}`, level[solutionType].length > 0);
 	for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role'])
 		levelBlock.classList.toggle(`has_${discordIdType}`, !unsetValues.includes(level[discordIdType]));
+	levelBlock.getElementsByClassName('marker_nickname_suffix')[0].style.color = level.nickname_merge ? 'grey': '';
 }
 
 function createLine(startLevelId, endLevelId, addToLevels) {
@@ -171,6 +172,13 @@ function createLevelBlock(level, unsaved, select) {
 		levelNicknameSuffixInput.value = levelsCurrent[level.id].nickname_suffix;
 		levelNicknameSuffixInput.oninput = levelNicknameSuffixInput.onchange = () => {
 			levelsCurrent[level.id].nickname_suffix = levelNicknameSuffixInput.value;
+			checkLevelChange(level.id);
+			checkLevelMarkerChange(level.id);
+		};
+		const levelNicknameMergeInput = document.getElementById('level_nickname_merge');
+		levelNicknameMergeInput.checked = levelsCurrent[level.id].nickname_merge;
+		levelNicknameMergeInput.onchange = () => {
+			levelsCurrent[level.id].nickname_merge = levelNicknameMergeInput.checked;
 			checkLevelChange(level.id);
 			checkLevelMarkerChange(level.id);
 		};
@@ -387,9 +395,9 @@ function initLevels() {
 			document.getElementById('add_level_button').classList.remove('active-button');
 			levelCreationMode = false;
 			createLevelBlock({
-				id: uuidv4(), name: '', nickname_suffix: '', parent_levels: [], child_levels: [], solutions: [],
-				unlocks: [], discord_channel: null, discord_role: null, extra_discord_role: null, category: null,
-				grid_location: [roundLocation(e.layerX) + 320, roundLocation(e.layerY)]
+				id: uuidv4(), name: '', nickname_suffix: '', nickname_merge: false, parent_levels: [], child_levels: [],
+				solutions: [], unlocks: [], discord_channel: null, discord_role: null, extra_discord_role: null,
+				category: null, grid_location: [roundLocation(e.layerX) + 320, roundLocation(e.layerY)]
 			}, true, true);
 			return;
 		}
