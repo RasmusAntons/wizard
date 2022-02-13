@@ -1,7 +1,7 @@
 import sqlalchemy.orm
 import sqlalchemy.event
 import sqlalchemy.engine
-from .models import Level, Solution, Unlock, Category, Setting, User, UserSolve, UserUnlock
+from .models import Base, Level, Solution, Unlock, Category, Setting, User, UserSolve, UserUnlock
 
 
 @sqlalchemy.event.listens_for(sqlalchemy.engine.Engine, "connect")

@@ -100,10 +100,13 @@ Users can unlock a level by calling the `/unlock` command with one of its unlock
 - Enable the `server members intent` option in your bot's configurations
 - Install python (>=3.9)
 - Check out the git `git clone https://github.com/RasmusAntons/wizard.git cd wizard`
-- Create a new venv `python -m venv venv` `. venv/bin/activate`
+- Create a new venv
+  - `python -m venv venv`
+  - `. venv/bin/activate`
 - Install requirements `pip install -r requirements.txt`
-- Initialise the database
-- `python manage.py initdb` Enter an access key for the admin site and discord bot token whan asked.
-- Run the server `python manage.py run`
+- Initialise the database:
+  - `alembic upgrade head`
+  - `python manage.py init` Enter an access key for the admin site and discord bot token when asked.
+- Run the server `python manage.py run --host 0.0.0.0 --port 8000`
 - Login on the admin interface Go to `http://localhost:8000` in your browser and enter the access key.
 > Note: Or install with Conda using `conda_env.yaml`

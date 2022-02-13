@@ -94,13 +94,13 @@ class User(Base):
 
 class UserSolve(Base):
     __tablename__ = 'user_solve'
-    user_id = Column(String(18), primary_key=True)
+    user_id = Column(String(18), ForeignKey(User.id, ondelete='CASCADE'), primary_key=True)
     level_id = Column(String(36), ForeignKey(Level.id, ondelete='CASCADE'), primary_key=True)
     level = relationship(Level)
 
 
 class UserUnlock(Base):
     __tablename__ = 'user_unlock'
-    user_id = Column(String(18), primary_key=True)
+    user_id = Column(String(18), ForeignKey(User.id, ondelete='CASCADE'), primary_key=True)
     level_id = Column(String(36), ForeignKey(Level.id, ondelete='CASCADE'), primary_key=True)
     level = relationship(Level)

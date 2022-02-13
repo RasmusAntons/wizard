@@ -287,7 +287,7 @@ async def patch_categories(request):
     return aiohttp.web.json_response({'message': 'ok'})
 
 
-async def api_server():
+async def api_server(host='127.0.0.1', port=8000):
     app = aiohttp.web.Application()
     app.add_routes([
         aiohttp.web.get('/api/settings', get_settings),
@@ -305,5 +305,5 @@ async def api_server():
     ])
     runner = aiohttp.web.AppRunner(app)
     await runner.setup()
-    site = aiohttp.web.TCPSite(runner, '0.0.0.0', 8000)
+    site = aiohttp.web.TCPSite(runner, host, port)
     await site.start()
