@@ -30,9 +30,10 @@ function checkLevelMarkerChange(levelId) {
 	const levelBlock = levelBlocks[levelId];
 	const level = levelsCurrent[levelId];
 	levelBlock.classList.toggle('has_nickname_suffix', level.nickname_suffix);
+	levelBlock.classList.toggle('has_link', level.link);
 	for (let solutionType of ['solutions', 'unlocks'])
 		levelBlock.classList.toggle(`has_${solutionType}`, level[solutionType].length > 0);
-	for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role'])
+	for (let discordIdType of ['discord_channel', 'discord_role'])
 		levelBlock.classList.toggle(`has_${discordIdType}`, !unsetValues.includes(level[discordIdType]));
 	levelBlock.getElementsByClassName('marker_nickname_suffix')[0].style.color = level.nickname_merge ? 'grey': '';
 }
@@ -109,7 +110,7 @@ function createLevelBlock(level, unsaved, select) {
 		levelsOriginal[level.id].unsaved = true;
 		checkLevelChange(level.id);
 	}
-	for (let [markerType, markerText] of [['nickname_suffix', 'N'], ['solutions', 'S'], ['discord_channel', 'C'], ['discord_role', 'R'], ['unlocks', 'U'], ['extra_discord_role', 'E'], ['edited', '*']]) {
+	for (let [markerType, markerText] of [['nickname_suffix', 'N'], ['solutions', 'S'], ['discord_channel', 'C'], ['discord_role', 'R'], ['unlocks', 'U'], ['link', 'L'], ['edited', '*']]) {
 		const markerDiv = document.createElement('div');
 		const markerSpan = document.createElement('span');
 		markerSpan.classList.add('marker');
@@ -168,13 +169,15 @@ function createLevelBlock(level, unsaved, select) {
 			checkLevelChange(level.id);
 			checkLevelMarkerChange(level.id);
 		};
-		const levelNicknameSuffixInput = document.getElementById('level_nickname_suffix');
-		levelNicknameSuffixInput.value = levelsCurrent[level.id].nickname_suffix;
-		levelNicknameSuffixInput.oninput = levelNicknameSuffixInput.onchange = () => {
-			levelsCurrent[level.id].nickname_suffix = levelNicknameSuffixInput.value;
-			checkLevelChange(level.id);
-			checkLevelMarkerChange(level.id);
-		};
+		for (let textAttribute of ['nickname_suffix', 'link', 'username', 'password']) {
+			const textAttributeInput = document.getElementById(`level_${textAttribute}`);
+			textAttributeInput.value = levelsCurrent[level.id][textAttribute];
+			textAttributeInput.oninput = textAttributeInput.onchange = () => {
+				levelsCurrent[level.id][textAttribute] = textAttributeInput.value;
+				checkLevelChange(level.id);
+				checkLevelMarkerChange(level.id);
+			};
+		}
 		const levelNicknameMergeInput = document.getElementById('level_nickname_merge');
 		levelNicknameMergeInput.checked = levelsCurrent[level.id].nickname_merge;
 		levelNicknameMergeInput.onchange = () => {
@@ -191,7 +194,7 @@ function createLevelBlock(level, unsaved, select) {
 				checkLevelMarkerChange(level.id);
 			};
 		}
-		for (let discordIdType of ['discord_channel', 'discord_role', 'extra_discord_role']) {
+		for (let discordIdType of ['discord_channel', 'discord_role']) {
 			const discordIdInput = document.getElementById(`level_${discordIdType}`);
 			discordIdInput.value = levelsCurrent[level.id][discordIdType];
 			discordIdInput.oninput = discordIdInput.onchange = () => {
@@ -308,8 +311,7 @@ function initLevels() {
 			} else {
 				levelsCurrent[selectedLevelId] = {
 					delete_channel: document.getElementById('level_delete_channel').checked,
-					delete_role: document.getElementById('level_delete_role').checked,
-					delete_extra_role: document.getElementById('level_delete_extra_role').checked,
+					delete_role: document.getElementById('level_delete_role').checked
 				};
 				levelsChanged[selectedLevelId] = levelsCurrent[selectedLevelId];
 			}
@@ -343,8 +345,7 @@ function initLevels() {
 	};
 	for (let [buttonId, inputId, targetKey] of [
 		['level_create_channel', 'level_discord_channel', 'discord_channel'],
-		['level_create_role', 'level_discord_role', 'discord_role'],
-		['level_create_extra_role', 'level_extra_discord_role', 'extra_discord_role']
+		['level_create_role', 'level_discord_role', 'discord_role']
 	]) {
 		const buttonElem = document.getElementById(buttonId);
 		const inputElem = document.getElementById(inputId);
@@ -396,8 +397,8 @@ function initLevels() {
 			levelCreationMode = false;
 			createLevelBlock({
 				id: uuidv4(), name: '', nickname_suffix: '', nickname_merge: false, parent_levels: [], child_levels: [],
-				solutions: [], unlocks: [], discord_channel: null, discord_role: null, extra_discord_role: null,
-				category: null, grid_location: [roundLocation(e.layerX) + 320, roundLocation(e.layerY)]
+				solutions: [], unlocks: [], discord_channel: null, discord_role: null, link: null, username: null,
+				password: null, category: null, grid_location: [roundLocation(e.layerX) + 320, roundLocation(e.layerY)]
 			}, true, true);
 			return;
 		}

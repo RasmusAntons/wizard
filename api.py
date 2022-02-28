@@ -68,7 +68,7 @@ async def get_levels(request):
     return aiohttp.web.json_response({level.id: level.to_api_dict() for level in levels})
 
 
-async def delete_level(level_id, delete_channel=False, delete_role=False, delete_extra_role=False):
+async def delete_level(level_id, delete_channel=False, delete_role=False):
     level = db.session.get(db.Level, level_id)
     if level is None:
         return aiohttp.web.json_response({'error': 'level does not exist'}, status=404)
@@ -79,7 +79,7 @@ async def delete_level(level_id, delete_channel=False, delete_role=False, delete
         db.session.delete(unlock)
     level.unlocks.clear()
     db.session.delete(level)
-    if delete_channel or delete_role or delete_extra_role:
+    if delete_channel or delete_role:
         guild_id = db.get_setting('guild')
         if guild_id is None:
             traceback.print_exc()
@@ -94,10 +94,6 @@ async def delete_level(level_id, delete_channel=False, delete_role=False, delete
                 role = guild.get_role(int(level.discord_role))
                 if role:
                     await role.delete()
-            if delete_extra_role and level.extra_discord_role:
-                extra_role = guild.get_role(int(level.extra_discord_role))
-                if extra_role:
-                    await extra_role.delete()
         except discord.HTTPException:
             traceback.print_exc()
             return aiohttp.web.json_response({'error': 'deleting discord resources failed'}, status=500)
@@ -115,8 +111,7 @@ async def patch_levels(request):
         if level_body is None or level_body.get('id') is None:
             delete_channel = False if level_body is None else level_body.get('delete_channel')
             delete_role = False if level_body is None else level_body.get('delete_role')
-            delete_extra_role = False if level_body is None else level_body.get('delete_extra_role')
-            error_response = await delete_level(level_id, delete_channel, delete_role, delete_extra_role)
+            error_response = await delete_level(level_id, delete_channel, delete_role)
             if error_response is not None:
                 db.session.rollback()
                 return error_response
@@ -125,9 +120,11 @@ async def patch_levels(request):
             level.name = level_body.get('name')
             level.nickname_suffix = level_body.get('nickname_suffix')
             level.nickname_merge = level_body.get('nickname_merge')
+            level.link = level_body.get('link')
+            level.username = level_body.get('username')
+            level.password = level_body.get('password')
             level.discord_channel = level_body.get('discord_channel')
             level.discord_role = level_body.get('discord_role')
-            level.extra_discord_role = level_body.get('extra_discord_role')
             level.category_id = level_body.get('category')
             level.grid_x, level.grid_y = level_body.get('grid_location')
             db.session.merge(level)

@@ -144,6 +144,11 @@ input:disabled {
 	display: none;
 }
 
+.popup_buttons {
+	position: absolute;
+	bottom: 10px;
+}
+
 #page-overlay {
 	position: fixed;
 	z-index: 10000;
@@ -344,7 +349,7 @@ button:disabled:hover {
 	color: white;
 }
 
-.block.has_extra_discord_role .marker_extra_discord_role {
+.block.has_link .marker_link {
 	background-color: #136f79;
 	border-top: 1px solid #23a3a3;
 	border-left: 1px solid #23a3a3;
@@ -417,6 +422,23 @@ button:disabled:hover {
 
 #toolbar-buttons button.changed span {
 	display: inline;
+}
+
+.toolbar-col {
+	display: inline-block;
+	position: relative;
+	width: 135px;
+	margin-left: 10px;
+	margin-right: 10px;
+	left: -2px;
+}
+
+.toolbar-col input {
+	width: 100%;
+}
+
+.break-all {
+	word-break: break-all;
 }
 
 .markers-div {

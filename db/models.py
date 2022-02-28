@@ -23,9 +23,11 @@ class Level(Base):
                                  secondaryjoin=id == level_relation.c.child_level)
     nickname_suffix = Column(String, nullable=True)
     nickname_merge = Column(Boolean, nullable=True, default=False)
+    link = Column(String, nullable=True)
+    username = Column(String, nullable=True)
+    password = Column(String, nullable=True)
     discord_channel = Column(String(18), nullable=True, index=True)
     discord_role = Column(String(18), nullable=True)
-    extra_discord_role = Column(String(18), nullable=True)
     category_id = Column(String(36), ForeignKey('category.id', ondelete='SET NULL'))
     category = relationship('Category')
     grid_x = Column(Integer, nullable=True)
@@ -41,10 +43,12 @@ class Level(Base):
             'unlocks': [unlock.text for unlock in self.unlocks],
             'nickname_suffix': self.nickname_suffix if self.nickname_suffix else None,
             'nickname_merge': self.nickname_merge,
+            'link': self.link,
+            'username': self.username,
+            'password': self.password,
             'discord_channel': self.discord_channel if self.discord_channel else None,
             'discord_role': self.discord_role if self.discord_role else None,
             'category': self.category_id,
-            'extra_discord_role': self.extra_discord_role if self.extra_discord_role else None,
             'grid_location': (self.grid_x, self.grid_y)
         }
 

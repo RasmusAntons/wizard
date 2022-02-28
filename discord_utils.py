@@ -62,8 +62,6 @@ def get_used_role_ids():
     for level in db.session.query(db.Level).all():
         if level.discord_role:
             roles.add(level.discord_role)
-        if level.extra_discord_role:
-            roles.add(level.extra_discord_role)
     completionist_role = db.get_setting('completionist_role')
     if completionist_role:
         roles.add(completionist_role)
@@ -148,8 +146,6 @@ async def update_user_roles(user_id, used_role_ids=None):
                 roles_user_should_have.add(starting_level.discord_role)
         for solved_level_id in solved_level_ids:
             level = db.session.get(db.Level, solved_level_id)
-            if level.extra_discord_role:
-                roles_user_should_have.add(level.extra_discord_role)
             for child_level in level.child_levels:
                 if child_level.id in solved_level_ids or not can_user_solve(child_level, user_id):
                     continue
@@ -220,8 +216,6 @@ def get_parent_levels_until_role_or_unlock(level):
     res = set()
     if not level.unlocks:
         for parent_level in level.parent_levels:
-            if parent_level.extra_discord_role:
-                continue
             res.update(get_parent_levels_until_role_or_unlock(parent_level))
     return res
 
@@ -286,16 +280,12 @@ async def update_role_permissions():
         raise Exception(f'guild not set or wrong: {guild_id}')
     for level in db.session.query(db.Level).all():
         role = guild.get_role(int(level.discord_role)) if level.discord_role else None
-        extra_role = guild.get_role(int(level.extra_discord_role)) if level.extra_discord_role else None
-        if role is None and extra_role is None:
+        if role is None:
             continue
         for parent_level in get_parent_levels_recursively(level):
             if parent_level.discord_channel and parent_level.discord_channel in channel_permissions.keys():
-                for r in (role, extra_role):
-                    if r is None:
-                        continue
-                    parent_chid = parent_level.discord_channel
-                    channel_permissions[parent_chid][r] = nextcord.PermissionOverwrite(read_messages=True)
+                parent_chid = parent_level.discord_channel
+                channel_permissions[parent_chid][role] = nextcord.PermissionOverwrite(read_messages=True)
     for channel_id, permissions in channel_permissions.items():
         channel = guild.get_channel(int(channel_id))
         if channel is not None:
