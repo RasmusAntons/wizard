@@ -305,7 +305,7 @@ button:disabled:hover {
 	color: white;
 }
 
-.block.has_solutions .marker_solutions {
+.block.has_link .marker_link {
 	background-color: #6946C6;
 	border-top: 1px solid #876AD2;
 	border-left: 1px solid #876AD2;
@@ -316,7 +316,7 @@ button:disabled:hover {
 	color: white;
 }
 
-.block.has_discord_channel .marker_discord_channel {
+.block.has_solutions .marker_solutions {
 	background-color: #9D1A3A;
 	border-top: 1px solid #c43155;
 	border-left: 1px solid #c43155;
@@ -327,7 +327,7 @@ button:disabled:hover {
 	color: white;
 }
 
-.block.has_discord_role .marker_discord_role {
+.block.has_unlocks .marker_unlocks {
 	background-color: #939D00;
 	border-top: 1px solid #c3ce27;
 	border-left: 1px solid #c3ce27;
@@ -338,7 +338,7 @@ button:disabled:hover {
 	color: white;
 }
 
-.block.has_unlocks .marker_unlocks {
+.block.has_discord_channel .marker_discord_channel {
 	background-color: #549D2B;
 	border-top: 1px solid #7FD051;
 	border-left: 1px solid #7FD051;
@@ -349,7 +349,7 @@ button:disabled:hover {
 	color: white;
 }
 
-.block.has_link .marker_link {
+.block.has_discord_role .marker_discord_role {
 	background-color: #136f79;
 	border-top: 1px solid #23a3a3;
 	border-left: 1px solid #23a3a3;

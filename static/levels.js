@@ -110,7 +110,7 @@ function createLevelBlock(level, unsaved, select) {
 		levelsOriginal[level.id].unsaved = true;
 		checkLevelChange(level.id);
 	}
-	for (let [markerType, markerText] of [['nickname_suffix', 'N'], ['solutions', 'S'], ['discord_channel', 'C'], ['discord_role', 'R'], ['unlocks', 'U'], ['link', 'L'], ['edited', '*']]) {
+	for (let [markerType, markerText] of [['nickname_suffix', 'N'], ['link', 'L'], ['solutions', 'S'], ['unlocks', 'U'], ['discord_channel', 'C'], ['discord_role', 'R'], ['edited', '*']]) {
 		const markerDiv = document.createElement('div');
 		const markerSpan = document.createElement('span');
 		markerSpan.classList.add('marker');
