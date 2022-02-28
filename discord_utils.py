@@ -90,8 +90,8 @@ async def update_user_nickname(user_id):
         return
     user = db.session.get(db.User, user_id)
     if user is None:
-        user = db.User(id=user_id, name=member.name)
-        db.session.merge(user)
+        user = db.User(id=user_id)
+        db.session.add(user)
     if db.get_setting('admin_enable') == 'true' and is_member_admin(member):
         name_suffix = db.get_setting('admin_badge', '')
     elif db.get_setting('completionist_enable_nickname') == 'true' and has_user_solved_everything(user_id):

@@ -7,6 +7,10 @@ import main
 
 def init_db():
     db.set_setting('guild', input('Guild id: '))
+    db.set_setting('enable_grid', 'true')
+    db.set_setting('enable_tooltips', 'true')
+    db.set_setting('auth_in_link', 'true')
+    db.set_setting('embed_colour', '#000000')
     db.set_setting('nickname_prefix', ' [')
     db.set_setting('nickname_separator', ', ')
     db.set_setting('nickname_suffix', ']')

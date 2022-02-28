@@ -2,6 +2,7 @@ import sqlalchemy
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base, backref
 import uuid
+import urllib.parse
 
 Base = declarative_base()
 
@@ -51,6 +52,24 @@ class Level(Base):
             'category': self.category_id,
             'grid_location': (self.grid_x, self.grid_y)
         }
+
+    def get_encoded_link(self, with_auth):
+        if not self.link:
+            return None
+        level_link = urllib.parse.quote(self.link, '\\./_=:@')
+        if with_auth and self.username or self.password:
+            username = self.username or ''
+            password = self.password or ''
+            level_link = level_link.replace('://', f'://{username}:{password}@', 1)
+        return level_link
+
+    def get_un_pw(self):
+        if self.username or self.password:
+            username = self.username or ''
+            password = self.password or ''
+            return f' [{username}:{password}]'
+        else:
+            return None
 
 
 class Solution(Base):

@@ -3,7 +3,8 @@ let settingsCurrent = {};
 let settingsChanged = {};
 
 const inputSettings = {
-	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'grid': 'check', 'tooltips': 'check',
+	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'grid': 'check', 'tooltips': 'check', 'auth_in_link': 'check',
+	'embed_color': 'text',
 	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check',
 	'completionist_enable_nickname': 'check', 'completionist_badge': 'text',
 	'completionist_enable_role': 'check', 'completionist_role': 'text',

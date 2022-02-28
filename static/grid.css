@@ -575,10 +575,10 @@ button:disabled:hover {
 	width: 292px;
 }
 
-#discord_category_color {
-	width: 14px;
-	height: 14px;
-	padding: 1px;
+#discord_category_color, #setting_embed_color {
+	width: 14px !important;
+	height: 14px !important;
+	padding: 1px !important;
 }
 
 .toolbar-row {
