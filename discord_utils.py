@@ -163,9 +163,9 @@ async def update_user_roles(user_id, used_role_ids=None):
                 roles_user_should_have.add(completionist_role)
 
     role_ids_to_add = roles_user_should_have - roles_user_has
-    roles_to_add = list(map(lambda r: guild.get_role(int(r)), role_ids_to_add))
+    roles_to_add = list(filter(lambda r: r is not None, map(lambda r: guild.get_role(int(r)), role_ids_to_add)))
     role_ids_to_remove = roles_user_has - roles_user_should_have
-    roles_to_remove = list(map(lambda r: guild.get_role(int(r)), role_ids_to_remove))
+    roles_to_remove = list(filter(lambda r: r is not None, map(lambda r: guild.get_role(int(r)), role_ids_to_remove)))
     await member.add_roles(*roles_to_add)
     await member.remove_roles(*roles_to_remove)
 
