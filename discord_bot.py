@@ -130,7 +130,6 @@ async def continue_command(ctx):
                 else:
                     level_lines.append(f'{level.name}{level_un_pw}')
             embed.description = '\n'.join(level_lines)
-            print(f'{embed.description}')
         else:
             embed.description = messages.no_current_levels
         await ctx.send(embed=embed)
@@ -175,7 +174,13 @@ async def setsolved_command(ctx, user: nextcord.User = nextcord.SlashOption('use
 
 @setsolved_command.on_autocomplete('level')
 async def setsolved_autocomplete(ctx, level):
-    levels = db.session.query(db.Level).where(db.Level.name.startswith(level)).all()
+    guild_id = int(db.get_setting('guild'))
+    guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
+    author = guild.get_member(int(ctx.user.id)) or await guild.fetch_member(int(ctx.user.id))
+    if not author or not discord_utils.is_member_admin(author):
+        levels = []
+    else:
+        levels = db.session.query(db.Level).where(db.Level.name.startswith(level)).all()
     await ctx.response.send_autocomplete([l.name for l in levels])
 
 
