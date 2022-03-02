@@ -13,9 +13,12 @@ def has_user_reached(level, user_id):
         return db.session.query(db.UserUnlock) \
             .where(and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)).scalar() is not None
     for parent_level in level.parent_levels:
-        has_solved = db.session.query(db.UserSolve) \
-            .where(and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == user_id)).scalar() is not None
-        if not has_solved:
+        if parent_level.solutions:
+            has_solved = db.session.query(db.UserSolve) \
+                .where(and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == user_id)).scalar() is not None
+            if not has_solved:
+                return False
+        elif not has_user_reached(parent_level, user_id):
             return False
     return True
 
@@ -24,7 +27,12 @@ def get_solvable_levels(user_id):
     levels = []
     for level in db.session.query(db.Level).all():
         if can_user_solve(level, user_id):
-            levels.append(level)
+            if level.solutions:
+                levels.append(level)
+            elif not level.child_levels:
+                levels.append(level)
+            elif not any(not l.unlocks and has_user_reached(l, user_id) for l in level.child_levels):
+                levels.append(level)
     return levels
 
 
@@ -134,8 +142,6 @@ async def update_user_roles(user_id, used_role_ids=None):
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     if used_role_ids is None:
         used_role_ids = get_used_role_ids()
-    solved_level_ids = set(
-        map(lambda l: l.level_id, db.session.query(db.UserSolve.level_id).where(db.UserSolve.user_id == user_id)))
 
     member = guild.get_member(int(user_id)) or await guild.fetch_member(user_id)
     if member is None or member.bot:
@@ -144,21 +150,12 @@ async def update_user_roles(user_id, used_role_ids=None):
     roles_user_should_have = set()
 
     if not (db.get_setting('admin_enable') == 'true' and is_member_admin(member)):
-        for starting_level in get_starting_levels():
-            if starting_level.discord_role and can_user_solve(starting_level, user_id):
-                roles_user_should_have.add(starting_level.discord_role)
-        for solved_level_id in solved_level_ids:
-            level = db.session.get(db.Level, solved_level_id)
-            for child_level in level.child_levels:
-                if child_level.id in solved_level_ids or not can_user_solve(child_level, user_id):
+        for level in db.session.query(db.Level).all():
+            if has_user_reached(level, user_id):
+                if any(not l.unlocks and has_user_reached(l, user_id) for l in level.child_levels):
                     continue
-                for parent_level in get_parent_levels_until_role_or_unlock(child_level):
+                for parent_level in get_parent_levels_until_role_or_unlock(level):
                     roles_user_should_have.add(parent_level.discord_role)
-                for grand_child_level in child_level.child_levels:
-                    if grand_child_level.unlocks and grand_child_level.discord_role:
-                        if grand_child_level.id in solved_level_ids or not can_user_solve(grand_child_level, user_id):
-                            continue
-                        roles_user_should_have.add(grand_child_level.discord_role)
 
         if db.get_setting('completionist_enable_role') == 'true' and has_user_solved_everything(user_id):
             completionist_role = db.get_setting('completionist_role')
