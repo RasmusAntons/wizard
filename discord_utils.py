@@ -11,11 +11,13 @@ import discord_bot
 def has_user_reached(level, user_id):
     if level.unlocks:
         return db.session.query(db.UserUnlock) \
-            .where(and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)).scalar() is not None
+                   .where(
+            and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)).scalar() is not None
     for parent_level in level.parent_levels:
         if parent_level.solutions:
             has_solved = db.session.query(db.UserSolve) \
-                .where(and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == user_id)).scalar() is not None
+                             .where(
+                and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == user_id)).scalar() is not None
             if not has_solved:
                 return False
         elif not has_user_reached(parent_level, user_id):
@@ -50,7 +52,7 @@ def get_solved_levels(user_id, name=None, start='', limit=None):
 
 def get_user_level_suffixes(user_id):
     levels = list(get_solvable_levels(user_id))
-    levels.sort(key=lambda l: l.name)
+    levels.sort(key=lambda l: (l.category.name if l.category else '') + l.name)
     user_level_suffixes = []
     for level in levels:
         if level.nickname_suffix and (not level.nickname_merge or level.nickname_suffix not in user_level_suffixes):
