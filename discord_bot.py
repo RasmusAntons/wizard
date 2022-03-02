@@ -95,7 +95,7 @@ async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', 
                 embed = nextcord.Embed(title=f'{level.name}', url=level.get_encoded_link(db.get_setting('auth_in_link') == 'true'))
                 embed.colour = int(db.get_setting('embed_color', '#000000')[1:], 16)
                 if level.get_un_pw():
-                    embed.description += level.get_un_pw()
+                    embed.description = level.get_un_pw()
                 if level.solutions:
                     embed.add_field(name='Solutions', value='\n'.join([s.text for s in level.solutions]))
                 embeds.append(embed)
@@ -108,7 +108,7 @@ async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', 
 async def recall_autocomplete(ctx, level):
     if ctx.channel.type == nextcord.ChannelType.private:
         start = level or ''
-        solved_levels = discord_utils.get_solved_levels(ctx.user.id, start=start)
+        solved_levels = discord_utils.get_solved_levels(ctx.user.id, start=start, limit=25)
         await ctx.response.send_autocomplete([l.name for l in solved_levels])
     else:
         await ctx.response.send_autocomplete([messages.use_in_dms])
@@ -180,7 +180,7 @@ async def setsolved_autocomplete(ctx, level):
     if not author or not discord_utils.is_member_admin(author):
         levels = []
     else:
-        levels = db.session.query(db.Level).where(db.Level.name.startswith(level)).all()
+        levels = db.session.query(db.Level).where(db.Level.name.startswith(level)).limit(25).all()
     await ctx.response.send_autocomplete([l.name for l in levels])
 
 

@@ -28,13 +28,16 @@ def get_solvable_levels(user_id):
     return levels
 
 
-def get_solved_levels(user_id, name=None, start=''):
-    return db.session.query(db.Level).where(
+def get_solved_levels(user_id, name=None, start='', limit=None):
+    query = db.session.query(db.Level).where(
         and_(
             db.Level.name == name if name else db.Level.name.startswith(start),
             exists().where(and_(db.UserSolve.user_id == user_id, db.Level.id == db.UserSolve.level_id))
         )
-    ).all()
+    )
+    if limit is not None:
+        query = query.limit(limit)
+    return query.all()
 
 
 def get_user_level_suffixes(user_id):
