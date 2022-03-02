@@ -153,7 +153,7 @@ async def setsolved_command(ctx, user: nextcord.User = nextcord.SlashOption('use
     if len(target_level) != 1:
         await ctx.send('level not found', ephemeral=True)
         return
-    await ctx.response.defer()
+    await ctx.response.defer(ephemeral=True)
     solved_level_names = []
     unlocked_level_names = []
     for parent_level in discord_utils.get_parent_levels_recursively(target_level[0]):
