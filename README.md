@@ -29,16 +29,16 @@ The settings menu consists of options that can generally be considered to be one
 
 ![settings-menu](https://cdn.discordapp.com/attachments/513014307978739714/957047748887199814/unknown.png)
 
-`Bot Token` Sets the Discord bot token.
-`Key` Sets the password used to access the site.
-`Discord Guild ID` Sets the guild the bot functions within.
-`Enable Grid` Toggles the grid pattern.
-`Enable Tooltips` Toggles the tooltips for the markers on blocks.
-`Auth In Link` When using `/continue` or `/recall`, the authentication will be included in the returned level link.
-`Embed Color` Sets the embed color of the bot's messages.
-`Nicknames` Opens the nicknames configurations menu.
-`Completionist` Opens the completionist configurations menu.
-`Admin` Opens the admin configurations menu.
+- `Bot Token` Sets the Discord bot token.
+- `Key` Sets the password used to access the site.
+- `Discord Guild ID` Sets the guild the bot functions within.
+- `Enable Grid` Toggles the grid pattern.
+- `Enable Tooltips` Toggles the tooltips for the markers on blocks.
+- `Auth In Link` When using `/continue` or `/recall`, the authentication will be included in the returned level link.
+- `Embed Color` Sets the embed color of the bot's messages.
+- `Nicknames` Opens the nicknames configurations menu.
+- `Completionist` Opens the completionist configurations menu.
+- `Admin` Opens the admin configurations menu.
 
 ![nicknames](https://cdn.discordapp.com/attachments/513014307978739714/937701310785024000/unknown.png)
 
