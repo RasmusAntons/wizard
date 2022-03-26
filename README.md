@@ -86,7 +86,7 @@ The markers are: ![nickname-suffix-marker](https://cdn.discordapp.com/attachment
 ![solutions-marker](https://cdn.discordapp.com/attachments/513014307978739714/957046606228758588/unknown.png)olutions,
 ![unlocks-marker](https://cdn.discordapp.com/attachments/513014307978739714/957046606442688622/unknown.png)unlocks,
 ![channel-marker](https://cdn.discordapp.com/attachments/513014307978739714/957046606711095326/unknown.png)hannel,
-![role-marker](https://cdn.discordapp.com/attachments/513014307978739714/957046606925017189/unknown.png)role,
+![role-marker](https://cdn.discordapp.com/attachments/513014307978739714/957046606925017189/unknown.png)role.
 
 Clicking on a block opens the level block menu in the toolbar.
 
