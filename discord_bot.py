@@ -92,7 +92,10 @@ async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', 
         else:
             embeds = []
             for level in solved_levels:
-                embed = nextcord.Embed(title=f'{level.name}', url=level.get_encoded_link(db.get_setting('auth_in_link') == 'true'))
+                embed = nextcord.Embed(title=f'{level.name}')
+                link = level.get_encoded_link(db.get_setting('auth_in_link') == 'true')
+                if link:
+                    embed.url = link
                 embed.colour = int(db.get_setting('embed_color', '#000000')[1:], 16)
                 if level.get_un_pw():
                     embed.description = level.get_un_pw()
@@ -137,6 +140,23 @@ async def continue_command(ctx):
         await ctx.send(messages.use_in_dms, ephemeral=True)
 
 
+@client.slash_command('skipto', description='Set progress up to this level')
+async def skipto_command(ctx, link=nextcord.SlashOption('link', 'url (including un/pw if required)', required=True)):
+    if ctx.channel.type == nextcord.ChannelType.private:
+        target_level = list(filter(lambda l: l.get_encoded_link(True) == link, db.session.query(db.Level).where().all()))
+        if len(target_level) != 1:
+            await ctx.send('level not found', ephemeral=True)
+            return
+        await ctx.response.defer(ephemeral=True)
+        try:
+            msg = await discord_utils.skip_user_to_level(ctx.user.id, target_level[0], False)
+            await ctx.send(msg, ephemeral=True)
+        except Exception as e:
+            await ctx.send(str(e), ephemeral=True)
+    else:
+        await ctx.send(messages.use_in_dms, ephemeral=True)
+
+
 @client.slash_command('setsolved', description='Set a user\'s progress to a certain level')
 async def setsolved_command(ctx, user: nextcord.User = nextcord.SlashOption('user', 'User', required=True), level=nextcord.SlashOption('level', 'Level name', required=True)):
     guild_id = int(db.get_setting('guild'))
@@ -145,32 +165,16 @@ async def setsolved_command(ctx, user: nextcord.User = nextcord.SlashOption('use
     if not author or not discord_utils.is_member_admin(author):
         await ctx.send(messages.permission_denied, ephemeral=True)
         return
-    member = guild.get_member(int(user.id)) or await guild.fetch_member(int(user.id))
-    if not member:
-        await ctx.send('invalid member', ephemeral=True)
-        return
     target_level = db.session.query(db.Level).where(db.Level.name == level).all()
     if len(target_level) != 1:
         await ctx.send('level not found', ephemeral=True)
         return
     await ctx.response.defer(ephemeral=True)
-    solved_level_names = []
-    unlocked_level_names = []
-    for parent_level in discord_utils.get_parent_levels_recursively(target_level[0]):
-        if parent_level.solutions and not db.session.query(db.UserSolve)\
-                .where(and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == str(member.id))).scalar():
-            solved_level_names.append(parent_level.name)
-            db.session.add(db.UserSolve(user_id=str(member.id), level=parent_level))
-        if parent_level.unlocks and not db.session.query(db.UserUnlock)\
-                .where(and_(db.UserUnlock.level_id == parent_level.id, db.UserUnlock.user_id == str(member.id))).scalar():
-            unlocked_level_names.append(parent_level.name)
-            db.session.add(db.UserUnlock(user_id=str(member.id), level=parent_level))
-    db.session.commit()
-    solved_level_names_string = f'{len(solved_level_names)} solves ({", ".join(reversed(solved_level_names))})'
-    unlocked_level_names_string = f'{len(unlocked_level_names)} unlocks ({", ".join(reversed(unlocked_level_names))})'
-    await discord_utils.update_user_roles(str(member.id))
-    await discord_utils.update_user_nickname(str(member.id))
-    await ctx.send(f'Updated {member.display_name}, added {solved_level_names_string} and {unlocked_level_names_string}', ephemeral=True)
+    try:
+        msg = await discord_utils.skip_user_to_level(user.id, target_level[0], True)
+        await ctx.send(msg, ephemeral=True)
+    except Exception as e:
+        await ctx.send(str(e), ephemeral=True)
 
 
 @setsolved_command.on_autocomplete('level')

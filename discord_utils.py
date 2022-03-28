@@ -292,3 +292,37 @@ async def update_role_permissions():
         channel = guild.get_channel(int(channel_id))
         if channel is not None:
             await channel.edit(overwrites=permissions)
+
+
+async def skip_user_to_level(user_id, level, include_self=False):
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+    member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))
+    if not member:
+        raise Exception('invalid author')
+    if db.get_setting('skipto_enable') != 'true':
+        raise Exception('this command is disabled')
+    solved_level_names = []
+    unlocked_level_names = []
+    for parent_level in get_parent_levels_recursively(level):
+        if parent_level == level and not include_self:
+            continue
+        if level.unlocks and level in parent_level.child_levels:
+            continue
+        if parent_level.solutions and not db.session.query(db.UserSolve).where(
+                and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == str(member.id))).scalar():
+            solved_level_names.append(parent_level.name)
+            db.session.add(db.UserSolve(user_id=str(member.id), level=parent_level))
+        if parent_level.unlocks and not db.session.query(db.UserUnlock).where(
+                and_(db.UserUnlock.level_id == parent_level.id, db.UserUnlock.user_id == str(member.id))).scalar():
+            unlocked_level_names.append(parent_level.name)
+            db.session.add(db.UserUnlock(user_id=str(member.id), level=parent_level))
+    db.session.commit()
+    await update_user_roles(str(member.id))
+    await update_user_nickname(str(member.id))
+    message_parts = []
+    if solved_level_names:
+        message_parts.append(f'{len(solved_level_names)} solves ({", ".join(reversed(solved_level_names))})')
+    if unlocked_level_names:
+        message_parts.append(f'{len(unlocked_level_names)} unlocks ({", ".join(reversed(unlocked_level_names))})')
+    return ('Added ' + ' and '.join(message_parts)) if message_parts else 'Nothing to do'
