@@ -27,7 +27,7 @@ Categories can also be linked to Discord categories.
 
 The settings menu consists of options that can generally be considered to be one-time configurations.
 
-![settings-menu](https://cdn.discordapp.com/attachments/513014307978739714/957047748887199814/unknown.png)
+![settings-menu](https://cdn.discordapp.com/attachments/543661397242937355/958319135958372442/unknown.png)
 
 - `Bot Token` Sets the Discord bot token.
 - `Key` Sets the password used to access the site.
@@ -35,6 +35,7 @@ The settings menu consists of options that can generally be considered to be one
 - `Enable Grid` Toggles the grid pattern.
 - `Enable Tooltips` Toggles the tooltips for the markers on blocks.
 - `Auth In Link` When using `/continue` or `/recall`, the authentication will be included in the returned level link.
+- `Enable Skipto` Allows players to skip to any level they want by providing the command with the URL and authentication of the level.
 - `Embed Color` Sets the embed color of the bot's messages.
 - `Nicknames` Opens the nicknames configurations menu.
 - `Completionist` Opens the completionist configurations menu.
