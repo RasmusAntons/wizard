@@ -162,9 +162,11 @@ async def skipto_command(ctx, link=nextcord.SlashOption('link', 'full url', requ
         await ctx.send(messages.use_in_dms, ephemeral=True)
 
 
-@client.slash_command('setsolved', description='Set a user\'s progress to a certain level')
-async def setsolved_command(ctx, user: nextcord.User = nextcord.SlashOption('user', 'User', required=True),
-                            level=nextcord.SlashOption('level', 'Level name', required=True)):
+@client.slash_command('setprogress', description='Set a user\'s progress to a certain level')
+async def setprogress_command(ctx, user: nextcord.User = nextcord.SlashOption('user', 'User', required=True),
+                              status=nextcord.SlashOption('status', 'reached/solved',
+                                                          choices=['reached', 'solved'], required=True),
+                              level=nextcord.SlashOption('level', 'Level name', required=True)):
     guild_id = int(db.get_setting('guild'))
     guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
     author = guild.get_member(int(ctx.user.id)) or await guild.fetch_member(int(ctx.user.id))
@@ -177,36 +179,14 @@ async def setsolved_command(ctx, user: nextcord.User = nextcord.SlashOption('use
         return
     await ctx.response.defer(ephemeral=True)
     try:
-        msg = await discord_utils.skip_user_to_level(user.id, target_level[0], True)
+        msg = await discord_utils.skip_user_to_level(user.id, target_level[0], status == 'solved')
         await ctx.send(msg, ephemeral=True)
     except Exception as e:
         await ctx.send(str(e), ephemeral=True)
 
 
-@client.slash_command('setreached', description='Set a user\'s progress to a certain level')
-async def setreached_command(ctx, user: nextcord.User = nextcord.SlashOption('user', 'User', required=True),
-                             level=nextcord.SlashOption('level', 'Level name', required=True)):
-    guild_id = int(db.get_setting('guild'))
-    guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
-    author = guild.get_member(int(ctx.user.id)) or await guild.fetch_member(int(ctx.user.id))
-    if not author or not discord_utils.is_member_admin(author):
-        await ctx.send(messages.permission_denied, ephemeral=True)
-        return
-    target_level = db.session.query(db.Level).where(db.Level.name == level).all()
-    if len(target_level) != 1:
-        await ctx.send('level not found', ephemeral=True)
-        return
-    await ctx.response.defer(ephemeral=True)
-    try:
-        msg = await discord_utils.skip_user_to_level(user.id, target_level[0], False)
-        await ctx.send(msg, ephemeral=True)
-    except Exception as e:
-        await ctx.send(str(e), ephemeral=True)
-
-
-@setreached_command.on_autocomplete('level')
-@setsolved_command.on_autocomplete('level')
-async def setsolved_autocomplete(ctx, level):
+@setprogress_command.on_autocomplete('level')
+async def setprogress_autocomplete(ctx, level):
     guild_id = int(db.get_setting('guild'))
     guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
     author = guild.get_member(int(ctx.user.id)) or await guild.fetch_member(int(ctx.user.id))
