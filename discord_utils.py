@@ -303,12 +303,12 @@ async def skip_user_to_level(user_id, level, include_self=False):
     solved_level_names = []
     unlocked_level_names = []
     for parent_level in get_parent_levels_recursively(level):
-        if level.unlocks and level in parent_level.child_levels:
-            continue
         if parent_level.unlocks and not db.session.query(db.UserUnlock).where(
                 and_(db.UserUnlock.level_id == parent_level.id, db.UserUnlock.user_id == str(member.id))).scalar():
             unlocked_level_names.append(parent_level.name)
             db.session.add(db.UserUnlock(user_id=str(member.id), level=parent_level))
+        if level.unlocks and level in parent_level.child_levels:
+            continue
         if parent_level == level and not include_self:
             continue
         if parent_level.solutions and not db.session.query(db.UserSolve).where(
