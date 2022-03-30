@@ -97,13 +97,14 @@ It's important to note that both `solutions` and `unlocks` allow for multiple st
 The merge checkbox next to the nickname suffix input field makes it so that duplicate suffixes are merged. For example: `[8, 8]` -> `[8]`.
 
 ## Bot Interactions
-The bot provides seven user commands:
+The bot provides eight user commands:
 - `/solve` [PLAYER] marks reached levels as solved once provided with a correct solution.
 - `/unlock` [PLAYER] marks hidden levels as reached so it can be solved later.
 - `/continue` [PLAYER] returns a list of your currently active levels.
 - `/recall` [PLAYER] returns the url and solution of the level specified given that you have already solved it.
 - `/skipto` [PLAYER] allows players to skip to a certain level by providing the url and authentication for it.
 - `/setsolved` [ADMIN] marks a level, as well as all of its parents as solved for a specific user.
+- `/setreached` [ADMIN] marks the target level as reached, as well as all of its parents as solved for a specific user.
 - `/resetuser` [ADMIN] resets all of a user's progress.
 
 ### Solving a Level
