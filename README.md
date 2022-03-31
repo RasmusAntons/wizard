@@ -59,7 +59,7 @@ To give a sense of freedom from a puzzle, the nickname badge removes the current
 
 ![admin](https://cdn.discordapp.com/attachments/513014307978739714/957048423339659314/unknown.png)
 
-The admin menu allows you to add additional admins to your server. This allows the users to use the `/setsolved`, `/setunlocked`, and `/resetuser` commands. 
+The admin menu allows you to add additional admins to your server. This allows the users to use the `/setprogress` and `/resetuser` commands. 
 
 ![admin-menu](https://cdn.discordapp.com/attachments/513014307978739714/957049978239479818/unknown.png)
 
