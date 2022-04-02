@@ -291,7 +291,11 @@ async def update_role_permissions():
     for channel_id, permissions in channel_permissions.items():
         channel = guild.get_channel(int(channel_id))
         if channel is not None:
-            await channel.edit(overwrites=permissions)
+            permissions_as_list = list(permissions.items())
+            first_batch = dict(permissions_as_list[:100])
+            await channel.edit(overwrites=first_batch)
+            for role, overwrite in permissions_as_list[100:]:
+                await channel.set_permissions(role, overwrite=overwrite)
 
 
 async def skip_user_to_level(user_id, level, include_self=False):
