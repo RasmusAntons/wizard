@@ -288,12 +288,12 @@ async def discord_sync():
     start_time = time.time()
     await discord_sync_update('moving level channels to categories')
     await discord_utils.move_all_levels_to_categories()
+    await discord_sync_update('updating role permissions')
     last_update = time.time()
-    async for progress in discord_sync_update('updating role permissions'):
+    async for progress in discord_utils.update_role_permissions():
         if time.time() - last_update > 10:
             await discord_sync_update(f'{progress} role permissions updated')
             last_update = time.time()
-    await discord_utils.update_role_permissions()
     await discord_sync_update('updating user roles')
     last_update = time.time()
     async for progress in discord_utils.update_all_user_roles():
