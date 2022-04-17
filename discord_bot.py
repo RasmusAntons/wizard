@@ -13,8 +13,10 @@ client = nextcord.Client(intents=intents)
 @client.event
 async def on_ready():
     print(f'logged in as {client.user}')
-    await discord_utils.update_all_user_roles()
-    await discord_utils.update_all_user_nicknames()
+    async for _ in discord_utils.update_all_user_roles():
+        pass
+    async for _ in discord_utils.update_all_user_nicknames():
+        pass
 
 
 @client.event

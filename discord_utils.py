@@ -1,3 +1,4 @@
+import asyncio
 import unicodedata
 
 import nextcord
@@ -133,10 +134,10 @@ async def update_user_nickname(user_id):
 async def update_all_user_nicknames():
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
-    for member in guild.members:
-        if member.bot:
-            continue
-        await update_user_nickname(str(member.id))
+    for i, member in enumerate(guild.members):
+        if not member.bot:
+            await update_user_nickname(str(member.id))
+        yield f'{i}/{guild.member_count}'
 
 
 async def update_user_roles(user_id, used_role_ids=None):
@@ -176,10 +177,10 @@ async def update_all_user_roles():
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     used_role_ids = get_used_role_ids()
-    for member in guild.members:
-        if member.bot:
-            continue
-        await update_user_roles(str(member.id), used_role_ids=used_role_ids)
+    for i, member in enumerate(guild.members):
+        if not member.bot:
+            await update_user_roles(str(member.id), used_role_ids=used_role_ids)
+        yield f'{i}/{guild.member_count}'
 
 
 def can_user_solve(level, user_id):
@@ -292,8 +293,9 @@ async def update_role_permissions():
             continue
         for parent_level in get_parent_levels_recursively(level):
             if parent_level.discord_channel and parent_level.discord_channel in channel_permissions.keys():
-                parent_chid = parent_level.discord_channel
-                channel_permissions[parent_chid][role] = nextcord.PermissionOverwrite(read_messages=True)
+                parent_child = parent_level.discord_channel
+                channel_permissions[parent_child][role] = nextcord.PermissionOverwrite(read_messages=True)
+    progress = 0
     for channel_id, permissions in channel_permissions.items():
         channel = guild.get_channel(int(channel_id))
         if channel is not None:
@@ -302,6 +304,7 @@ async def update_role_permissions():
             await channel.edit(overwrites=first_batch)
             for role, overwrite in permissions_as_list[100:]:
                 await channel.set_permissions(role, overwrite=overwrite)
+        yield f'{progress}/{len(channel_permissions)}'
 
 
 async def skip_user_to_level(user_id, level, include_self=False):
