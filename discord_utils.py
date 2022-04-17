@@ -235,8 +235,6 @@ async def move_level_to_category(level):
     if level.discord_channel and level.category and level.category.discord_category:
         discord_channel = discord_bot.client.get_channel(int(level.discord_channel)) \
                           or await discord_bot.client.fetch_channel(level.discord_channel)
-        print(f'{discord_channel.category_id=}')
-        print(f'{int(level.category.discord_category)}')
         if discord_channel.category_id != int(level.category.discord_category):
             discord_category = discord_bot.client.get_channel(int(level.category.discord_category)) \
                                or await discord_bot.client.fetch_channel(level.category.discord_category)
