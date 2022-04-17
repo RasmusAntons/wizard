@@ -836,3 +836,31 @@ input:checked + .slider:before {
     border-left: solid 5px #656475;
     background-color: #2f2f40;
 }
+
+/* new elements */
+
+#sync_popup {
+	box-sizing: border-box;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	margin-left: -200px;
+	height: 200px;
+	margin-top: -88px;
+	background: #2F2F40;
+	z-index: 10001;
+	color: white;
+	padding-left: 15px;
+	padding-right: 15px;
+	border-bottom: solid 1px #000;
+	border-top: solid 1px #656475;
+	border-radius: 1px;
+	line-height: 32px;
+	display: none;
+}
+
+#sync_log {
+	width: calc(100% - 4px);
+	height: 100px;
+}

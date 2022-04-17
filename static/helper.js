@@ -61,6 +61,7 @@ function cloneObject(obj) {
 
 document.addEventListener('DOMContentLoaded', e => {
 	const savingPopup = document.getElementById('saving_popup');
+	const syncPopup = document.getElementById('sync_popup');
 	const pageOverlay = document.getElementById('page-overlay')
 	if (localStorage.getItem('key') === null) {
 		promptKey();
@@ -128,6 +129,39 @@ document.addEventListener('DOMContentLoaded', e => {
 			checkChanges(true);
 			savingPopup.style.display = '';
 			pageOverlay.style.display = '';
+		});
+	}
+	document.getElementById('sync_button').onclick = () => {
+		const syncLog = document.getElementById('sync_log');
+		const closeButton = document.getElementById('sync_close_button');
+		syncPopup.style.display = 'block';
+		pageOverlay.style.display = 'block';
+		closeButton.setAttribute('disabled', true);
+		apiCall('/api/sync/start', 'POST').then(r => {
+			syncLog.value = '';
+			let progress = 0;
+			const queryStatus = () => {
+				apiCall(`/api/sync/status?progress=${progress}`).then(r => {
+					progress = r.progress;
+					for (let line of r.log) {
+						let ts = new Date(line[0] * 1000);
+						let options = {'hour': '2-digit', 'minute': '2-digit', 'second': '2-digit'};
+						let time = ts.toLocaleTimeString(options);
+						syncLog.value += `${time} - ${line[1]}\n`
+					}
+					syncLog.scrollTop = syncLog.scrollHeight;
+					if (!r.active) {
+						closeButton.removeAttribute('disabled');
+						closeButton.onclick = () => {
+							syncPopup.style.display = '';
+							pageOverlay.style.display = '';
+						}
+					} else {
+						queryStatus();
+					}
+				});
+			};
+			queryStatus();
 		});
 	}
 	window.onbeforeunload = function() {

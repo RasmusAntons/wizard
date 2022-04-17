@@ -1,4 +1,6 @@
+import asyncio
 import json
+import time
 import traceback
 
 import aiohttp.web
@@ -7,6 +9,12 @@ import discord
 import db
 import discord_bot
 import discord_utils
+
+
+sync_lock = asyncio.Lock()
+sync_event = asyncio.Event()
+sync_active = False
+sync_log = []
 
 
 def protected(f):
@@ -22,14 +30,6 @@ def protected(f):
         except (AttributeError, ValueError, AssertionError):
             return aiohttp.web.json_response({'error': 'invalid api key'}, status=403)
     return wrapper
-
-
-async def get_index(request):
-    return aiohttp.web.FileResponse('static/index.html')
-
-
-async def get_favicon(request):
-    return aiohttp.web.FileResponse('static/favicon.ico')
 
 
 @protected
@@ -52,8 +52,6 @@ async def patch_settings(request):
         else:
             db.session.execute(db.Setting.__table__.delete().where(db.Setting.key == config_key))
     try:
-        await discord_utils.update_all_user_nicknames()
-        await discord_utils.update_all_user_roles()
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -157,12 +155,6 @@ async def patch_levels(request):
         db.session.merge(parent_level)
     try:
         discord_utils.check_loops()
-        for level_id, level in body.items():
-            if level.get('id') is not None:
-                await discord_utils.move_level_to_category(level_id)
-        await discord_utils.update_role_permissions()
-        await discord_utils.update_all_user_roles()
-        await discord_utils.update_all_user_nicknames()
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -280,27 +272,47 @@ async def patch_categories(request):
         traceback.print_exc()
         db.session.rollback()
         return aiohttp.web.json_response({'error': str(e)}, status=500)
-    # todo: move levels to category if category channel changed
     return aiohttp.web.json_response({'message': 'ok'})
 
 
-async def api_server(host='127.0.0.1', port=8000):
-    app = aiohttp.web.Application()
-    app.add_routes([
-        aiohttp.web.get('/api/settings', get_settings),
-        aiohttp.web.patch('/api/settings', patch_settings),
-        aiohttp.web.get('/api/levels/', get_levels),
-        aiohttp.web.patch('/api/levels/', patch_levels),
-        aiohttp.web.post('/api/discord/channels/', post_discord_channels),
-        aiohttp.web.post('/api/discord/roles/', post_discord_roles),
-        aiohttp.web.post('/api/discord/categories/', post_discord_categories),
-        aiohttp.web.get('/api/categories/', get_categories),
-        aiohttp.web.patch('/api/categories/', patch_categories),
-        aiohttp.web.get('/', get_index),
-        aiohttp.web.get('/favicon.ico', get_favicon),
-        aiohttp.web.static('/static', 'static'),
-    ])
-    runner = aiohttp.web.AppRunner(app)
-    await runner.setup()
-    site = aiohttp.web.TCPSite(runner, host, port)
-    await site.start()
+async def discord_sync_update(message, done=False):
+    global sync_active
+    async with sync_lock:
+        sync_log.append([time.time(), message])
+        sync_active = not done
+    sync_event.set()
+    sync_event.clear()
+
+
+async def discord_sync():
+    start_time = time.time()
+    await discord_sync_update('moving level channels to categories')
+    await discord_utils.move_all_levels_to_categories()
+    await discord_sync_update('updating role permissions')
+    await discord_utils.update_role_permissions()
+    await discord_sync_update('updating user roles')
+    await discord_utils.update_all_user_roles()
+    await discord_sync_update('updating user nicknames')
+    await discord_utils.update_all_user_nicknames()
+    used_time = time.time() - start_time
+    await discord_sync_update(f'finished discord_sync after {used_time: .2f}s', True)
+
+
+@protected
+async def discord_sync_start(request):
+    async with sync_lock:
+        if not sync_active:
+            discord_bot.client.loop.create_task(discord_sync())
+            sync_log.clear()
+    return aiohttp.web.json_response({'message': 'ok'})
+
+
+@protected
+async def discord_sync_status(request):
+    req_progress = int(request.query.get('progress', 0))
+    async with sync_lock:
+        if not sync_active or req_progress < len(sync_log):
+            return aiohttp.web.json_response({'active': sync_active, 'log': sync_log[req_progress:], 'progress': len(sync_log)})
+    await sync_event.wait()
+    async with sync_lock:
+        return aiohttp.web.json_response({'active': sync_active, 'log': sync_log[req_progress:], 'progress': len(sync_log)})

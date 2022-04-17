@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="/admin">admin</a><br>
+<h3>leaderboard</h3>
+{% for points, user in user_points %}
+	{{ user.nick }} - {{ points }} <br>
+{% endfor %}
+{% endblock %}

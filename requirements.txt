@@ -1,4 +1,6 @@
 sqlalchemy
 nextcord
 aiohttp
+aiohttp_jinja2
+jinja2
 alembic

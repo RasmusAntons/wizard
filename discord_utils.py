@@ -10,14 +10,14 @@ import discord_bot
 
 def has_user_reached(level, user_id):
     if level.unlocks:
-        return db.session.query(db.UserUnlock) \
-                   .where(
-            and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)).scalar() is not None
+        return db.session.query(db.UserUnlock).where(
+            and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)
+        ).scalar() is not None
     for parent_level in level.parent_levels:
         if parent_level.solutions:
-            has_solved = db.session.query(db.UserSolve) \
-                             .where(
-                and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == user_id)).scalar() is not None
+            has_solved = db.session.query(db.UserSolve).where(
+                and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == user_id)
+            ).scalar() is not None
             if not has_solved:
                 return False
         elif not has_user_reached(parent_level, user_id):
@@ -183,8 +183,9 @@ async def update_all_user_roles():
 
 
 def can_user_solve(level, user_id):
-    if db.session.query(db.UserSolve) \
-            .where(and_(db.UserSolve.level_id == level.id, db.UserSolve.user_id == user_id)).scalar():
+    if db.session.query(db.UserSolve).where(
+            and_(db.UserSolve.level_id == level.id, db.UserSolve.user_id == user_id)
+    ).scalar():
         return False
     return has_user_reached(level, user_id)
 
@@ -230,8 +231,7 @@ def get_child_ids_recursively(level):
     return child_ids
 
 
-async def move_level_to_category(level_id):
-    level = db.session.get(db.Level, level_id)
+async def move_level_to_category(level):
     if level.discord_channel and level.category and level.category.discord_category:
         discord_channel = discord_bot.client.get_channel(int(level.discord_channel)) \
                           or await discord_bot.client.fetch_channel(level.discord_channel)
@@ -253,6 +253,11 @@ async def move_level_to_category(level_id):
                 await discord_channel.edit(category=discord_category, position=position)
             else:
                 await discord_channel.edit(category=discord_category)
+
+
+async def move_all_levels_to_categories():
+    for level in db.session.query(db.Level).all():
+        await move_level_to_category(level)
 
 
 def get_parent_levels_recursively(level, initial_level=None):
