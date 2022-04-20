@@ -13,7 +13,7 @@ These blocks contain all relevant information about individual levels, such as s
 
 ![create-and delete-line](https://cdn.discordapp.com/attachments/513014307978739714/937692958159949844/unknown.png)
 
-Allows the user to create or delete a dependancy line by clicking on two level blocks in order of parent to child.
+Allows the user to create or delete a dependency line by clicking on two level blocks in order of parent to child.
 
 ![categories](https://cdn.discordapp.com/attachments/513014307978739714/937695801537363978/unknown.png)
 
@@ -67,14 +67,18 @@ Being an admin removes all progress badges from your nickname. The menu allows y
 
 ![save](https://cdn.discordapp.com/attachments/513014307978739714/937702495873036328/unknown.png)
 
-The save button will only save once the edited marker ![edited-marker](https://cdn.discordapp.com/attachments/513014307978739714/937702781387673620/edited.png) appears on it.
+The save button saves the current configuration. If there are changes to save, the edited marker ![edited-marker](https://cdn.discordapp.com/attachments/513014307978739714/937702781387673620/edited.png) appears on it.
 The marker appears on any edited object, including level blocks and buttons.
-When saving:
+When saving, wizard will abandon the process if any errors are detected, including loops in level dependencies
+
+![sync](https://cdn.discordapp.com/attachments/819395604152844368/966423758933983242/unknown.png)
+
+The sync button synchronises the discord server. If there are unsaved changes, those will be saved first, but the button can also be used to fix inconsistencies otherwise. 
 - Level channels and roles are updated on Discord.
 - The channels of changed levels are moved to their categories (if set).
 - For each linked channel, everyone is denied read permission with an exception for the roles of the level and its child levels.
 - If a level has a parent level every user that has reached that level is immediately given its role.
-- wizard will abandon the process if any errors are detected, including loops in level dependencies.
+- .
 
 ### Level Blocks
 Level blocks are the fundamental building blocks of wizard. Each block represents a single level within a puzzle.
