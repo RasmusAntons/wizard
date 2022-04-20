@@ -136,8 +136,14 @@ function createLevelBlock(level, unsaved, select) {
 			createLine(level.id, childLevelId, false);
 	}
 	levelBlock.onmousedown = e => {
-		if (e)
-			e.stopPropagation();
+		if (e) {
+			if (!(e.buttons & 1)) {
+				e.stopImmediatePropagation();
+				return;
+			} else {
+				e.stopPropagation();
+			}
+		}
 		if (currentLine) {
 			if (currentLine.includes(level.id))
 				return;
