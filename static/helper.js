@@ -1,5 +1,6 @@
 let snapDistance = 20;
 const unsetValues = [null, undefined, ""];
+let unsavedChanges = false;
 
 function promptKey() {
 	const newKey = prompt('key');
@@ -21,9 +22,11 @@ function checkChanges(updateSaveButton) {
 	const haveSettingsChanged = Object.keys(settingsChanged).length > 0;
 	const haveCategoriesChanged = Object.keys(categoriesChanged).length > 0;
 	const haveLevelsChanged = Object.keys(levelsChanged).length > 0;
-	const hasSomethingChanged = haveSettingsChanged || haveCategoriesChanged || haveLevelsChanged;
-	document.getElementById('save_button').classList.toggle('changed', hasSomethingChanged);
-	return hasSomethingChanged;
+	unsavedChanges = haveSettingsChanged || haveCategoriesChanged || haveLevelsChanged;
+	for (let button_id of ['save_button', 'sync_button'])
+		document.getElementById(button_id).classList.toggle('changed', unsavedChanges);
+	document.getElementById('sync_button_label').textContent = unsavedChanges ? 'save & sync' : 'sync';
+	return unsavedChanges;
 }
 
 function apiCall(path, method, data) {
@@ -59,10 +62,107 @@ function cloneObject(obj) {
 	return JSON.parse(JSON.stringify(obj));
 }
 
-document.addEventListener('DOMContentLoaded', e => {
+function save() {
 	const savingPopup = document.getElementById('saving_popup');
+	const pageOverlay = document.getElementById('page-overlay')
+	let settingRequest, categoryRequest, levelRequest;
+	savingPopup.style.display = 'block';
+	pageOverlay.style.display = 'block';
+	if (Object.keys(settingsChanged).length) {
+		settingRequest = apiCall(`/api/settings`, 'PATCH', settingsChanged).then(r => {
+			settingsOriginal = cloneObject(settingsCurrent);
+			if ('key' in settingsChanged)
+				localStorage.setItem('key', settingsChanged['key']);
+			settingsChanged = {};
+			checkSettingChange();
+		});
+	} else {
+		settingRequest = new Promise(r => r());
+	}
+	if (Object.keys(categoriesChanged).length > 0) {
+		categoryRequest = apiCall('/api/categories/', 'PATCH', categoriesChanged).then(r => {
+			if (r.error) {
+				alert(r.error);
+			} else {
+				for (let [categoryId, category] of Object.entries(categoriesChanged)) {
+					if (category.id) {
+						categoriesOriginal[categoryId] = cloneObject(category);
+					} else {
+						delete categoriesOriginal[categoryId];
+						delete categoriesCurrent[categoryId];
+					}
+				}
+				categoriesChanged = {};
+				checkCategoryChange();
+			}
+		});
+	} else {
+		categoryRequest = new Promise(r => r());
+	}
+	if (Object.keys(levelsChanged).length > 0) {
+		levelRequest = apiCall('/api/levels/', 'PATCH', levelsChanged).then(r => {
+			if (r.error) {
+				alert(r.error);
+			} else {
+				for (let [levelId, level] of Object.entries(levelsChanged)) {
+					if (level.id) {
+						levelsOriginal[levelId] = cloneObject(level);
+						levelBlocks[levelId].classList.toggle('edited', false);
+					} else {
+						delete levelsOriginal[levelId];
+						delete levelsCurrent[levelId];
+					}
+				}
+				levelsChanged = {};
+			}
+		});
+	} else {
+		levelRequest = new Promise(r => r());
+	}
+	return settingRequest.then(() => categoryRequest).then(() => levelRequest).then(() => {
+		checkChanges(true);
+		savingPopup.style.display = '';
+		pageOverlay.style.display = '';
+	});
+}
+
+function sync() {
 	const syncPopup = document.getElementById('sync_popup');
 	const pageOverlay = document.getElementById('page-overlay')
+	const syncLog = document.getElementById('sync_log');
+	const closeButton = document.getElementById('sync_close_button');
+	syncPopup.style.display = 'block';
+	pageOverlay.style.display = 'block';
+	closeButton.setAttribute('disabled', true);
+	apiCall('/api/sync/start', 'POST').then(r => {
+		syncLog.value = '';
+		let progress = 0;
+		const queryStatus = () => {
+			apiCall(`/api/sync/status?progress=${progress}`).then(r => {
+				progress = r.progress;
+				for (let line of r.log) {
+					let ts = new Date(line[0] * 1000);
+					let options = {'hour': '2-digit', 'minute': '2-digit', 'second': '2-digit'};
+					let time = ts.toLocaleTimeString(options);
+					syncLog.value += `${time} - ${line[1]}\n`
+				}
+				syncLog.scrollTop = syncLog.scrollHeight;
+				if (!r.active) {
+					closeButton.removeAttribute('disabled');
+					closeButton.onclick = () => {
+						syncPopup.style.display = '';
+						pageOverlay.style.display = '';
+					}
+				} else {
+					queryStatus();
+				}
+			});
+		};
+		queryStatus();
+	});
+}
+
+document.addEventListener('DOMContentLoaded', e => {
 	if (localStorage.getItem('key') === null) {
 		promptKey();
 	}
@@ -70,99 +170,12 @@ document.addEventListener('DOMContentLoaded', e => {
 	initLevels();
 	initCategories();
 	initSettings();
-	document.getElementById('save_button').onclick = () => {
-		let settingRequest, categoryRequest, levelRequest;
-		savingPopup.style.display = 'block';
-		pageOverlay.style.display = 'block';
-		if (Object.keys(settingsChanged).length) {
-			settingRequest = apiCall(`/api/settings`, 'PATCH', settingsChanged).then(r => {
-				settingsOriginal = cloneObject(settingsCurrent);
-				if ('key' in settingsChanged)
-					localStorage.setItem('key', settingsChanged['key']);
-				settingsChanged = {};
-				checkSettingChange();
-			});
-		} else {
-			settingRequest = new Promise(r => r());
-		}
-		if (Object.keys(categoriesChanged).length > 0) {
-			categoryRequest = apiCall('/api/categories/', 'PATCH', categoriesChanged).then(r => {
-				if (r.error) {
-					alert(r.error);
-				} else {
-					for (let [categoryId, category] of Object.entries(categoriesChanged)) {
-						if (category.id) {
-							categoriesOriginal[categoryId] = cloneObject(category);
-						} else {
-							delete categoriesOriginal[categoryId];
-							delete categoriesCurrent[categoryId];
-						}
-					}
-					categoriesChanged = {};
-					checkCategoryChange();
-				}
-			});
-		} else {
-			categoryRequest = new Promise(r => r());
-		}
-		if (Object.keys(levelsChanged).length > 0) {
-			levelRequest = apiCall('/api/levels/', 'PATCH', levelsChanged).then(r => {
-				if (r.error) {
-					alert(r.error);
-				} else {
-					for (let [levelId, level] of Object.entries(levelsChanged)) {
-						if (level.id) {
-							levelsOriginal[levelId] = cloneObject(level);
-							levelBlocks[levelId].classList.toggle('edited', false);
-						} else {
-							delete levelsOriginal[levelId];
-							delete levelsCurrent[levelId];
-						}
-					}
-					levelsChanged = {};
-				}
-			});
-		} else {
-			levelRequest = new Promise(r => r());
-		}
-		settingRequest.then(() => categoryRequest).then(() => levelRequest).then(() => {
-			checkChanges(true);
-			savingPopup.style.display = '';
-			pageOverlay.style.display = '';
-		});
-	}
+	document.getElementById('save_button').onclick = save;
 	document.getElementById('sync_button').onclick = () => {
-		const syncLog = document.getElementById('sync_log');
-		const closeButton = document.getElementById('sync_close_button');
-		syncPopup.style.display = 'block';
-		pageOverlay.style.display = 'block';
-		closeButton.setAttribute('disabled', true);
-		apiCall('/api/sync/start', 'POST').then(r => {
-			syncLog.value = '';
-			let progress = 0;
-			const queryStatus = () => {
-				apiCall(`/api/sync/status?progress=${progress}`).then(r => {
-					progress = r.progress;
-					for (let line of r.log) {
-						let ts = new Date(line[0] * 1000);
-						let options = {'hour': '2-digit', 'minute': '2-digit', 'second': '2-digit'};
-						let time = ts.toLocaleTimeString(options);
-						syncLog.value += `${time} - ${line[1]}\n`
-					}
-					syncLog.scrollTop = syncLog.scrollHeight;
-					if (!r.active) {
-						closeButton.removeAttribute('disabled');
-						closeButton.onclick = () => {
-							syncPopup.style.display = '';
-							pageOverlay.style.display = '';
-						}
-					} else {
-						queryStatus();
-					}
-				});
-			};
-			queryStatus();
-		});
+		if (unsavedChanges)
+			save().then(sync);
+		else
+			sync();
 	}
 	window.onbeforeunload = function() {
 		if (checkChanges(false)) {

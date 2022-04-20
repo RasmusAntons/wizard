@@ -307,7 +307,7 @@ async def discord_sync():
             await discord_sync_update(f'{progress} nicknames updated')
             last_update = time.time()
     used_time = time.time() - start_time
-    await discord_sync_update(f'finished discord_sync after {used_time: .2f}s', True)
+    await discord_sync_update(f'finished discord sync after {used_time:.2f}s', True)
 
 
 @protected
