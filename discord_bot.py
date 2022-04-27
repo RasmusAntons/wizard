@@ -88,12 +88,12 @@ async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to
 @client.slash_command('recall', description='Recall a solved level')
 async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', required=True)):
     if ctx.channel.type == nextcord.ChannelType.private:
-        solved_levels = discord_utils.get_solved_levels(ctx.user.id, name=level)
-        if len(solved_levels) == 0:
+        found_levels = discord_utils.get_solved_or_unlocked_levels(ctx.user.id, name=level)
+        if len(found_levels) == 0:
             await ctx.send('No such level', ephemeral=True)
         else:
             embeds = []
-            for level in solved_levels:
+            for level in found_levels:
                 embed = nextcord.Embed(title=f'{level.name}')
                 link = level.get_encoded_link(db.get_setting('auth_in_link') == 'true')
                 if link:
@@ -101,7 +101,9 @@ async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', 
                 embed.colour = int(db.get_setting('embed_color', '#000000')[1:], 16)
                 if level.get_un_pw():
                     embed.description = level.get_un_pw()
-                if level.solutions:
+                if level.unlocks:
+                    embed.add_field(name='Unlocks', value='\n'.join([s.text for s in level.unlocks]))
+                if level.solutions and discord_utils.has_user_solved(level, ctx.user.id):
                     embed.add_field(name='Solutions', value='\n'.join([s.text for s in level.solutions]))
                 embeds.append(embed)
             await ctx.send(embeds=embeds)
@@ -113,7 +115,7 @@ async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', 
 async def recall_autocomplete(ctx, level):
     if ctx.channel.type == nextcord.ChannelType.private:
         start = level or ''
-        solved_levels = discord_utils.get_solved_levels(ctx.user.id, start=start, limit=25)
+        solved_levels = discord_utils.get_solved_or_unlocked_levels(ctx.user.id, start=start, limit=25)
         await ctx.response.send_autocomplete([l.name for l in solved_levels])
     else:
         await ctx.response.send_autocomplete([messages.use_in_dms])

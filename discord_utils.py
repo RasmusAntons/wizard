@@ -2,7 +2,7 @@ import asyncio
 import unicodedata
 
 import nextcord
-from sqlalchemy import and_, exists
+from sqlalchemy import and_, or_, exists
 import sqlalchemy.testing
 
 import db
@@ -24,6 +24,12 @@ def has_user_reached(level, user_id):
         elif not has_user_reached(parent_level, user_id):
             return False
     return True
+
+
+def has_user_solved(level, user_id):
+    return db.session.query(db.UserSolve).where(
+        and_(db.UserSolve.level_id == level.id, db.UserSolve.user_id == user_id)
+    ).scalar() is not None
 
 
 def get_solvable_levels(user_id):
@@ -50,6 +56,20 @@ def get_solved_levels(user_id, name=None, start='', limit=None):
         query = query.limit(limit)
     return query.all()
 
+
+def get_solved_or_unlocked_levels(user_id, name=None, start='', limit=None):
+    query = db.session.query(db.Level).where(
+        and_(
+            db.Level.name == name if name else db.Level.name.startswith(start),
+            or_(
+                exists().where(and_(db.UserSolve.user_id == user_id, db.Level.id == db.UserSolve.level_id)),
+                exists().where(and_(db.UserUnlock.user_id == user_id, db.Level.id == db.UserUnlock.level_id))
+            )
+        )
+    )
+    if limit is not None:
+        query = query.limit(limit)
+    return query.all()
 
 def get_user_level_suffixes(user_id):
     levels = list(get_solvable_levels(user_id))
