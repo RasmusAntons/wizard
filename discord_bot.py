@@ -21,7 +21,7 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    db.session.merge(db.User(id=str(member.id), name=member.nick))
+    db.session.merge(db.User(id=str(member.id), name=member.nick, leaderboard_name=member.display_name))
     db.session.commit()
     await discord_utils.update_user_roles(member.id)
     await discord_utils.update_user_nickname(member.id)
@@ -35,6 +35,7 @@ async def on_member_update(before, after):
         if after.nick == user.nick:
             return
         user.name = after.nick
+        user.leaderboard_name = after.display_name
         db.session.merge(user)
         db.session.commit()
         await discord_utils.update_user_nickname(str(after.id))

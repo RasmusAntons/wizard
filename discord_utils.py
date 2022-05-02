@@ -32,6 +32,19 @@ def has_user_solved(level, user_id):
     ).scalar() is not None
 
 
+def get_solvable_users(level):
+    users = []
+    for user in db.session.query(db.User).all():
+        if can_user_solve(level, user.id):
+            if level.solutions:
+                users.append(user)
+            elif not level.child_levels:
+                users.append(user)
+            elif not any(not l.unlocks and has_user_reached(l, user_id) for l in level.child_levels):
+                users.append(user)
+    return users
+
+
 def get_solvable_levels(user_id):
     levels = []
     for level in db.session.query(db.Level).all():
@@ -123,6 +136,10 @@ async def update_user_nickname(user_id):
     if member.bot:
         return
     user = db.session.get(db.User, user_id)
+    if member.nick is None:
+        user.leaderboard_name = member.display_name
+    if user.leaderboard_name is None:
+        user.leaderboard_name = user.name or member.name
     if user is None:
         user = db.User(id=user_id)
         db.session.add(user)
@@ -130,14 +147,17 @@ async def update_user_nickname(user_id):
         name_suffix = db.get_setting('admin_badge', '')
     elif db.get_setting('completionist_enable_nickname') == 'true' and has_user_solved_everything(user_id):
         name_suffix = db.get_setting('completionist_badge', '*')
-    elif db.get_setting('nickname_enable') == 'true':
-        level_suffixes = get_user_level_suffixes(user_id)
-        prefix = db.get_setting('nickname_prefix', ' [')
-        separator = db.get_setting('nickname_separator', ', ')
-        suffix = db.get_setting('nickname_suffix', ']')
-        name_suffix = f'{prefix}{separator.join(level_suffixes)}{suffix}' if level_suffixes else ''
+        user.level_string = name_suffix
     else:
-        name_suffix = None
+        level_suffixes = get_user_level_suffixes(user_id)
+        separator = db.get_setting('nickname_separator', ', ')
+        user.level_string = separator.join(level_suffixes) if level_suffixes else ''
+        if db.get_setting('nickname_enable') == 'true':
+            prefix = db.get_setting('nickname_prefix', ' [')
+            suffix = db.get_setting('nickname_suffix', ']')
+            name_suffix = f'{prefix}{separator.join(level_suffixes)}{suffix}' if level_suffixes else ''
+        else:
+            name_suffix = None
     user.nick = user.name or member.name
     if name_suffix:
         user.nick = user.nick[:32 - max(0, len(name_suffix))] + name_suffix[:32]
@@ -173,13 +193,18 @@ async def update_user_roles(user_id, used_role_ids=None):
     roles_user_should_have = set()
 
     if not (db.get_setting('admin_enable') == 'true' and is_member_admin(member)):
+        user = db.session.get(db.User, user_id)
+        user_score = 0
         for level in db.session.query(db.Level).all():
+            if has_user_solved(level, user_id):
+                user_score += 1
             if has_user_reached(level, user_id):
                 if any(not l.unlocks and has_user_reached(l, user_id) for l in level.child_levels):
                     continue
                 for parent_level in get_parent_levels_until_role_or_unlock(level):
                     roles_user_should_have.add(parent_level.discord_role)
-
+        user.score = user_score
+        db.session.commit()
         if db.get_setting('completionist_enable_role') == 'true' and has_user_solved_everything(user_id):
             completionist_role = db.get_setting('completionist_role')
             if completionist_role:

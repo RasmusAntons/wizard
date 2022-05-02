@@ -111,8 +111,11 @@ class Setting(Base):
 class User(Base):
     __tablename__ = 'user'
     id = Column(String(18), primary_key=True)
-    name = Column(String(32))
-    nick = Column(String(32))
+    name = Column(String(32), nullable=True)
+    nick = Column(String(32), nullable=True)
+    leaderboard_name = Column(String, nullable=True)
+    level_string = Column(String, nullable=True)
+    score = Column(Integer, default=0)
 
 
 class UserSolve(Base):

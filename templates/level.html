@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h3>{{ level.name }}</h3>
+	<b>{{ users|length }} users:</b>
+	{% for user in users %}
+		<br>{{ user.leaderboard_name }}
+	{% endfor %}
+{% endblock %}

@@ -2,8 +2,12 @@
 
 {% block content %}
 <a href="/admin">admin</a><br>
+<a href="/levels">levels</a><br>
 <h3>leaderboard</h3>
-{% for points, user in user_points %}
-	{{ user.nick }} - {{ points }} <br>
-{% endfor %}
+	<table id="leaderboard">
+		<tr><th>person</th><th>nickname status</th><th>score</th></tr>
+	{% for user in users %}
+		<tr><td>{{ user.leaderboard_name }}</td><td>{{ user.level_string }}</td><td>{{ user.score }}</td></tr>
+	{% endfor %}
+	</table>
 {% endblock %}

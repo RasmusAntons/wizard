@@ -6,13 +6,12 @@ import jinja2
 
 import api
 import db
+import discord_utils
 
 
 async def get_index(request):
-    users = db.session.query(db.User).all()
-    user_points = [(len(user.solved), user) for user in users]
-    user_points.sort(key=lambda t: -t[0])
-    context = {'user_points': user_points}
+    users = db.session.query(db.User).order_by(db.User.score.desc()).all()
+    context = {'users': users}
     return aiohttp_jinja2.render_template('index.html', request, context=context)
 
 
@@ -23,12 +22,26 @@ async def get_admin(request):
 async def get_favicon(request):
     return aiohttp.web.FileResponse('static/favicon.ico')
 
+async def get_levels(request):
+    levels = db.session.query(db.Level).all()
+    context = {'levels': levels}
+    return aiohttp_jinja2.render_template('levels.html', request, context=context)
+
+
+async def get_level(request):
+    level = db.session.get(db.Level, request.match_info.get('level_id'))
+    users = discord_utils.get_solvable_users(level)
+    context = {'level': level, 'users': users}
+    return aiohttp_jinja2.render_template('level.html', request, context=context)
+
 
 async def ui_server(host='127.0.0.1', port=8000):
     app = aiohttp.web.Application()
     aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(os.path.join(os.getcwd(), 'templates')))
     app.add_routes([
         aiohttp.web.get('/admin', get_admin),
+        aiohttp.web.get('/levels', get_levels),
+        aiohttp.web.get('/level/{level_id}', get_level),
         aiohttp.web.get('/favicon.ico', get_favicon),
         aiohttp.web.static('/static', 'static'),
         aiohttp.web.get('/', get_index),
