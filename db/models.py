@@ -117,7 +117,7 @@ class User(Base):
 
     def avatar_size(self, size):
         if self.avatar is None:
-            return 'https://cdn.discordapp.com/embed/avatars/1.png?size=1024'
+            return 'https://cdn.discordapp.com/embed/avatars/1.png'
         return self.avatar.replace('?size=1024', f'?size={size}')
 
 
