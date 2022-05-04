@@ -1,9 +1,61 @@
 {% extends "base.html" %}
 
+{% block head %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+	const categoryChecks = document.getElementsByClassName('category-check');
+	for (let categoryCheck of categoryChecks) {
+		categoryCheck.onchange = () => {
+			const categories = Array.from(categoryChecks).filter(e => e.checked).map(e => e.value).join(',');
+			console.log(categories);
+			fetch(`/api/leaderboard?categories=${categories}`).then(r => r.json()).then(r => {
+				const leaderboardPoints = document.getElementById('leaderboard-points');
+				while (leaderboardPoints.firstChild)
+					leaderboardPoints.removeChild(leaderboardPoints.firstChild)
+				for (let [points, users] of Object.entries(r).reverse()) {
+					const pointsRow = document.createElement('tr');
+					const pointsCell = document.createElement('td');
+					pointsCell.textContent = points;
+					pointsRow.appendChild(pointsCell);
+					const usersCell = document.createElement('td');
+					for (let user of users) {
+						const userImage = document.createElement('img');
+						userImage.src = user.avatar.replace('?size=1024', '?size=60');
+						usersCell.appendChild(userImage);
+						const userNick = document.createElement('span');
+						userNick.textContent = user.nick;
+						usersCell.appendChild(userNick);
+					}
+					pointsRow.appendChild(usersCell);
+					leaderboardPoints.appendChild(pointsRow);
+				}
+			});
+		};
+	}
+});
+</script>
+{% endblock %}
+
 {% block content %}
 <a href="/admin">admin</a><br>
 <h3>leaderboard</h3>
-{% for points, user in user_points %}
-	{{ user.nick }} - {{ points }} <br>
-{% endfor %}
+	<div>
+	{% for category in categories %}
+		<label><input class="category-check" type="checkbox" checked value="{{ category.id }}">{{ category.name }}</label>
+	{% endfor %}
+	</div>
+	<table>
+		<thead>
+			<tr><th>Levels solved</th><th>Users</th></tr>
+			</thead>
+		<tbody id="leaderboard-points">
+		{% for points, users in user_points %}
+			<tr><td>{{ points }}</td><td>
+			{% for user in users %}
+				<img src="{{ user.avatar_size(60) }}">{{ user.nick }}
+			{% endfor %}
+			</td></tr>
+		{% endfor %}
+		</tbody>
+	</table>
 {% endblock %}

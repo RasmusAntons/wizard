@@ -328,3 +328,17 @@ async def discord_sync_status(request):
     await sync_event.wait()
     async with sync_lock:
         return aiohttp.web.json_response({'active': sync_active, 'log': sync_log[req_progress:], 'progress': len(sync_log)})
+
+
+async def get_leaderboard(request):
+    categories = request.query.get('categories')
+    if categories is not None:
+        categories = categories.split(',')
+    leaderboard = discord_utils.get_leaderboard(categories=categories)
+    json_leaderboard = {points: [{
+        'id': user.id,
+        'name': user.name,
+        'nick': user.nick,
+        'avatar': user.avatar
+    } for user in users] for points, users in leaderboard}
+    return aiohttp.web.json_response(json_leaderboard)

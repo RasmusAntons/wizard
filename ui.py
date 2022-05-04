@@ -6,13 +6,13 @@ import jinja2
 
 import api
 import db
+import discord_utils
 
 
 async def get_index(request):
-    users = db.session.query(db.User).all()
-    user_points = [(len(user.solved), user) for user in users]
-    user_points.sort(key=lambda t: -t[0])
-    context = {'user_points': user_points}
+    user_points = discord_utils.get_leaderboard()
+    categories = db.session.query(db.Category).all()
+    context = {'user_points': user_points, 'categories': categories}
     return aiohttp_jinja2.render_template('index.html', request, context=context)
 
 
@@ -43,6 +43,7 @@ async def ui_server(host='127.0.0.1', port=8000):
         aiohttp.web.patch('/api/categories/', api.patch_categories),
         aiohttp.web.post('/api/sync/start', api.discord_sync_start),
         aiohttp.web.get('/api/sync/status', api.discord_sync_status),
+        aiohttp.web.get('/api/leaderboard', api.get_leaderboard),
     ])
     runner = aiohttp.web.AppRunner(app)
     await runner.setup()

@@ -357,3 +357,34 @@ async def skip_user_to_level(user_id, level, include_self=False):
     if unlocked_level_names:
         message_parts.append(f'{len(unlocked_level_names)} unlocks ({", ".join(reversed(unlocked_level_names))})')
     return ('Added ' + ' and '.join(message_parts)) if message_parts else 'Nothing to do'
+
+def get_leaderboard(categories=None):
+    if categories is not None:
+        levels = db.session.query(db.Level).where(db.Level.category_id.in_(categories))
+    else:
+        levels = db.session.query(db.Level).all()
+    scores = {}
+    for level in levels:
+        for user_solve in level.user_solves:
+            scores[user_solve.user_id] = scores.get(user_solve.user_id, 0) + 1
+    groups = {}
+    for uid, score in scores.items():
+        user = db.session.get(db.User, uid)
+        if score not in groups:
+            groups[score] = []
+        groups[score].append(user)
+    return sorted(groups.items(), reverse=True)
+
+def update_avatar(member):
+    user = db.session.get(db.User, str(member.id)) or db.User(id=member.id)
+    avatar_url = member.display_avatar.url
+    if avatar_url != user.avatar:
+        user.avatar = avatar_url
+        db.session.commit()
+
+
+async def update_all_avatars():
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+    for member in guild.members:
+        update_avatar(member)

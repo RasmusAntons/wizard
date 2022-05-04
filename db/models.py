@@ -113,6 +113,10 @@ class User(Base):
     id = Column(String(18), primary_key=True)
     name = Column(String(32))
     nick = Column(String(32))
+    avatar = Column(String, nullable=True)
+
+    def avatar_size(self, size):
+        return self.avatar.replace('?size=1024', f'?size={size}')
 
 
 class UserSolve(Base):

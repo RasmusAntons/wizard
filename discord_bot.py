@@ -17,6 +17,7 @@ async def on_ready():
         pass
     async for _ in discord_utils.update_all_user_nicknames():
         pass
+    await discord_utils.update_all_avatars()
 
 
 @client.event
@@ -25,6 +26,7 @@ async def on_member_join(member):
     db.session.commit()
     await discord_utils.update_user_roles(member.id)
     await discord_utils.update_user_nickname(member.id)
+    discord_utils.update_avatar(after)
 
 
 @client.event
@@ -38,6 +40,8 @@ async def on_member_update(before, after):
         db.session.merge(user)
         db.session.commit()
         await discord_utils.update_user_nickname(str(after.id))
+    if before.guild_avatar != after.guild_avatar:
+        discord_utils.update_avatar(after)
 
 
 @client.event
@@ -45,6 +49,8 @@ async def on_user_update(before, after):
     if before.name != after.name:
         print(f'{after.name} changed their name from {before.name} to {after.name}')
         await discord_utils.update_user_nickname(str(after.id))
+    if before.avatar != after.avatar:
+        discord_utils.update_avatar(after)
 
 
 @client.slash_command('solve', description='Solve')
