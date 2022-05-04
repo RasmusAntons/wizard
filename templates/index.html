@@ -19,15 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
 					pointsRow.appendChild(pointsCell);
 					const usersCell = document.createElement('td');
 					for (let user of users) {
+						const userBlock = document.createElement('div');
+						userBlock.classList.add('user-block');
 						const userImage = document.createElement('img');
 						if (user.avatar)
 							userImage.src = user.avatar.replace('?size=1024', '?size=60');
 						else
 							userImage.src = 'https://cdn.discordapp.com/embed/avatars/1.png';
-						usersCell.appendChild(userImage);
 						const userNick = document.createElement('span');
 						userNick.textContent = user.nick;
-						usersCell.appendChild(userNick);
+						userNick.classList.add('user-nick');
+						userBlock.append(userImage, userNick, document.createTextNode(' '));
+						usersCell.appendChild(userBlock);
 					}
 					pointsRow.appendChild(usersCell);
 					leaderboardPoints.appendChild(pointsRow);
@@ -47,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		<label><input class="category-check" type="checkbox" checked value="{{ category.id }}">{{ category.name }}</label>
 	{% endfor %}
 	</div>
-	<table>
+	<table id="leaderboard">
 		<thead>
 			<tr><th>Levels solved</th><th>Users</th></tr>
 			</thead>
@@ -55,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		{% for points, users in user_points %}
 			<tr><td>{{ points }}</td><td>
 			{% for user in users %}
-				<img src="{{ user.avatar_size(60) }}"><span>{{ user.nick }}</span>
+				<div class="user-block"><img src="{{ user.avatar_size(60) }}"><span class="user-nick">{{ user.nick }}</span></div>
 			{% endfor %}
 			</td></tr>
 		{% endfor %}
