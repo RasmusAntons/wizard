@@ -365,6 +365,8 @@ def get_leaderboard(categories=None):
         levels = db.session.query(db.Level).all()
     scores = {}
     for level in levels:
+        if not level.solutions:
+            continue
         for user_solve in level.user_solves:
             scores[user_solve.user_id] = scores.get(user_solve.user_id, 0) + 1
     groups = {}
