@@ -379,7 +379,7 @@ def get_leaderboard(categories=None):
 
 def update_avatar(member):
     user = db.session.get(db.User, str(member.id)) or db.User(id=member.id)
-    avatar_url = member.display_avatar.url
+    avatar_url = member.display_avatar.url if user is not None else None
     if avatar_url != user.avatar:
         user.avatar = avatar_url
         db.session.commit()
@@ -388,5 +388,10 @@ def update_avatar(member):
 async def update_all_avatars():
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
-    for member in guild.members:
-        update_avatar(member)
+    for user in dn.session.get(db.User).all():
+        member = guild.get_member(int(user.id)) or await guild.fetch_member(int(user.id))
+        if member is not None:
+            update_avatar(member)
+        else:
+            user.avatar = None
+            db.session.commit()
