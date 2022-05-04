@@ -20,7 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
 					const usersCell = document.createElement('td');
 					for (let user of users) {
 						const userImage = document.createElement('img');
-						userImage.src = user.avatar.replace('?size=1024', '?size=60');
+						if (user.avatar)
+							userImage.src = user.avatar.replace('?size=1024', '?size=60');
+						else
+							userImage.src = 'https://cdn.discordapp.com/embed/avatars/1.png';
 						usersCell.appendChild(userImage);
 						const userNick = document.createElement('span');
 						userNick.textContent = user.nick;
@@ -52,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		{% for points, users in user_points %}
 			<tr><td>{{ points }}</td><td>
 			{% for user in users %}
-				<img src="{{ user.avatar_size(60) }}">{{ user.nick }}
+				<img src="{{ user.avatar_size(60) }}"><span>{{ user.nick }}</span>
 			{% endfor %}
 			</td></tr>
 		{% endfor %}
