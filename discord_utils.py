@@ -388,8 +388,8 @@ def update_avatar(member):
 async def update_all_avatars():
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
-    for user in dn.session.get(db.User).all():
-        member = guild.get_member(int(user.id)) or await guild.fetch_member(int(user.id))
+    for user in db.session.query(db.User).all():
+        member = guild.get_member(int(user.id))
         if member is not None:
             update_avatar(member)
         else:
