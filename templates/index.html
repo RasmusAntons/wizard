@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
+<link rel="stylesheet" href="/static/style.css">
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 	const categoryChecks = document.getElementsByClassName('category-check');
@@ -46,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 {% block content %}
 <a href="/admin">admin</a><br>
 <h3>leaderboard</h3>
-	<div>
+	<div id="category-checks">
 	{% for category in categories %}
 		<label><input class="category-check" type="checkbox" checked value="{{ category.id }}">{{ category.name }}</label>
 	{% endfor %}
