@@ -154,7 +154,7 @@ async def patch_levels(request):
             parent_level.child_levels.remove(removed_child_level)
         db.session.merge(parent_level)
     try:
-        discord_utils.check_loops()
+        # discord_utils.check_loops()
         db.session.commit()
     except Exception as e:
         db.session.rollback()
