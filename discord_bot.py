@@ -26,7 +26,7 @@ async def on_member_join(member):
     db.session.commit()
     await discord_utils.update_user_roles(member.id)
     await discord_utils.update_user_nickname(member.id)
-    discord_utils.update_avatar(after)
+    discord_utils.update_avatar(member)
 
 
 @client.event
