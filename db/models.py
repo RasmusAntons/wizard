@@ -75,14 +75,16 @@ class Level(Base):
 class Solution(Base):
     __tablename__ = 'solution'
     level_id = Column(String(36), ForeignKey(Level.id), primary_key=True)
-    level = relationship(Level, foreign_keys=[level_id], backref=backref('solutions', cascade='all,delete'))
+    level = relationship(Level, foreign_keys=[level_id], backref=backref('solutions', cascade='all,delete'),
+                         cascade='delete, delete-orphan')
     text = Column(String, index=True, primary_key=True)
 
 
 class Unlock(Base):
     __tablename__ = 'unlock'
     level_id = Column(String(36), ForeignKey(Level.id), primary_key=True)
-    level = relationship(Level, foreign_keys=[level_id], backref=backref('unlocks', cascade='all,delete'))
+    level = relationship(Level, foreign_keys=[level_id], backref=backref('unlocks', cascade='all,delete'),
+                         cascade='delete, delete-orphan')
     text = Column(String, index=True, primary_key=True)
 
 
@@ -124,14 +126,14 @@ class User(Base):
 class UserSolve(Base):
     __tablename__ = 'user_solve'
     user_id = Column(String(18), ForeignKey(User.id, ondelete='CASCADE'), primary_key=True)
-    user = relationship(User, backref='solved')
+    user = relationship(User, backref='solved', cascade='delete, delete-orphan')
     level_id = Column(String(36), ForeignKey(Level.id, ondelete='CASCADE'), primary_key=True)
-    level = relationship(Level, backref='user_solves')
+    level = relationship(Level, backref='user_solves', cascade='delete, delete-orphan')
 
 
 class UserUnlock(Base):
     __tablename__ = 'user_unlock'
     user_id = Column(String(18), ForeignKey(User.id, ondelete='CASCADE'), primary_key=True)
-    user = relationship(User, backref='unlocked')
+    user = relationship(User, backref='unlocked', cascade='delete, delete-orphan')
     level_id = Column(String(36), ForeignKey(Level.id, ondelete='CASCADE'), primary_key=True)
-    level = relationship(Level, backref='user_unlocks')
+    level = relationship(Level, backref='user_unlocks', cascade='delete, delete-orphan')
