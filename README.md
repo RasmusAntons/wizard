@@ -78,7 +78,6 @@ The sync button synchronises the discord server. If there are unsaved changes, t
 - The channels of changed levels are moved to their categories (if set).
 - For each linked channel, everyone is denied read permission with an exception for the roles of the level and its child levels.
 - If a level has a parent level every user that has reached that level is immediately given its role.
-- .
 
 ### Level Blocks
 Level blocks are the fundamental building blocks of wizard. Each block represents a single level within a puzzle.
