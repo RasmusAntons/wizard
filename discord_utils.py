@@ -359,6 +359,8 @@ async def skip_user_to_level(user_id, level, include_self=False):
     return ('Added ' + ' and '.join(message_parts)) if message_parts else 'Nothing to do'
 
 def get_leaderboard(categories=None):
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id)
     if categories is not None:
         levels = db.session.query(db.Level).where(db.Level.category_id.in_(categories))
     else:
@@ -372,6 +374,9 @@ def get_leaderboard(categories=None):
     groups = {}
     for uid, score in scores.items():
         user = db.session.get(db.User, uid)
+        member = guild.get_member(int(user.id))
+        if member and is_member_admin:
+            continue
         if score not in groups:
             groups[score] = []
         groups[score].append(user)
