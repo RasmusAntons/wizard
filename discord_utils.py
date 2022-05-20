@@ -108,7 +108,7 @@ def get_starting_levels():
 
 def is_member_admin(member):
     admin_role_id = db.get_setting('admin_role')
-    if admin_role_id is None:
+    if not admin_role_id:
         return False
     return member.get_role(int(admin_role_id)) is not None
 
