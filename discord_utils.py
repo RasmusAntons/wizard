@@ -395,3 +395,15 @@ async def update_all_avatars():
         else:
             user.avatar = None
             db.session.commit()
+
+
+def get_used_categories():
+    used_categories = []
+    for category in db.session.query(db.Category).all():
+        for level in category.levels:
+            if level.solutions:
+                break
+        else:
+            continue
+        used_categories.append(category)
+    return used_categories

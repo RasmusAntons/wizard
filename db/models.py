@@ -30,7 +30,7 @@ class Level(Base):
     discord_channel = Column(String(18), nullable=True, index=True)
     discord_role = Column(String(18), nullable=True)
     category_id = Column(String(36), ForeignKey('category.id', ondelete='SET NULL'))
-    category = relationship('Category')
+    category = relationship('Category', backref=backref('levels'))
     grid_x = Column(Integer, nullable=True)
     grid_y = Column(Integer, nullable=True)
 

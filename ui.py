@@ -11,7 +11,7 @@ import discord_utils
 
 async def get_index(request):
     user_points = discord_utils.get_leaderboard()
-    categories = db.session.query(db.Category).all()
+    categories = discord_utils.get_used_categories()
     context = {'user_points': user_points, 'categories': categories}
     return aiohttp_jinja2.render_template('index.html', request, context=context)
 
