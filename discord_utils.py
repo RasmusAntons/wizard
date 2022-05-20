@@ -375,7 +375,7 @@ def get_leaderboard(categories=None):
     for uid, score in scores.items():
         user = db.session.get(db.User, uid)
         member = guild.get_member(int(user.id))
-        if member and is_member_admin:
+        if member and is_member_admin(member):
             continue
         if score not in groups:
             groups[score] = []
