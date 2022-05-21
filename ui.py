@@ -12,7 +12,7 @@ import discord_utils
 async def get_index(request):
     user_points = discord_utils.get_leaderboard()
     categories = discord_utils.get_used_categories()
-    style = db.get_setting('style', 'default')
+    style = db.get_setting('style', 'rainbow')
     for category in categories:
         category.css_colour = f'#{category.colour:06x}' if category.colour else ''
     context = {'user_points': user_points, 'categories': categories, 'style': style}

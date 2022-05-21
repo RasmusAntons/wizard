@@ -18,6 +18,7 @@ def init_db():
     db.set_setting('completionist_enable_nickname', 'false')
     db.set_setting('completionist_enable_role', 'false')
     db.set_setting('admin_enable_nickname', 'false')
+    db.set_setting('style', 'rainbow')
     db.set_setting('key', getpass.getpass('Access key: '))
     db.set_setting('bot_token', getpass.getpass('Discord bot token: '))
     db.session.commit()
