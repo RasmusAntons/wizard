@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
 {% block head %}
-<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/styles/{{ style }}.css">
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 	const categoryChecks = document.getElementsByClassName('category-check');

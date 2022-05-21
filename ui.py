@@ -12,9 +12,10 @@ import discord_utils
 async def get_index(request):
     user_points = discord_utils.get_leaderboard()
     categories = discord_utils.get_used_categories()
+    style = db.get_setting('style', 'default')
     for category in categories:
         category.css_colour = f'#{category.colour:06x}' if category.colour else ''
-    context = {'user_points': user_points, 'categories': categories}
+    context = {'user_points': user_points, 'categories': categories, 'style': style}
     return aiohttp_jinja2.render_template('index.html', request, context=context)
 
 
@@ -45,6 +46,7 @@ async def ui_server(host='127.0.0.1', port=8000):
         aiohttp.web.patch('/api/categories/', api.patch_categories),
         aiohttp.web.post('/api/sync/start', api.discord_sync_start),
         aiohttp.web.get('/api/sync/status', api.discord_sync_status),
+        aiohttp.web.get('/api/styles', api.get_styles),
         aiohttp.web.get('/api/leaderboard', api.get_leaderboard),
     ])
     runner = aiohttp.web.AppRunner(app)

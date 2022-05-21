@@ -1,7 +1,10 @@
 import asyncio
 import json
+import os.path
 import time
 import traceback
+import glob
+import pathlib
 
 import aiohttp.web
 import discord
@@ -329,6 +332,13 @@ async def discord_sync_status(request):
     await sync_event.wait()
     async with sync_lock:
         return aiohttp.web.json_response({'active': sync_active, 'log': sync_log[req_progress:], 'progress': len(sync_log)})
+
+
+@protected
+async def get_styles(request):
+    style_files = glob.glob('static/styles/*.css')
+    styles = [pathlib.Path(style_file).stem for style_file in style_files]
+    return aiohttp.web.json_response(styles)
 
 
 async def get_leaderboard(request):

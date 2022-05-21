@@ -8,7 +8,7 @@ const inputSettings = {
 	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check',
 	'completionist_enable_nickname': 'check', 'completionist_badge': 'text',
 	'completionist_enable_role': 'check', 'completionist_role': 'text',
-	'admin_enable': 'check', 'admin_badge': 'text', 'admin_role': 'text'
+	'admin_enable': 'check', 'admin_badge': 'text', 'admin_role': 'text', 'style': 'select'
 };
 
 function checkSettingChange(settingKey) {
@@ -45,13 +45,28 @@ function updateNicknamePreview() {
 	}
 }
 
+function loadStyleOptions() {
+	apiCall('/api/styles').then(styles => {
+		const styleSelect = document.getElementById('setting_style');
+		const currentStyle = settingsCurrent.style;
+		for (let style of styles) {
+			const option = document.createElement('option');
+			option.value = style;
+			option.textContent = style;
+			if (style === currentStyle)
+				option.selected = true;
+			styleSelect.appendChild(option);
+		}
+	});
+}
+
 function loadSettings(cb) {
 	apiCall('/api/settings').then(settings => {
 		settingsOriginal = settings;
 		settingsCurrent = cloneObject(settings);
 		for (let [settingKey, settingType] of Object.entries(inputSettings)) {
 			const settingInput = document.getElementById(`setting_${settingKey}`);
-			if (settingType === 'text') {
+			if (settingType === 'text' || settingType === 'select') {
 				if (settingKey in settings)
 					settingInput.value = settings[settingKey];
 				settingInput.oninput = settingInput.onchange = () => {
@@ -73,6 +88,7 @@ function loadSettings(cb) {
 				});
 			}
 		}
+		loadStyleOptions();
 		updateNicknamePreview();
 		if (cb)
 			cb();
