@@ -73,7 +73,7 @@ def get_solved_or_unlocked_levels(user_id, name=None, start='', limit=None):
 
 def get_user_level_suffixes(user_id):
     levels = list(get_solvable_levels(user_id))
-    levels.sort(key=lambda l: (l.category.ordinal if l.category else -1,  l.name))
+    levels.sort(key=lambda l: ((l.category.ordinal or 0) if l.category else -1,  l.name))
     user_level_suffixes = []
     for level in levels:
         if level.nickname_suffix and (not level.nickname_merge or level.nickname_suffix not in user_level_suffixes):
