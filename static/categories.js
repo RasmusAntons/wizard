@@ -68,7 +68,7 @@ function createCategory(category, unsaved) {
 	categoriesCurrent[category.id] = cloneObject(category);
 	const categoryListItem = document.createElement('li');
 	categoryListItems[category.id] = categoryListItem;
-	categoryListItem.textContent = category.name;
+	categoryListItem.textContent = category.name || ' ';
 	categoryListItem.style.borderLeftColor = '#' + category.colour.toString(16).padStart(6, '0');
 	const categoryListHandle = document.createElement('span')
 	categoryListHandle.textContent = '⣿';
@@ -236,7 +236,7 @@ function initCategories() {
 	document.getElementById('add_category_button').onclick = () => {
 		const categoryId = uuidv4();
 		createCategory({
-			id: categoryId, name: 'new category', discord_category: null, colour: 0x232330,
+			id: categoryId, name: '', discord_category: null, colour: 0x232330,
 			ordinal: Object.values(categoryListItems).length
 		}, true);
 		initializeDraggables();
