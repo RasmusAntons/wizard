@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <h3>leaderboard</h3>
 	<div id="category-checks">
 	{% for category in categories %}
-		<label><input class="category-check" type="checkbox" checked value="{{ category.id }}">{{ category.name }}</label>
+		<label><input class="category-check" type="checkbox" checked value="{{ category.id }}" style="accent-color: {{ category.css_colour }}">{{ category.name }}</label>
 	{% endfor %}
 	</div>
 	<table id="leaderboard">

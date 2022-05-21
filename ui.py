@@ -12,6 +12,8 @@ import discord_utils
 async def get_index(request):
     user_points = discord_utils.get_leaderboard()
     categories = discord_utils.get_used_categories()
+    for category in categories:
+        category.css_colour = f'#{category.colour:06x}' if category.colour else ''
     context = {'user_points': user_points, 'categories': categories}
     return aiohttp_jinja2.render_template('index.html', request, context=context)
 
