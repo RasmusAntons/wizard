@@ -78,7 +78,6 @@ def get_user_level_suffixes(user_id):
     for level in levels:
         if level.nickname_suffix and (not level.nickname_merge or level.nickname_suffix not in user_level_suffixes):
             user_level_suffixes.append(level.nickname_suffix)
-    print(f'{user_level_suffixes=}')
     return user_level_suffixes
 
 
