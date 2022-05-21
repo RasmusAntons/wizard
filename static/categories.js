@@ -39,6 +39,8 @@ function sortCategoryList(updateOrdinals) {
 }
 
 function initializeDraggables() {
+	for (let oldDraggable of categoryDraggables)
+		oldDraggable.remove();
 	categoryDraggables = [];
 	for (let [categoryId, listItem] of Object.entries(categoryListItems)) {
 		const draggable = new PlainDraggable(listItem, {
@@ -72,8 +74,8 @@ function createCategory(category, unsaved) {
 	categoryListHandle.textContent = '⣿';
 	categoryListHandle.className = 'handle';
 	categoryListHandle.addEventListener('click', e => e.stopPropagation());
-	categoryListItem.appendChild(categoryListHandle);
 	categoryList.appendChild(categoryListItem);
+	categoryListItem.appendChild(categoryListHandle);
 	if (unsaved) {
 		categoriesOriginal[category.id].unsaved = true;
 		checkCategoryChange(category.id);
@@ -87,7 +89,7 @@ function createCategory(category, unsaved) {
 		categoryNameInput.value = categoriesCurrent[category.id].name;
 		categoryNameInput.disabled = false;
 		categoryNameInput.oninput = categoryNameInput.onchange = () => {
-			categoryListItems[category.id].textContent = categoryNameInput.value;
+			categoryListItems[category.id].childNodes[0].textContent = categoryNameInput.value;
 			levelCategoryListItems[category.id].textContent = categoryNameInput.value;
 			categoriesCurrent[category.id].name = categoryNameInput.value;
 			checkCategoryChange(category.id);
@@ -234,10 +236,10 @@ function initCategories() {
 	document.getElementById('add_category_button').onclick = () => {
 		const categoryId = uuidv4();
 		createCategory({
-			id: categoryId, name: '', discord_category: null, colour: 0x232330,
+			id: categoryId, name: 'new category', discord_category: null, colour: 0x232330,
 			ordinal: Object.values(categoryListItems).length
 		}, true);
+		initializeDraggables();
 		categoryListItems[categoryId].click();
-
 	}
 }
