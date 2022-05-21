@@ -105,3 +105,12 @@ h3 {
 	color: white;
 	text-shadow: 1px 1px 2px black; 
 }
+
+label {
+    display: inline-block;
+}
+
+#category-checks {
+    margin: 20px auto;
+    width: 42%;
+}
