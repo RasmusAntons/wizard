@@ -94,13 +94,15 @@ class Category(Base):
     name = Column(String, nullable=True)
     discord_category = Column(String(18), nullable=True)
     colour = Column(Integer, nullable=True)
+    ordinal = Column(Integer, nullable=True)
 
     def to_api_dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'discord_category': self.discord_category if self.discord_category is not None else None,
-            'colour': self.colour
+            'colour': self.colour,
+            'ordinal': self.ordinal
         }
 
 

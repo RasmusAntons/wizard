@@ -236,7 +236,7 @@ async def post_discord_categories(request):
 
 @protected
 async def get_categories(request):
-    categories = db.session.query(db.Category).all()
+    categories = db.session.query(db.Category).order_by('ordinal').all()
     return aiohttp.web.json_response({category.id: category.to_api_dict() for category in categories})
 
 
@@ -265,6 +265,7 @@ async def patch_categories(request):
             category.name = category_body.get('name')
             category.discord_category = category_body.get('discord_category')
             category.colour = category_body.get('colour')
+            category.ordinal = category_body.get('ordinal')
             db.session.merge(category)
     try:
         db.session.commit()

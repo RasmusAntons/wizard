@@ -404,7 +404,7 @@ async def update_all_avatars():
 
 def get_used_categories():
     used_categories = []
-    for category in db.session.query(db.Category).all():
+    for category in db.session.query(db.Category).order_by('ordinal').all():
         for level in category.levels:
             if level.solutions:
                 break

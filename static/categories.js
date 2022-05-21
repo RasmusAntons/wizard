@@ -3,7 +3,9 @@ let categoriesCurrent = {};
 let categoriesChanged = {};
 let selectedCategoryId;
 let categoryListItems = {};
+let categoryDraggables = [];
 let levelCategoryListItems = {};
+const listItemHeight = 26;
 
 function checkCategoryChange(categoryId) {
 	if (categoryId) {
@@ -21,6 +23,43 @@ function checkCategoryChange(categoryId) {
 	checkChanges(true);
 }
 
+function sortCategoryList(updateOrdinals) {
+	const toolbar = document.getElementById('toolbar');
+	categoryDraggables.sort((e, o) => e.top + 1 - o.top);
+	for (let [i, draggable] of categoryDraggables.entries()) {
+		const parentOffset = draggable.element.parentElement.offsetTop;
+		const scrollOffset = draggable.element.parentElement.parentElement.scrollTop + toolbar.scrollTop;
+		if(Math.abs(draggable.top - parentOffset - scrollOffset - i * listItemHeight) >= 1)
+			draggable.top = i * listItemHeight + parentOffset - scrollOffset;
+		if (updateOrdinals && categoriesCurrent[draggable.category].ordinal !== i) {
+			categoriesCurrent[draggable.category].ordinal = i;
+			checkCategoryChange(draggable.category);
+		}
+	}
+}
+
+function initializeDraggables() {
+	categoryDraggables = [];
+	for (let [categoryId, listItem] of Object.entries(categoryListItems)) {
+		const draggable = new PlainDraggable(listItem, {
+			handle: listItem.querySelector('.handle'),
+			snap: {y: {step: listItemHeight}, side: 'start'},
+			onDrag: function (moveTo) {
+				if (!moveTo.snapped)
+					return false;
+				sortCategoryList(false);
+				return true;
+			},
+			onDragEnd: function (moveTo) {
+				sortCategoryList(true);
+				return true;
+			}
+		});
+		draggable.category = categoryId;
+		categoryDraggables.push(draggable);
+	}
+}
+
 function createCategory(category, unsaved) {
 	const categoryList = document.getElementById('editable_category_list');
 	categoriesOriginal[category.id] = category;
@@ -29,6 +68,11 @@ function createCategory(category, unsaved) {
 	categoryListItems[category.id] = categoryListItem;
 	categoryListItem.textContent = category.name;
 	categoryListItem.style.borderLeftColor = '#' + category.colour.toString(16).padStart(6, '0');
+	const categoryListHandle = document.createElement('span')
+	categoryListHandle.textContent = '⣿';
+	categoryListHandle.className = 'handle';
+	categoryListHandle.addEventListener('click', e => e.stopPropagation());
+	categoryListItem.appendChild(categoryListHandle);
 	categoryList.appendChild(categoryListItem);
 	if (unsaved) {
 		categoriesOriginal[category.id].unsaved = true;
@@ -130,6 +174,7 @@ function createCategory(category, unsaved) {
 	};
 	const levelCategoryList = document.getElementById('selectable_category_list');
 	const levelCategoryListItem = categoryListItem.cloneNode(true);
+	levelCategoryListItem.removeChild(levelCategoryListItem.querySelector('.handle'));
 	levelCategoryListItems[category.id] = levelCategoryListItem;
 	levelCategoryListItem.onclick = () => {
 		levelsCurrent[selectedLevelId].category = category.id;
@@ -154,7 +199,7 @@ function createCategory(category, unsaved) {
 
 function loadCategories(cb) {
 	apiCall('/api/categories/').then(categories => {
-		for (const [id, category] of Object.entries(categories)) {
+		for (const category of Object.values(categories).sort((e, o) => e.ordinal - o.ordinal)) {
 			createCategory(category, false);
 		}
 		if (cb)
@@ -168,6 +213,7 @@ function initCategories() {
 		document.getElementById('toolbar-settings').style.display = '';
 		document.getElementById('toolbar-nicknames').style.display = '';
 		document.getElementById('toolbar-category').style.display = 'block';
+		initializeDraggables();
 		if (selectedCategoryId)
 			categoryListItems[selectedCategoryId].classList.remove('selected-category');
 		const categoryNameInput = document.getElementById('discord_category_name');
@@ -187,7 +233,10 @@ function initCategories() {
 	};
 	document.getElementById('add_category_button').onclick = () => {
 		const categoryId = uuidv4();
-		createCategory({id: categoryId, name: '', discord_category: null, colour: 0x232330}, true);
+		createCategory({
+			id: categoryId, name: '', discord_category: null, colour: 0x232330,
+			ordinal: Object.values(categoryListItems).length
+		}, true);
 		categoryListItems[categoryId].click();
 
 	}

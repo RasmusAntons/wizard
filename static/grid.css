@@ -532,17 +532,29 @@ button:disabled:hover {
 	display: none;
 }
 
-.category_list {
+.category_list_container {
 	height: 120px;
+	width: 292px;
 	overflow: scroll;
 	overflow-x: hidden;
-	padding: 0;
-	background: #1b1b28;
-	width: 292px;
 	margin-left: 14px;
+	margin-top: 14px;
+	margin-bottom: 14px;
+	background: #1b1b28;
+}
+
+.category_list {
+	padding: 0;
+	position: relative;
+	margin: 0;
 }
 
 .category_list li {
+	position: relative;
+	display: block;
+	transition-property: transform;
+	transition-duration: 0.1s;
+	transition-timing-function: ease-in;
 	box-sizing: border-box;
 	font-family: 'Share Tech Mono', monospace;
 	background-color: #37374c;
@@ -550,7 +562,7 @@ button:disabled:hover {
 	border: none;
 	height: 26px;
 	line-height: 25px;
-	width: 286px;
+	width: 100%;
 	color: #fff;
 	text-transform: lowercase;
 	border-bottom: solid 1px #000;
@@ -560,6 +572,14 @@ button:disabled:hover {
 
 .category_list li:hover {
 	background-color: #2b2b3d;
+}
+
+.handle {
+	width: 10%;
+	text-align: left;
+	position: absolute;
+	left: 10px;
+	color: #656475;
 }
 
 #category_id button {
