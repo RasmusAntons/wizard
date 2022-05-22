@@ -342,14 +342,17 @@ async def get_styles(request):
 
 
 async def get_leaderboard(request):
-    categories = request.query.get('categories')
-    if categories is not None:
-        categories = categories.split(',')
-    leaderboard = discord_utils.get_leaderboard(categories=categories)
-    json_leaderboard = {points: [{
-        'id': user.id,
-        'name': user.name,
-        'nick': user.nick,
-        'avatar': user.avatar
-    } for user in users] for points, users in leaderboard}
-    return aiohttp.web.json_response(json_leaderboard)
+    categories = discord_utils.get_used_categories()
+    categories_dict = {category.id: {
+        'name': category.name,
+        'colour': category.colour,
+        'ordinal': category.ordinal
+    } for category in categories}
+    users_dict = discord_utils.get_users_dict()
+    scores_dict = discord_utils.get_scores_dict()
+    leaderboard = {
+        'categories': categories_dict,
+        'users': users_dict,
+        'scores': scores_dict
+    }
+    return aiohttp.web.json_response(leaderboard)

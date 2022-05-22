@@ -23,6 +23,7 @@ table th {
 
 .user-block img {
 	width: 40px;
+	height: 40px;
 	border-radius: 50%;
 }
 
@@ -59,4 +60,5 @@ label {
 #category-checks {
 	margin: 20px auto;
 	width: 42%;
+	user-select: none;
 }

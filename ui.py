@@ -1,4 +1,5 @@
 import os
+import json
 
 import aiohttp.web
 import aiohttp_jinja2
@@ -10,12 +11,13 @@ import discord_utils
 
 
 async def get_index(request):
-    user_points = discord_utils.get_leaderboard()
+    users_json = json.dumps(discord_utils.get_users_dict(), indent='\t')
+    scores_json = json.dumps(discord_utils.get_scores_dict(), indent='\t')
     categories = discord_utils.get_used_categories()
     style = db.get_setting('style', 'rainbow')
     for category in categories:
         category.css_colour = f'#{category.colour:06x}' if category.colour else ''
-    context = {'user_points': user_points, 'categories': categories, 'style': style}
+    context = {'users_json': users_json, 'scores_json': scores_json, 'categories': categories, 'style': style}
     return aiohttp_jinja2.render_template('index.html', request, context=context)
 
 

@@ -4,43 +4,59 @@
 <link rel="stylesheet" href="/static/base.css">
 <link rel="stylesheet" href="/static/styles/{{ style }}.css">
 <script>
+const users = {{ users_json|safe }};
+const scores = {{ scores_json|safe }};
+function updateLeaderboard() {
+	const leaderboardPoints = document.getElementById('leaderboard-points');
+	const categoryChecks = document.getElementsByClassName('category-check');
+	const categories = Array.from(categoryChecks).filter(e => e.checked).map(e => e.value);
+	while (leaderboardPoints.firstChild)
+		leaderboardPoints.removeChild(leaderboardPoints.firstChild);
+	const scoreGroups = {};
+	for (let [uid, user] of Object.entries(users)) {
+		if (user.admin || !(uid in scores))
+			continue;
+		let score = 0;
+		for (let [categoryId, categoryScore] of Object.entries(scores[uid])) {
+			if (categories.includes(categoryId))
+				score += categoryScore;
+		}
+		if (score === 0)
+			continue;
+		if (scoreGroups[score] === undefined)
+			scoreGroups[score] = [];
+		scoreGroups[score].push(user);
+	}
+	for (let [points, users] of Object.entries(scoreGroups).reverse()) {
+		const pointsRow = document.createElement('tr');
+		const pointsCell = document.createElement('td');
+		pointsCell.textContent = points;
+		pointsRow.appendChild(pointsCell);
+		const usersCell = document.createElement('td');
+		for (let user of users) {
+			const userBlock = document.createElement('div');
+			userBlock.classList.add('user-block');
+			const userImage = document.createElement('img');
+			if (user.avatar)
+				userImage.src = user.avatar.replace('?size=1024', '?size=60');
+			else
+				userImage.src = 'https://cdn.discordapp.com/embed/avatars/1.png';
+			usersCell.appendChild(userImage);
+			const userNick = document.createElement('span');
+			userNick.textContent = user.nick;
+			userNick.classList.add('user-nick');
+			userBlock.append(userImage, userNick, document.createTextNode(' '));
+			usersCell.appendChild(userBlock);
+		}
+		pointsRow.appendChild(usersCell);
+		leaderboardPoints.appendChild(pointsRow);
+	}
+}
 document.addEventListener('DOMContentLoaded', () => {
 	const categoryChecks = document.getElementsByClassName('category-check');
-	for (let categoryCheck of categoryChecks) {
-		categoryCheck.onchange = () => {
-			const categories = Array.from(categoryChecks).filter(e => e.checked).map(e => e.value).join(',');
-			console.log(categories);
-			fetch(`/api/leaderboard?categories=${categories}`).then(r => r.json()).then(r => {
-				const leaderboardPoints = document.getElementById('leaderboard-points');
-				while (leaderboardPoints.firstChild)
-					leaderboardPoints.removeChild(leaderboardPoints.firstChild)
-				for (let [points, users] of Object.entries(r).reverse()) {
-					const pointsRow = document.createElement('tr');
-					const pointsCell = document.createElement('td');
-					pointsCell.textContent = points;
-					pointsRow.appendChild(pointsCell);
-					const usersCell = document.createElement('td');
-					for (let user of users) {
-						const userBlock = document.createElement('div');
-						userBlock.classList.add('user-block');
-						const userImage = document.createElement('img');
-						if (user.avatar)
-							userImage.src = user.avatar.replace('?size=1024', '?size=60');
-						else
-							userImage.src = 'https://cdn.discordapp.com/embed/avatars/1.png';
-						usersCell.appendChild(userImage);
-						const userNick = document.createElement('span');
-						userNick.textContent = user.nick;
-						userNick.classList.add('user-nick');
-						userBlock.append(userImage, userNick, document.createTextNode(' '));
-						usersCell.appendChild(userBlock);
-					}
-					pointsRow.appendChild(usersCell);
-					leaderboardPoints.appendChild(pointsRow);
-				}
-			});
-		};
-	}
+	for (let categoryCheck of categoryChecks)
+		categoryCheck.onchange = updateLeaderboard;
+	updateLeaderboard();
 });
 </script>
 {% endblock %}
@@ -56,14 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		<thead>
 			<tr><th>Levels solved</th><th>Users</th></tr>
 		</thead>
-		<tbody id="leaderboard-points">
-		{% for points, users in user_points %}
-			<tr><td>{{ points }}</td><td>
-			{% for user in users %}
-				<div class="user-block"><img src="{{ user.avatar_size(60) }}"><span class="user-nick">{{ user.nick }}</span></div>
-			{% endfor %}
-			</td></tr>
-		{% endfor %}
-		</tbody>
+		<tbody id="leaderboard-points"></tbody>
 	</table>
 {% endblock %}

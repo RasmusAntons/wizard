@@ -358,6 +358,7 @@ async def skip_user_to_level(user_id, level, include_self=False):
         message_parts.append(f'{len(unlocked_level_names)} unlocks ({", ".join(reversed(unlocked_level_names))})')
     return ('Added ' + ' and '.join(message_parts)) if message_parts else 'Nothing to do'
 
+
 def get_leaderboard(categories=None):
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id)
@@ -381,6 +382,30 @@ def get_leaderboard(categories=None):
             groups[score] = []
         groups[score].append(user)
     return sorted(groups.items(), reverse=True)
+
+
+def get_users_dict():
+    users = {}
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id)
+    for user in db.session.query(db.User).all():
+        member = guild.get_member(int(user.id))
+        users[user.id] = {
+            'nick': user.nick,
+            'avatar': user.avatar,
+            'admin': member and is_member_admin(member)
+        }
+    return users
+
+
+def get_scores_dict():
+    scores = {}
+    for solve in db.session.query(db.UserSolve).all():
+        if solve.user_id not in scores:
+            scores[solve.user_id] = {}
+        scores[solve.user_id][solve.level.category_id] = scores[solve.user_id].get(solve.level.category_id, 0) + 1
+    return scores
+
 
 def update_avatar(member):
     user = db.session.get(db.User, str(member.id)) or db.User(id=member.id)
