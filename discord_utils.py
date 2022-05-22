@@ -359,6 +359,10 @@ async def skip_user_to_level(user_id, level, include_self=False):
     return ('Added ' + ' and '.join(message_parts)) if message_parts else 'Nothing to do'
 
 
+def get_invalid_user_solves():
+    return db.session.query(db.UserSolve).where(~exists(db.Solution).where(db.UserSolve.level_id == db.Solution.level_id)).all()
+
+
 def get_leaderboard(categories=None):
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id)

@@ -4,6 +4,7 @@ import db
 from sqlalchemy import and_
 import discord_utils
 import messages
+import time
 
 intents = nextcord.Intents.default()
 intents.members = True
@@ -13,10 +14,26 @@ client = nextcord.Client(intents=intents)
 @client.event
 async def on_ready():
     print(f'logged in as {client.user}')
-    async for _ in discord_utils.update_all_user_roles():
-        pass
-    async for _ in discord_utils.update_all_user_nicknames():
-        pass
+    invalid_solves = discord_utils.get_invalid_user_solves()
+    if invalid_solves:
+        print('WARNING: User solves for levels without solution')
+        for invalid_solve in invalid_solves:
+            print(f'\tnick: {invalid_solve.user.nick} level: {invalid_solve.level.name}')
+        print('delete with sqlite:')
+        solves_sql = ', '.join([f'({s.user_id}, \'{s.level_id}\')' for s in invalid_solves])
+        print(f'\tDELETE FROM user_solve WHERE (user_id, level_id) in ({solves_sql});')
+    print('updating user roles')
+    last_update = time.time()
+    async for progress in discord_utils.update_all_user_roles():
+        if time.time() - last_update > 10:
+            print(f'{progress} user roles updated')
+            last_update = time.time()
+    print('updating user nicknames')
+    last_update = time.time()
+    async for progress in discord_utils.update_all_user_nicknames():
+        if time.time() - last_update > 10:
+            print(f'{progress} nicknames updated')
+            last_update = time.time()
     await discord_utils.update_all_avatars()
 
 
