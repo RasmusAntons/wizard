@@ -20,7 +20,7 @@ async def on_ready():
         for invalid_solve in invalid_solves:
             print(f'\tnick: {invalid_solve.user.nick} level: {invalid_solve.level.name}')
         print('delete with sqlite:')
-        solves_sql = ', '.join([f'({s.user_id}, \'{s.level_id}\')' for s in invalid_solves])
+        solves_sql = ', '.join([f'(\'{s.user_id}\', \'{s.level_id}\')' for s in invalid_solves])
         print(f'\tDELETE FROM user_solve WHERE (user_id, level_id) in ({solves_sql});')
     print('updating user roles')
     last_update = time.time()
