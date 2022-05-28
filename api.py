@@ -29,6 +29,7 @@ def protected(f):
                 return await f(request, *args, **kwargs)
             except Exception as e:
                 traceback.print_exc()
+                db.session.rollback()
                 return aiohttp.web.json_response({'error': str(e)}, status=500)
         except (AttributeError, ValueError, AssertionError):
             return aiohttp.web.json_response({'error': 'invalid api key'}, status=403)
