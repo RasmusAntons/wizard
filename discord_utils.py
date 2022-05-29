@@ -7,6 +7,7 @@ import sqlalchemy.testing
 
 import db
 import discord_bot
+from logger import logger
 
 
 def has_user_reached(level, user_id):
@@ -118,7 +119,7 @@ async def update_user_nickname(user_id):
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))
     if not member:
-        print(f'member {user_id} not found in guild {guild.name}')
+        logger.error('member %s not found in guild %s', user_id, guild.name)
         return
     if member.bot:
         return
@@ -144,11 +145,11 @@ async def update_user_nickname(user_id):
     db.session.commit()
     if member.nick == user.nick:
         return
-    print(f'updating nickname for {member.name} to {user.nick} in {guild.name}')
+    logger.info(f'updating nickname for %s (%s) to %s in %s', member.name, member.id, user.nick, guild.name)
     try:
         await member.edit(nick=user.nick)
     except nextcord.Forbidden:
-        print(f'missing permission to update nickname for {member.name}')
+        logger.error(f'missing permission to update nickname for %s (%s)', member.name, member.id)
 
 
 async def update_all_user_nicknames():
@@ -230,7 +231,7 @@ async def add_role_to_user(user_id, role_id):
     if member is None:
         raise Exception(f'failed to find member')
     role = guild.get_role(int(role_id))
-    print(f'assigning role {role.name} to user {member.name}')
+    logger.info('assigning role %s to user %s (%s)', role.name, member.name, member.id)
     await member.add_roles(role)
 
 

@@ -1,3 +1,5 @@
+import traceback
+
 import nextcord
 
 import db
@@ -5,6 +7,7 @@ from sqlalchemy import and_
 import discord_utils
 import messages
 import time
+from logger import logger
 
 intents = nextcord.Intents.default()
 intents.members = True
@@ -13,32 +16,35 @@ client = nextcord.Client(intents=intents)
 
 @client.event
 async def on_ready():
-    print(f'logged in as {client.user}')
+    logger.info(f'logged in as %s', client.user)
     invalid_solves = discord_utils.get_invalid_user_solves()
     if invalid_solves:
-        print('WARNING: User solves for levels without solution')
+        logger.warning('User solves for levels without solution')
         for invalid_solve in invalid_solves:
-            print(f'\tnick: {invalid_solve.user.nick} level: {invalid_solve.level.name}')
-        print('delete with sqlite:')
+            logger.warning(f'\tnick: %s level: %s', invalid_solve.user.nick, invalid_solve.level.name)
+        logger.warning('delete with sqlite:')
         solves_sql = ', '.join([f'(\'{s.user_id}\', \'{s.level_id}\')' for s in invalid_solves])
-        print(f'\tDELETE FROM user_solve WHERE (user_id, level_id) in ({solves_sql});')
-    print('updating user roles')
+        logger.warning(f'\tDELETE FROM user_solve WHERE (user_id, level_id) in ({solves_sql});')
+    logger.info('updating user roles')
     last_update = time.time()
     async for progress in discord_utils.update_all_user_roles():
         if time.time() - last_update > 10:
-            print(f'{progress} user roles updated')
+            logger.info(f'%s user roles updated', progress)
             last_update = time.time()
-    print('updating user nicknames')
+    logger.info('updating user nicknames')
     last_update = time.time()
     async for progress in discord_utils.update_all_user_nicknames():
         if time.time() - last_update > 10:
-            print(f'{progress} nicknames updated')
+            logger.info(f'%s nicknames updated', progress)
             last_update = time.time()
+    logger.info('updating user avatars')
     await discord_utils.update_all_avatars()
+    logger.info('startup complete')
 
 
 @client.event
 async def on_member_join(member):
+    logger.debug('member joined: %s (%s)', member.name, member.id)
     db.session.merge(db.User(id=str(member.id), name=member.nick))
     db.session.commit()
     await discord_utils.update_user_roles(member.id)
@@ -47,14 +53,20 @@ async def on_member_join(member):
 
 
 @client.event
+async def on_error(event, *args, **kwargs):
+    logger.error(f'error in %s: %sargs=%s, kwargs=%s', event, traceback.format_exc(), args, kwargs)
+
+
+@client.event
 async def on_member_remove(member):
+    logger.debug('member removed: %s (%s)', member.name, member.id)
     discord_utils.update_avatar(member)
 
 
 @client.event
 async def on_member_update(before, after):
     if before.nick != after.nick:
-        print(f'{after.name} changed their nick from {before.nick} to {after.nick}')
+        logger.debug('nickname changed: %s (%s) from %s to %s', after.name, after.id, before.nick, after.nick)
         user = db.session.get(db.User, str(after.id)) or db.User(id=after.id)
         if after.nick == user.nick:
             return
@@ -63,13 +75,15 @@ async def on_member_update(before, after):
         db.session.commit()
         await discord_utils.update_user_nickname(str(after.id))
     if before.guild_avatar != after.guild_avatar:
+        logger.debug('avatar changed: %s (%s) from %s to %s', after.name, after.id, before.guild_avatar,
+                     after.guild_avatar)
         discord_utils.update_avatar(after)
 
 
 @client.event
 async def on_user_update(before, after):
     if before.name != after.name:
-        print(f'{after.name} changed their name from {before.name} to {after.name}')
+        logger.debug('username changed: %s (%s) from %s to %s', after.name, after.id, before.name, after.name)
         await discord_utils.update_user_nickname(str(after.id))
     if before.avatar != after.avatar:
         discord_utils.update_avatar(after)
@@ -77,6 +91,7 @@ async def on_user_update(before, after):
 
 @client.slash_command('solve', description='Solve')
 async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solution of the level you solved.')):
+    logger.info('%s (%s) executed in %s /solve %s', ctx.user.name, ctx.user.id, ctx.channel.type, solution)
     if ctx.channel.type == nextcord.ChannelType.private:
         level_solutions = db.session.query(db.Solution).where(db.Solution.text == solution)
         for level_solution in level_solutions:
@@ -96,6 +111,7 @@ async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solu
 
 @client.slash_command('unlock', description='Unlock')
 async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to unlock a secret level you found.')):
+    logger.info('%s (%s) executed in %s /unlock %s', ctx.user.name, ctx.user.id, ctx.channel.type, unlock)
     if ctx.channel.type == nextcord.ChannelType.private:
         level_unlocks = db.session.query(db.Unlock).where(db.Unlock.text == unlock)
         for level_unlock in level_unlocks:
@@ -115,6 +131,7 @@ async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to
 
 @client.slash_command('recall', description='Recall a solved level')
 async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', required=True)):
+    logger.info('%s (%s) executed in %s /recall %s', ctx.user.name, ctx.user.id, ctx.channel.type, level)
     if ctx.channel.type == nextcord.ChannelType.private:
         found_levels = discord_utils.get_solved_or_unlocked_levels(ctx.user.id, name=level)
         if len(found_levels) == 0:
@@ -141,6 +158,7 @@ async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', 
 
 @recall_command.on_autocomplete('level')
 async def recall_autocomplete(ctx, level):
+    logger.debug('%s (%s) autocomplete in %s /recall %s', ctx.user.name, ctx.user.id, ctx.channel.type, level)
     if ctx.channel.type == nextcord.ChannelType.private:
         start = level or ''
         solved_levels = discord_utils.get_solved_or_unlocked_levels(ctx.user.id, start=start, limit=25)
@@ -151,6 +169,7 @@ async def recall_autocomplete(ctx, level):
 
 @client.slash_command('continue', description='List your current levels')
 async def continue_command(ctx):
+    logger.info('%s (%s) executed in %s /continue', ctx.user.name, ctx.user.id, ctx.channel.type)
     if ctx.channel.type == nextcord.ChannelType.private:
         current_levels = list(filter(lambda l: l.solutions, discord_utils.get_solvable_levels(ctx.user.id)))
         embed = nextcord.Embed(title='Current Levels')
@@ -176,6 +195,8 @@ async def continue_command(ctx):
 async def skipto_command(ctx, link=nextcord.SlashOption('link', 'full url', required=True),
                          username=nextcord.SlashOption('username', 'username', required=False),
                          password=nextcord.SlashOption('password', 'password', required=False)):
+    logger.info('%s (%s) executed in %s /skipto %s username=%s password=%s', ctx.user.name, ctx.user.id,
+                ctx.channel.type, link, username, password)
     if ctx.channel.type == nextcord.ChannelType.private:
         try:
             if db.get_setting('skipto_enable') != 'true':
@@ -199,6 +220,8 @@ async def setprogress_command(ctx, user: nextcord.User = nextcord.SlashOption('u
                               status=nextcord.SlashOption('status', 'reached/solved',
                                                           choices=['reached', 'solved'], required=True),
                               level=nextcord.SlashOption('level', 'Level name', required=True)):
+    logger.info('%s (%s) executed in %s /setprogress %s (%s) %s %s', ctx.user.name, ctx.user.id, ctx.channel.type,
+                user.name, user.id, status, level)
     guild_id = int(db.get_setting('guild'))
     guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
     author = guild.get_member(int(ctx.user.id)) or await guild.fetch_member(int(ctx.user.id))
@@ -219,6 +242,7 @@ async def setprogress_command(ctx, user: nextcord.User = nextcord.SlashOption('u
 
 @setprogress_command.on_autocomplete('level')
 async def setprogress_autocomplete(ctx, level):
+    logger.debug('%s (%s) autocomplete in %s /setprogress %s', ctx.user.name, ctx.user.id, ctx.channel.type, level)
     guild_id = int(db.get_setting('guild'))
     guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
     author = guild.get_member(int(ctx.user.id)) or await guild.fetch_member(int(ctx.user.id))
@@ -231,6 +255,7 @@ async def setprogress_autocomplete(ctx, level):
 
 @client.slash_command('resetuser', description='Delete a user from the database')
 async def resetuser_command(ctx, user: nextcord.User = nextcord.SlashOption('user', 'User', required=True)):
+    logger.info('%s (%s) executed in %s /resetuser %s (%s)', ctx.user.name, ctx.user.id, ctx.channel.type, user.name, user.id)
     guild_id = int(db.get_setting('guild'))
     guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
     author = guild.get_member(int(ctx.user.id)) or await guild.fetch_member(int(ctx.user.id))

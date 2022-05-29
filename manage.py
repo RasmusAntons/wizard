@@ -1,8 +1,10 @@
 import argparse
 import getpass
+import logging
 
 import db
 import main
+from logger import logger
 
 
 def init_db():
@@ -32,8 +34,11 @@ if __name__ == '__main__':
     run_parser.add_argument('--host', type=str, default='127.0.0.1', required=False)
     run_parser.add_argument('--port', type=int, default='8000', required=False)
     run_parser.add_argument('--offline', action='store_true')
+    run_parser.add_argument('--debug', action='store_true')
     args = parser.parse_args()
     if args.action == 'init':
         init_db()
     elif args.action == 'run':
+        if args.debug:
+            logger.setLevel(logging.DEBUG)
         main.run(host=args.host, port=args.port, offline=args.offline)
