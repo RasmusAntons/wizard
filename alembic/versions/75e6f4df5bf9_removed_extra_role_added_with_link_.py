@@ -21,7 +21,10 @@ def upgrade():
     op.add_column('level', sa.Column('link', sa.String(), nullable=True))
     op.add_column('level', sa.Column('username', sa.String(), nullable=True))
     op.add_column('level', sa.Column('password', sa.String(), nullable=True))
-    op.drop_column('level', 'extra_discord_role')
+    try:
+        op.drop_column('level', 'extra_discord_role')
+    except:
+        pass
     # ### end Alembic commands ###
 
 
