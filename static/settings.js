@@ -8,7 +8,8 @@ const inputSettings = {
 	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check',
 	'completionist_enable_nickname': 'check', 'completionist_badge': 'text',
 	'completionist_enable_role': 'check', 'completionist_role': 'text',
-	'admin_enable': 'check', 'admin_badge': 'text', 'admin_role': 'text', 'style': 'select'
+	'admin_enable': 'check', 'admin_badge': 'text', 'admin_role': 'text', 'style': 'select',
+	'public_url': 'text', 'enigmatics_token': 'text'
 };
 
 function checkSettingChange(settingKey) {
@@ -152,14 +153,12 @@ function initSettings() {
 			pageOverlay.style.display = '';
 		};
 	};
-	document.getElementById('show_bot_token').onclick = () => {
-		const targetElem = document.getElementById('setting_bot_token');
-		targetElem.type = (targetElem.type === 'password') ? 'text' : 'password';
-	};
-	document.getElementById('show_unlock_key').onclick = () => {
-		const targetElem = document.getElementById('setting_key');
-		targetElem.type = (targetElem.type === 'password') ? 'text' : 'password';
-	};
+	for (let key of ['bot_token', 'key', 'enigmatics_token']) {
+		document.getElementById(`show_${key}`).onclick = () => {
+			const targetElem = document.getElementById(`setting_${key}`);
+			targetElem.type = (targetElem.type === 'password') ? 'text' : 'password';
+		};
+	}
 	const enableGrid = document.getElementById('setting_grid');
 	enableGrid.onchange = e => {
 		document.getElementById('main').style.fill = e.target.checked ? 'url(#bigGrid)' : '#1a1a21';

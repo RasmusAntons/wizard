@@ -1,6 +1,8 @@
 import traceback
 
+import aiohttp
 import nextcord
+from nextcord.ext import tasks
 
 import db
 from sqlalchemy import and_
@@ -40,6 +42,17 @@ async def on_ready():
     logger.info('updating user avatars')
     await discord_utils.update_all_avatars()
     logger.info('startup complete')
+    await update_enigmatics()
+
+
+@tasks.loop(minutes=28)
+async def update_enigmatics():
+    token = db.get_setting('enigmatics_token')
+    public_url = db.get_setting('public_url')
+    if token:
+        data = {'token': token, 'url': public_url}
+        async with aiohttp.ClientSession() as session:
+            await session.post('https://enigmatics.3po.ch/puzzles/api/wizard_update', json=data)
 
 
 @client.event

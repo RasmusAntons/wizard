@@ -229,6 +229,9 @@
                 </div>
             </div>
             <div id="toolbar-settings" class="toolbar-group">
+				<button id="nicknames-menu-button">Nicknames</button>
+                <button id="completionist-menu-button">Completionist</button>
+                <button id="admin-menu-button">Admin</button>
                 <div class="toolbar-row">
                     <label for="setting_bot_token">bot token</label>
                     <br>
@@ -241,7 +244,7 @@
                     <label for="setting_key">key</label>
                     <br>
                     <input type="password" id="setting_key">
-                    <button id="show_unlock_key">
+                    <button id="show_key">
                         <img src="/static/eye_open.svg" style="width: 23px; opacity: 0.4">
                     </button>
                 </div>
@@ -249,6 +252,28 @@
                     <label for="setting_guild">discord guild id</label>
                     <br>
                     <input id="setting_guild" class="plz_be_longer_thx">
+                </div>
+				<div class="toolbar-row">
+                    <label for="setting_embed_color">embed color</label>
+                    <input type="color" id="setting_embed_color" value="#ff0000">
+                </div>
+				<div class="toolbar-row">
+                    <label for="setting_style">leaderboard style</label>
+                    <select id="setting_style"></select>
+                </div>
+				<div class="toolbar-row">
+                    <label class="switch">
+                        <span class="labeltext">auth in link</span>
+                        <input type="checkbox" id="setting_auth_in_link">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toolbar-row">
+                    <label class="switch">
+                        <span class="labeltext">enable skipto</span>
+                        <input type="checkbox" id="setting_skipto_enable">
+                        <span class="slider"></span>
+                    </label>
                 </div>
                 <div class="toolbar-row">
                     <label class="switch">
@@ -264,31 +289,19 @@
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div class="toolbar-row">
-                    <label class="switch">
-                        <span class="labeltext">auth in link</span>
-                        <input type="checkbox" id="setting_auth_in_link">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="toolbar-row">
-                    <label class="switch">
-                        <span class="labeltext">enable skipto</span>
-                        <input type="checkbox" id="setting_skipto_enable">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="toolbar-row">
-                    <label for="setting_embed_color">embed color</label>
-                    <input type="color" id="setting_embed_color" value="#ff0000">
+				<div class="toolbar-row">
+                    <label for="setting_public_url">public url</label>
+                    <br>
+                    <input id="setting_public_url" class="plz_be_longer_thx">
                 </div>
 				<div class="toolbar-row">
-                    <label for="setting_style">leaderboard style</label>
-                    <select id="setting_style"></select>
+                    <label for="setting_enigmatics_token">enigmatics.org token</label>
+                    <br>
+                    <input type="password" id="setting_enigmatics_token">
+                    <button id="show_enigmatics_token">
+                        <img src="/static/eye_open.svg" style="width: 23px; opacity: 0.4">
+                    </button>
                 </div>
-                <button id="nicknames-menu-button">Nicknames</button>
-                <button id="completionist-menu-button">Completionist</button>
-                <button id="admin-menu-button">Admin</button>
             </div>
         </div>
         <div id="container">

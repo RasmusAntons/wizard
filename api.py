@@ -62,6 +62,8 @@ async def patch_settings(request):
         else:
             db.session.execute(db.Setting.__table__.delete().where(db.Setting.key == config_key))
     db.session.commit()
+    if 'enigmatics_token' in body or 'public_url' in body:
+        await discord_bot.update_enigmatics()
     return aiohttp.web.json_response({'message': 'ok'})
 
 
@@ -367,4 +369,4 @@ async def get_leaderboard(request):
         'users': users_dict,
         'scores': scores_dict
     }
-    return aiohttp.web.json_response(leaderboard)
+    return aiohttp.web.json_response(leaderboard, headers={'Access-Control-Allow-Origin': '*'})
