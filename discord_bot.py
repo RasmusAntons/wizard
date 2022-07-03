@@ -52,7 +52,7 @@ async def update_enigmatics():
     if token:
         data = {'token': token, 'url': public_url}
         async with aiohttp.ClientSession() as session:
-            await session.post('https://enigmatics.3po.ch/puzzles/api/wizard_update', json=data)
+            await session.post('https://enigmatics.org/puzzles/api/wizard_update', json=data)
 
 
 @client.event
