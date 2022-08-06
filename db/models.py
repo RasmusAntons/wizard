@@ -27,8 +27,8 @@ class Level(Base):
     link = Column(String, nullable=True)
     username = Column(String, nullable=True)
     password = Column(String, nullable=True)
-    discord_channel = Column(String(18), nullable=True, index=True)
-    discord_role = Column(String(18), nullable=True)
+    discord_channel = Column(String(20), nullable=True, index=True)
+    discord_role = Column(String(20), nullable=True)
     category_id = Column(String(36), ForeignKey('category.id', ondelete='SET NULL'))
     category = relationship('Category', backref=backref('levels'))
     grid_x = Column(Integer, nullable=True)
@@ -114,7 +114,7 @@ class Setting(Base):
 
 class User(Base):
     __tablename__ = 'user'
-    id = Column(String(18), primary_key=True)
+    id = Column(String(20), primary_key=True)
     name = Column(String(32))
     nick = Column(String(32))
     avatar = Column(String, nullable=True)
@@ -127,7 +127,7 @@ class User(Base):
 
 class UserSolve(Base):
     __tablename__ = 'user_solve'
-    user_id = Column(String(18), ForeignKey(User.id, ondelete='CASCADE'), primary_key=True)
+    user_id = Column(String(20), ForeignKey(User.id, ondelete='CASCADE'), primary_key=True)
     user = relationship(User, backref=backref('solved', cascade='delete, delete-orphan'))
     level_id = Column(String(36), ForeignKey(Level.id, ondelete='CASCADE'), primary_key=True)
     level = relationship(Level, backref=backref('user_solves', cascade='delete, delete-orphan'))
@@ -135,7 +135,7 @@ class UserSolve(Base):
 
 class UserUnlock(Base):
     __tablename__ = 'user_unlock'
-    user_id = Column(String(18), ForeignKey(User.id, ondelete='CASCADE'), primary_key=True)
+    user_id = Column(String(20), ForeignKey(User.id, ondelete='CASCADE'), primary_key=True)
     user = relationship(User, backref=backref('unlocked', cascade='delete, delete-orphan'))
     level_id = Column(String(36), ForeignKey(Level.id, ondelete='CASCADE'), primary_key=True)
     level = relationship(Level, backref=backref('user_unlocks', cascade='delete, delete-orphan'))
