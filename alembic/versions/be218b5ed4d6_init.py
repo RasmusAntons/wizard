@@ -21,7 +21,7 @@ def upgrade():
     op.create_table('category',
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('name', sa.String(), nullable=True),
-    sa.Column('discord_category', sa.String(length=18), nullable=True),
+    sa.Column('discord_category', sa.String(length=20), nullable=True),
     sa.Column('colour', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
@@ -31,7 +31,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('key')
     )
     op.create_table('user',
-    sa.Column('id', sa.String(length=18), nullable=False),
+    sa.Column('id', sa.String(length=20), nullable=False),
     sa.Column('name', sa.String(length=32), nullable=True),
     sa.Column('nick', sa.String(length=32), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -41,9 +41,9 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('nickname_suffix', sa.String(), nullable=True),
     sa.Column('nickname_merge', sa.Boolean(), nullable=True),
-    sa.Column('discord_channel', sa.String(length=18), nullable=True),
-    sa.Column('discord_role', sa.String(length=18), nullable=True),
-    sa.Column('extra_discord_role', sa.String(length=18), nullable=True),
+    sa.Column('discord_channel', sa.String(length=20), nullable=True),
+    sa.Column('discord_role', sa.String(length=20), nullable=True),
+    sa.Column('extra_discord_role', sa.String(length=20), nullable=True),
     sa.Column('category_id', sa.String(length=36), nullable=True),
     sa.Column('grid_x', sa.Integer(), nullable=True),
     sa.Column('grid_y', sa.Integer(), nullable=True),
@@ -73,14 +73,14 @@ def upgrade():
     )
     op.create_index(op.f('ix_unlock_text'), 'unlock', ['text'], unique=False)
     op.create_table('user_solve',
-    sa.Column('user_id', sa.String(length=18), nullable=False),
+    sa.Column('user_id', sa.String(length=20), nullable=False),
     sa.Column('level_id', sa.String(length=36), nullable=False),
     sa.ForeignKeyConstraint(['level_id'], ['level.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('user_id', 'level_id')
     )
     op.create_table('user_unlock',
-    sa.Column('user_id', sa.String(length=18), nullable=False),
+    sa.Column('user_id', sa.String(length=20), nullable=False),
     sa.Column('level_id', sa.String(length=36), nullable=False),
     sa.ForeignKeyConstraint(['level_id'], ['level.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
