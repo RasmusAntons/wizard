@@ -13,12 +13,12 @@ from logger import logger
 def has_user_reached(level, user_id):
     if level.unlocks:
         return db.session.query(db.UserUnlock).where(
-            and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)
+            and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == str(user_id))
         ).scalar() is not None
     for parent_level in level.parent_levels:
         if parent_level.solutions:
             has_solved = db.session.query(db.UserSolve).where(
-                and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == user_id)
+                and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == str(user_id))
             ).scalar() is not None
             if not has_solved:
                 return False
@@ -29,7 +29,7 @@ def has_user_reached(level, user_id):
 
 def has_user_solved(level, user_id):
     return db.session.query(db.UserSolve).where(
-        and_(db.UserSolve.level_id == level.id, db.UserSolve.user_id == user_id)
+        and_(db.UserSolve.level_id == level.id, db.UserSolve.user_id == str(user_id))
     ).scalar() is not None
 
 
@@ -50,7 +50,7 @@ def get_solved_levels(user_id, name=None, start='', limit=None):
     query = db.session.query(db.Level).where(
         and_(
             db.Level.name == name if name else db.Level.name.startswith(start),
-            exists().where(and_(db.UserSolve.user_id == user_id, db.Level.id == db.UserSolve.level_id))
+            exists().where(and_(db.UserSolve.user_id == str(user_id), db.Level.id == db.UserSolve.level_id))
         )
     )
     if limit is not None:
@@ -63,8 +63,8 @@ def get_solved_or_unlocked_levels(user_id, name=None, start='', limit=None):
         and_(
             db.Level.name == name if name else db.Level.name.startswith(start),
             or_(
-                exists().where(and_(db.UserSolve.user_id == user_id, db.Level.id == db.UserSolve.level_id)),
-                exists().where(and_(db.UserUnlock.user_id == user_id, db.Level.id == db.UserUnlock.level_id))
+                exists().where(and_(db.UserSolve.user_id == str(user_id), db.Level.id == db.UserSolve.level_id)),
+                exists().where(and_(db.UserUnlock.user_id == str(user_id), db.Level.id == db.UserUnlock.level_id))
             )
         )
     )
@@ -86,7 +86,7 @@ def has_user_solved_everything(user_id):
     unsolved_level = db.session.query(db.Level).where(
         and_(
             exists().where(db.Level.id == db.Solution.level_id),
-            ~exists().where(and_(db.UserSolve.user_id == user_id, db.Level.id == db.UserSolve.level_id))
+            ~exists().where(and_(db.UserSolve.user_id == str(user_id), db.Level.id == db.UserSolve.level_id))
         )
     ).first()
     return unsolved_level is None
@@ -123,9 +123,9 @@ async def update_user_nickname(user_id):
         return
     if member.bot:
         return
-    user = db.session.get(db.User, user_id)
+    user = db.session.get(db.User, str(user_id))
     if user is None:
-        user = db.User(id=user_id)
+        user = db.User(id=str(user_id))
         db.session.add(user)
     if db.get_setting('admin_enable') == 'true' and is_member_admin(member):
         name_suffix = db.get_setting('admin_badge', '')
@@ -206,7 +206,7 @@ async def update_all_user_roles():
 
 def can_user_solve(level, user_id):
     if db.session.query(db.UserSolve).where(
-            and_(db.UserSolve.level_id == level.id, db.UserSolve.user_id == user_id)
+            and_(db.UserSolve.level_id == level.id, db.UserSolve.user_id == str(user_id))
     ).scalar():
         return False
     return has_user_reached(level, user_id)
@@ -214,7 +214,7 @@ def can_user_solve(level, user_id):
 
 def can_user_unlock(level, user_id):
     if db.session.query(db.UserUnlock) \
-            .where(and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == user_id)).scalar():
+            .where(and_(db.UserUnlock.level_id == level.id, db.UserUnlock.user_id == str(user_id))).scalar():
         return False
     for parent_level in level.parent_levels:
         if not has_user_reached(parent_level, user_id):
@@ -265,7 +265,7 @@ async def move_level_to_category(level):
                 position = None
                 found_child = False
                 for other_channel in discord_category.channels:
-                    for other_level in db.session.query(db.Level).where(db.Level.discord_channel == other_channel.id):
+                    for other_level in db.session.query(db.Level).where(db.Level.discord_channel == str(other_channel.id)):
                         if other_level.id in child_ids:
                             position = other_channel.position
                             found_child = True
@@ -338,7 +338,7 @@ async def skip_user_to_level(user_id, level, include_self=False):
     unlocked_level_names = []
     for parent_level in get_parent_levels_recursively(level):
         if parent_level.unlocks and not db.session.query(db.UserUnlock).where(
-                and_(db.UserUnlock.level_id == parent_level.id, db.UserUnlock.user_id == str(member.id))).scalar():
+                and_(db.UserUnlock.level_id == str(parent_level.id), db.UserUnlock.user_id == str(member.id))).scalar():
             unlocked_level_names.append(parent_level.name)
             db.session.add(db.UserUnlock(user_id=str(member.id), level=parent_level))
         if level.unlocks and level in parent_level.child_levels:
