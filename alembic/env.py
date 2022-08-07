@@ -2,6 +2,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+import os
 
 from alembic import context
 
@@ -23,6 +24,11 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+if os.environ.get('DATABASE_URL'):
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url.startswith('postgres://'):
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
+    config.set_main_option('sqlalchemy.url', db_url)
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
