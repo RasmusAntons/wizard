@@ -1,5 +1,5 @@
 sqlalchemy
-nextcord
+discord.py==2.0.*
 aiohttp
 aiohttp_jinja2
 jinja2

@@ -1,7 +1,7 @@
 import asyncio
 import unicodedata
 
-import nextcord
+import discord
 from sqlalchemy import and_, or_, exists
 import sqlalchemy.testing
 
@@ -148,7 +148,7 @@ async def update_user_nickname(user_id):
     logger.info(f'updating nickname for %s (%s) to %s in %s', member.name, member.id, user.nick, guild.name)
     try:
         await member.edit(nick=user.nick)
-    except nextcord.Forbidden:
+    except discord.Forbidden:
         logger.error(f'missing permission to update nickname for %s (%s)', member.name, member.id)
 
 
@@ -260,7 +260,7 @@ async def move_level_to_category(level):
         if discord_channel.category_id != int(level.category.discord_category):
             discord_category = discord_bot.client.get_channel(int(level.category.discord_category)) \
                                or await discord_bot.client.fetch_channel(level.category.discord_category)
-            if discord_category and discord_category.type == nextcord.ChannelType.category:
+            if discord_category and discord_category.type == discord.ChannelType.category:
                 child_ids = get_child_ids_recursively(level)
                 position = None
                 found_child = False
@@ -304,7 +304,7 @@ async def update_role_permissions():
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     channel_permissions = {level.discord_channel: {
-        guild.default_role: nextcord.PermissionOverwrite(read_messages=False)
+        guild.default_role: discord.PermissionOverwrite(read_messages=False)
     } for level in levels if level.discord_channel}
     if guild is None:
         raise Exception(f'guild not set or wrong: {guild_id}')
@@ -315,7 +315,7 @@ async def update_role_permissions():
         for parent_level in get_parent_levels_recursively(level):
             if parent_level.discord_channel and parent_level.discord_channel in channel_permissions.keys():
                 parent_child = parent_level.discord_channel
-                channel_permissions[parent_child][role] = nextcord.PermissionOverwrite(read_messages=True)
+                channel_permissions[parent_child][role] = discord.PermissionOverwrite(read_messages=True)
     progress = 0
     for channel_id, permissions in channel_permissions.items():
         channel = guild.get_channel(int(channel_id))

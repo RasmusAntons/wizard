@@ -1,8 +1,8 @@
 import traceback
 
 import aiohttp
-import nextcord
-from nextcord.ext import tasks
+import discord
+from discord.ext import tasks
 
 import db
 from sqlalchemy import and_
@@ -10,10 +10,20 @@ import discord_utils
 import messages
 import time
 from logger import logger
+import ui
 
-intents = nextcord.Intents.default()
+intents = discord.Intents.default()
 intents.members = True
-client = nextcord.Client(intents=intents)
+client = discord.Client(intents=intents)
+command_tree = discord.app_commands.CommandTree(client)
+ui_host = '127.0.0.1'
+ui_port = 8000
+
+
+@client.event
+async def setup_hook():
+    client.loop.create_task(ui.ui_server(host=ui_host, port=ui_port))
+    await command_tree.sync()
 
 
 @client.event
@@ -102,57 +112,63 @@ async def on_user_update(before, after):
         discord_utils.update_avatar(after)
 
 
-@client.slash_command('solve', description='Solve')
-async def solve_command(ctx, solution=nextcord.SlashOption('solution', 'The solution of the level you solved.')):
-    logger.info('%s (%s) executed in %s /solve %s', ctx.user.name, ctx.user.id, ctx.channel.type, solution)
-    if ctx.channel.type == nextcord.ChannelType.private:
+@command_tree.command(name='solve', description='Solve')
+@discord.app_commands.describe(solution='The solution of the level you solved.')
+async def solve_command(interaction: discord.Interaction, solution: str):
+    logger.info('%s (%s) executed in %s /solve %s', interaction.user.name, interaction.user.id,
+                interaction.channel.type, solution)
+    if interaction.channel.type == discord.ChannelType.private:
         level_solutions = db.session.query(db.Solution).where(db.Solution.text == solution)
         for level_solution in level_solutions:
             level = level_solution.level
-            if discord_utils.can_user_solve(level, str(ctx.user.id)):
-                db.session.add(db.UserSolve(user_id=str(ctx.user.id), level=level))
+            if discord_utils.can_user_solve(level, str(interaction.user.id)):
+                db.session.add(db.UserSolve(user_id=str(interaction.user.id), level=level))
                 db.session.commit()
-                await ctx.send(messages.confirm_solve.format(level_name=level.name))
-                await discord_utils.update_user_roles(str(ctx.user.id))
-                await discord_utils.update_user_nickname(str(ctx.user.id))
+                await interaction.response.send_message(messages.confirm_solve.format(level_name=level.name))
+                await discord_utils.update_user_roles(str(interaction.user.id))
+                await discord_utils.update_user_nickname(str(interaction.user.id))
                 break
         else:
-            await ctx.send(messages.reject_solve)
+            await interaction.response.send_message(messages.reject_solve)
     else:
-        await ctx.send(messages.use_in_dms, ephemeral=True)
+        await interaction.response.send_message(messages.use_in_dms, ephemeral=True)
 
 
-@client.slash_command('unlock', description='Unlock')
-async def unlock_command(ctx, unlock=nextcord.SlashOption('unlock', 'The code to unlock a secret level you found.')):
-    logger.info('%s (%s) executed in %s /unlock %s', ctx.user.name, ctx.user.id, ctx.channel.type, unlock)
-    if ctx.channel.type == nextcord.ChannelType.private:
+@command_tree.command(name='unlock', description='Unlock')
+@discord.app_commands.describe(unlock='The code to unlock a secret level you found.')
+async def unlock_command(interaction: discord.Interaction, unlock: str):
+    logger.info('%s (%s) executed in %s /unlock %s', interaction.user.name, interaction.user.id,
+                interaction.channel.type, unlock)
+    if interaction.channel.type == discord.ChannelType.private:
         level_unlocks = db.session.query(db.Unlock).where(db.Unlock.text == unlock)
         for level_unlock in level_unlocks:
             level = level_unlock.level
-            if discord_utils.can_user_unlock(level, str(ctx.user.id)):
-                db.session.add(db.UserUnlock(user_id=str(ctx.user.id), level=level))
+            if discord_utils.can_user_unlock(level, str(interaction.user.id)):
+                db.session.add(db.UserUnlock(user_id=str(interaction.user.id), level=level))
                 db.session.commit()
-                await ctx.send(messages.confirm_unlock.format(level_name=level.name))
-                await discord_utils.update_user_roles(str(ctx.user.id))
-                await discord_utils.update_user_nickname(str(ctx.user.id))
+                await interaction.response.send_message(messages.confirm_unlock.format(level_name=level.name))
+                await discord_utils.update_user_roles(str(interaction.user.id))
+                await discord_utils.update_user_nickname(str(interaction.user.id))
                 break
         else:
-            await ctx.send(messages.reject_unlock)
+            await interaction.response.send_message(messages.reject_unlock)
     else:
-        await ctx.send(messages.use_in_dms, ephemeral=True)
+        await interaction.response.send_message(messages.use_in_dms, ephemeral=True)
 
 
-@client.slash_command('recall', description='Recall a solved level')
-async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', required=True)):
-    logger.info('%s (%s) executed in %s /recall %s', ctx.user.name, ctx.user.id, ctx.channel.type, level)
-    if ctx.channel.type == nextcord.ChannelType.private:
-        found_levels = discord_utils.get_solved_or_unlocked_levels(ctx.user.id, name=level)
+@command_tree.command(name='recall', description='Recall a solved level')
+@discord.app_commands.describe(level='Level name')
+async def recall_command(interaction: discord.Interaction, level: str):
+    logger.info('%s (%s) executed in %s /recall %s', interaction.user.name, interaction.user.id,
+                interaction.channel.type, level)
+    if interaction.channel.type == discord.ChannelType.private:
+        found_levels = discord_utils.get_solved_or_unlocked_levels(interaction.user.id, name=level)
         if len(found_levels) == 0:
-            await ctx.send('No such level', ephemeral=True)
+            await interaction.response.send_message('No such level', ephemeral=True)
         else:
             embeds = []
             for level in found_levels:
-                embed = nextcord.Embed(title=f'{level.name}')
+                embed = discord.Embed(title=f'{level.name}')
                 link = level.get_encoded_link(db.get_setting('auth_in_link') == 'true')
                 if link:
                     embed.url = link
@@ -161,31 +177,37 @@ async def recall_command(ctx, level=nextcord.SlashOption('level', 'Level name', 
                     embed.description = level.get_un_pw()
                 if level.unlocks:
                     embed.add_field(name='Unlocks', value='\n'.join([s.text for s in level.unlocks]))
-                if level.solutions and discord_utils.has_user_solved(level, ctx.user.id):
+                if level.solutions and discord_utils.has_user_solved(level, interaction.user.id):
                     embed.add_field(name='Solutions', value='\n'.join([s.text for s in level.solutions]))
                 embeds.append(embed)
-            await ctx.send(embeds=embeds)
+            await interaction.response.send_message(embeds=embeds)
     else:
-        await ctx.send(messages.use_in_dms, ephemeral=True)
+        await interaction.response.send_message(messages.use_in_dms, ephemeral=True)
 
 
-@recall_command.on_autocomplete('level')
-async def recall_autocomplete(ctx, level):
-    logger.debug('%s (%s) autocomplete in %s /recall %s', ctx.user.name, ctx.user.id, ctx.channel.type, level)
-    if ctx.channel.type == nextcord.ChannelType.private:
+@recall_command.autocomplete(name='level')
+async def recall_autocomplete(interaction: discord.Interaction, level: str):
+    logger.debug('%s (%s) autocomplete in %s /recall %s', interaction.user.name, interaction.user.id,
+                 interaction.channel.type, level)
+    if interaction.channel.type == discord.ChannelType.private:
         start = level or ''
-        solved_levels = discord_utils.get_solved_or_unlocked_levels(ctx.user.id, start=start, limit=25)
-        await ctx.response.send_autocomplete([l.name for l in solved_levels])
+        solved_levels = discord_utils.get_solved_or_unlocked_levels(interaction.user.id, start=start, limit=25)
+        await interaction.response.autocomplete([
+            discord.app_commands.Choice(name=l.name, value=l.name) for l in solved_levels
+        ])
     else:
-        await ctx.response.send_autocomplete([messages.use_in_dms])
+        await interaction.response.autocomplete([
+            discord.app_commands.Choice(name=messages.use_in_dms, value=messages.use_in_dms)
+        ])
 
 
-@client.slash_command('continue', description='List your current levels')
-async def continue_command(ctx):
-    logger.info('%s (%s) executed in %s /continue', ctx.user.name, ctx.user.id, ctx.channel.type)
-    if ctx.channel.type == nextcord.ChannelType.private:
-        current_levels = list(filter(lambda l: l.solutions, discord_utils.get_solvable_levels(ctx.user.id)))
-        embed = nextcord.Embed(title='Current Levels')
+@command_tree.command(name='continue', description='List your current levels')
+async def continue_command(interaction: discord.Interaction):
+    logger.info('%s (%s) executed in %s /continue', interaction.user.name, interaction.user.id,
+                interaction.channel.type)
+    if interaction.channel.type == discord.ChannelType.private:
+        current_levels = list(filter(lambda l: l.solutions, discord_utils.get_solvable_levels(interaction.user.id)))
+        embed = discord.Embed(title='Current Levels')
         embed.colour = int(db.get_setting('embed_color', '#000000')[1:], 16)
         if current_levels:
             level_lines = []
@@ -199,18 +221,17 @@ async def continue_command(ctx):
             embed.description = '\n'.join(level_lines)
         else:
             embed.description = messages.no_current_levels
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
     else:
-        await ctx.send(messages.use_in_dms, ephemeral=True)
+        await interaction.response.send_message(messages.use_in_dms, ephemeral=True)
 
 
-@client.slash_command('skipto', description='Set progress up to this level')
-async def skipto_command(ctx, link=nextcord.SlashOption('link', 'full url', required=True),
-                         username=nextcord.SlashOption('username', 'username', required=False),
-                         password=nextcord.SlashOption('password', 'password', required=False)):
-    logger.info('%s (%s) executed in %s /skipto %s username=%s password=%s', ctx.user.name, ctx.user.id,
-                ctx.channel.type, link, username, password)
-    if ctx.channel.type == nextcord.ChannelType.private:
+@command_tree.command(name='skipto', description='Set progress up to this level')
+@discord.app_commands.describe(link='full url')
+async def skipto_command(interaction: discord.Interaction, link: str, username: str = None, password: str = None):
+    logger.info('%s (%s) executed in %s /skipto %s username=%s password=%s', interaction.user.name, interaction.user.id,
+                interaction.channel.type, link, username, password)
+    if interaction.channel.type == discord.ChannelType.private:
         try:
             if db.get_setting('skipto_enable') != 'true':
                 raise Exception('this command is disabled')
@@ -219,65 +240,72 @@ async def skipto_command(ctx, link=nextcord.SlashOption('link', 'full url', requ
                 raise Exception('level not found')
             if target_level[0].username != username or target_level[0].password != password:
                 raise Exception('wrong username or password')
-            await ctx.response.defer(ephemeral=True)
-            msg = await discord_utils.skip_user_to_level(ctx.user.id, target_level[0], False)
-            await ctx.send(msg, ephemeral=True)
+            await interaction.response.defer(ephemeral=True)
+            msg = await discord_utils.skip_user_to_level(interaction.user.id, target_level[0], False)
+            await interaction.response.send_message(msg, ephemeral=True)
         except Exception as e:
-            await ctx.send(str(e), ephemeral=True)
+            await interaction.response.send_message(str(e), ephemeral=True)
     else:
-        await ctx.send(messages.use_in_dms, ephemeral=True)
+        await interaction.response.send_message(messages.use_in_dms, ephemeral=True)
 
 
-@client.slash_command('setprogress', description='Set a user\'s progress to a certain level')
-async def setprogress_command(ctx, user: nextcord.User = nextcord.SlashOption('user', 'User', required=True),
-                              status=nextcord.SlashOption('status', 'reached/solved',
-                                                          choices=['reached', 'solved'], required=True),
-                              level=nextcord.SlashOption('level', 'Level name', required=True)):
-    logger.info('%s (%s) executed in %s /setprogress %s (%s) %s %s', ctx.user.name, ctx.user.id, ctx.channel.type,
-                user.name, user.id, status, level)
+@command_tree.command(name='setprogress', description='Set a user\'s progress to a certain level')
+@discord.app_commands.describe(user='User', status='reached/solved', level='Level name')
+@discord.app_commands.choices(status=[
+    discord.app_commands.Choice(name='reached', value='reached'),
+    discord.app_commands.Choice(name='solved', value='solved')
+])
+async def setprogress_command(interaction: discord.Interaction, user: discord.User, status: str, level: str):
+    logger.info('%s (%s) executed in %s /setprogress %s (%s) %s %s', interaction.user.name, interaction.user.id,
+                interaction.channel.type, user.name, user.id, status, level)
     guild_id = int(db.get_setting('guild'))
     guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
-    author = guild.get_member(int(ctx.user.id)) or await guild.fetch_member(int(ctx.user.id))
+    author = guild.get_member(int(interaction.user.id)) or await guild.fetch_member(int(interaction.user.id))
     if not author or not discord_utils.is_member_admin(author):
-        await ctx.send(messages.permission_denied, ephemeral=True)
+        await interaction.response.send_message(messages.permission_denied, ephemeral=True)
         return
     target_level = db.session.query(db.Level).where(db.Level.name == level).all()
     if len(target_level) != 1:
-        await ctx.send('level not found', ephemeral=True)
+        await interaction.response.send_message('level not found', ephemeral=True)
         return
-    await ctx.response.defer(ephemeral=True)
+    await interaction.response.defer(ephemeral=True)
     try:
         msg = await discord_utils.skip_user_to_level(user.id, target_level[0], status == 'solved')
-        await ctx.send(msg, ephemeral=True)
+        await interaction.response.send_message(msg, ephemeral=True)
     except Exception as e:
-        await ctx.send(str(e), ephemeral=True)
+        await interaction.response.send_message(str(e), ephemeral=True)
 
 
-@setprogress_command.on_autocomplete('level')
-async def setprogress_autocomplete(ctx, level):
-    logger.debug('%s (%s) autocomplete in %s /setprogress %s', ctx.user.name, ctx.user.id, ctx.channel.type, level)
+@setprogress_command.autocomplete('level')
+async def setprogress_autocomplete(interaction: discord.Interaction, level):
+    logger.debug('%s (%s) autocomplete in %s /setprogress %s', interaction.user.name, interaction.user.id,
+                 interaction.channel.type, level)
     guild_id = int(db.get_setting('guild'))
     guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
-    author = guild.get_member(int(ctx.user.id)) or await guild.fetch_member(int(ctx.user.id))
+    author = guild.get_member(int(interaction.user.id)) or await guild.fetch_member(int(interaction.user.id))
     if not author or not discord_utils.is_member_admin(author):
         levels = []
     else:
         levels = db.session.query(db.Level).where(db.Level.name.startswith(level)).limit(25).all()
-    await ctx.response.send_autocomplete([l.name for l in levels])
+    await interaction.response.autocomplete([
+        discord.app_commands.Choice(name=l.name, value=l.name) for l in levels
+    ])
 
 
-@client.slash_command('resetuser', description='Delete a user from the database')
-async def resetuser_command(ctx, user: nextcord.User = nextcord.SlashOption('user', 'User', required=True)):
-    logger.info('%s (%s) executed in %s /resetuser %s (%s)', ctx.user.name, ctx.user.id, ctx.channel.type, user.name, user.id)
+@command_tree.command(name='resetuser', description='Delete a user from the database')
+@discord.app_commands.describe(user='User')
+async def resetuser_command(interaction: discord.Interaction, user: discord.User):
+    logger.info('%s (%s) executed in %s /resetuser %s (%s)', interaction.user.name, interaction.user.id,
+                interaction.channel.type, user.name, user.id)
     guild_id = int(db.get_setting('guild'))
     guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
-    author = guild.get_member(int(ctx.user.id)) or await guild.fetch_member(int(ctx.user.id))
+    author = guild.get_member(int(interaction.user.id)) or await guild.fetch_member(int(interaction.user.id))
     if not author or not discord_utils.is_member_admin(author):
-        await ctx.send(messages.permission_denied, ephemeral=True)
+        await interaction.response.send_message(messages.permission_denied, ephemeral=True)
         return
     member = guild.get_member(int(user.id)) or await guild.fetch_member(int(user.id))
     if not member:
-        await ctx.send('invalid member', ephemeral=True)
+        await interaction.response.send_message('invalid member', ephemeral=True)
         return
     db_user = db.session.get(db.User, str(member.id))
     if db_user:
@@ -285,6 +313,6 @@ async def resetuser_command(ctx, user: nextcord.User = nextcord.SlashOption('use
         db.session.commit()
         await discord_utils.update_user_roles(str(member.id))
         await discord_utils.update_user_nickname(str(member.id))
-        await ctx.send(f'Deleted {member.display_name} from the database', ephemeral=True)
+        await interaction.response.send_message(f'Deleted {member.display_name} from the database', ephemeral=True)
     else:
-        await ctx.send(f'{member.display_name} is not in the database', ephemeral=True)
+        await interaction.response.send_message(f'{member.display_name} is not in the database', ephemeral=True)
