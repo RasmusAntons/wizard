@@ -9,6 +9,9 @@ from logger import logger
 
 
 def init_db():
+    if db.get_setting('guild', None) is not None:
+        logger.log('database already initialised, skipping init_db...')
+        return
     db.set_setting('guild', os.environ.get('GUILD_ID') or input('Guild id: '))
     db.set_setting('enable_grid', 'true')
     db.set_setting('enable_tooltips', 'true')
