@@ -1,0 +1,8 @@
+.env
+.git/
+.idea/
+data/
+db.sqlite
+__pycache__/
+venv/
+logs/
