@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  wizard:
+    build: .
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8000:80"
+    environment:
+      - GUILD_ID
+      - ACCESS_KEY
+      - BOT_TOKEN
+      - DATABASE_URL=sqlite:////app/data/db.sqlite
+    env_file:
+      - .env
