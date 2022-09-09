@@ -162,6 +162,69 @@ function sync() {
 	});
 }
 
+function exportData() {
+	apiCall('/api/userdata').then(userdata => {
+		const result = {
+			settings: settingsOriginal,
+			categories: categoriesOriginal,
+			levels: levelsOriginal,
+			userdata: userdata
+		};
+		const blob = new Blob([JSON.stringify(result)], {type: 'application/json'});
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.setAttribute('download', 'wizard_data.json');
+		document.body.appendChild(a);
+		a.click();
+		document.removeChild(a);
+	});
+}
+
+function importData() {
+	const fileInput = document.getElementById('import_file_input');
+	if (fileInput.files.length === 0) {
+		alert('no file selected!');
+		return;
+	}
+	const reader = new FileReader();
+	reader.onload = (event) => {
+		let data = null;
+		try {
+			data = JSON.parse(event.target.result);
+		} catch (e) {
+			console.error(e);
+			alert('error parsing json');
+			return;
+		}
+		document.getElementById('saving_popup').style.display = 'block';
+		document.getElementById('page-overlay').style.display = 'block';
+		let settingRequest, categoryRequest, levelRequest, userdataRequest;
+		if (Object.keys(data.settings).length) {
+			settingRequest = apiCall(`/api/settings`, 'PATCH', data.settings);
+		} else {
+			settingRequest = new Promise(r => r());
+		}
+		if (Object.keys(data.categories).length > 0) {
+			categoryRequest = apiCall('/api/categories/', 'PATCH', data.levels);
+		} else {
+			categoryRequest = new Promise(r => r());
+		}
+		if (Object.keys(data.levels).length > 0) {
+			levelRequest = apiCall('/api/levels/', 'PATCH', data.levels);
+		} else {
+			levelRequest = new Promise(r => r());
+		}
+		if (Object.keys(data.userdata).length > 0) {
+			userdataRequest = apiCall('/api/userdata', 'PATCH', data.userdata);
+		} else {
+			userdataRequest = new Promise(r => r());
+		}
+		return settingRequest.then(() => categoryRequest).then(() => levelRequest).then(() => userdataRequest)
+			.then(() => {location.reload()});
+	};
+	reader.readAsText(fileInput.files[0]);
+}
+
 document.addEventListener('DOMContentLoaded', e => {
 	if (localStorage.getItem('key') === null) {
 		promptKey();
@@ -177,6 +240,16 @@ document.addEventListener('DOMContentLoaded', e => {
 		else
 			sync();
 	}
+	document.getElementById('export_button').onclick = exportData;
+	document.getElementById('import_button').onclick = () => {
+		document.getElementById('import_popup').style.display = 'block';
+	};
+	document.getElementById('import_ok_button').onclick = () => {
+		importData();
+	};
+	document.getElementById('import_cancel_button').onclick = () => {
+		document.getElementById('import_popup').style.display = 'none';
+	};
 	window.onbeforeunload = function() {
 		if (checkChanges(false)) {
 			return "There are unsaved changes, pls stay? 🥺";

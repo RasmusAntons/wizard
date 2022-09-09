@@ -112,7 +112,7 @@ async def patch_levels(request):
         body = await request.json()
         logger.debug('patching levels: %s', json.dumps(body))
     except json.JSONDecodeError:
-        logger.error('exception in patch_settings: %s', traceback.format_exc())
+        logger.error('exception in patch_levels: %s', traceback.format_exc())
         return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
     new_relations = {}
     for level_id, level_body in body.items():
@@ -353,6 +353,40 @@ async def get_styles(request):
     style_files = glob.glob('static/styles/*.css')
     styles = [pathlib.Path(style_file).stem for style_file in style_files]
     return aiohttp.web.json_response(styles)
+
+
+@protected
+async def get_userdata(request):
+    users = db.session.query(db.User).all()
+    response = {user.id: {
+        'id': user.id,
+        'name': user.name,
+        'nick': user.nick,
+        'avatar': user.avatar,
+        'solved': [solve.level_id for solve in user.solved],
+        'unlocked': [unlock.level_id for unlock in user.unlocked]
+    } for user in users}
+    return aiohttp.web.json_response(response)
+
+
+@protected
+async def patch_userdata(request):
+    try:
+        body = await request.json()
+        logger.debug('patching userdata: %s', json.dumps(body))
+    except json.JSONDecodeError:
+        logger.error('exception in patch_userdata: %s', traceback.format_exc())
+        return aiohttp.web.json_response({'error': 'invalid request'}, status=400)
+    for user_dict in body.values():
+        user = db.User(id=user_dict['id'], name=user_dict['name'], nick=user_dict['nick'], avatar=user_dict['avatar'])
+        db.session.merge(user)
+        for level_id in user_dict['solved']:
+            user_solve = db.UserSolve(user_id=user.id, level_id=level_id)
+            db.session.merge(user_solve)
+        for level_id in user_dict['unlocked']:
+            user_unlock = db.UserUnlock(user_id=user.id, level_id=level_id)
+            db.session.merge(user_unlock)
+    return aiohttp.web.json_response({'message': 'ok'})
 
 
 async def get_leaderboard(request):

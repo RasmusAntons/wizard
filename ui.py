@@ -50,6 +50,8 @@ async def ui_server(host='127.0.0.1', port=8000):
         aiohttp.web.get('/api/sync/status', api.discord_sync_status),
         aiohttp.web.get('/api/styles', api.get_styles),
         aiohttp.web.get('/api/leaderboard', api.get_leaderboard),
+        aiohttp.web.get('/api/userdata', api.get_userdata),
+        aiohttp.web.patch('/api/userdata', api.patch_userdata),
     ])
     runner = aiohttp.web.AppRunner(app)
     await runner.setup()

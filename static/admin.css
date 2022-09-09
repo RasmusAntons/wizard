@@ -884,3 +884,37 @@ input:checked + .slider:before {
 	width: calc(100% - 4px);
 	height: 100px;
 }
+
+#export_button {
+	width: 145px;
+}
+
+#import_button {
+	width: 145px;
+	margin-left: -6px !important;
+}
+
+#import_popup {
+	box-sizing: border-box;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 400px;
+	margin-left: -200px;
+	height: 200px;
+	margin-top: -88px;
+	background: #2F2F40;
+	z-index: 10001;
+	color: white;
+	padding-left: 15px;
+	padding-right: 15px;
+	border-bottom: solid 1px #000;
+	border-top: solid 1px #656475;
+	border-radius: 1px;
+	line-height: 32px;
+	display: none;
+}
+
+#import_popup p {
+	line-height: 1em;
+}
