@@ -167,6 +167,8 @@ function createLevelBlock(level, unsaved, select) {
 		document.getElementById('toolbar-category').style.display = '';
 		document.getElementById('toolbar-settings').style.display = '';
 		document.getElementById('toolbar-nicknames').style.display = '';
+		document.getElementById('toolbar-completionist').style.display = '';
+		document.getElementById('toolbar-admin').style.display = '';
 		const levelNameInput = document.getElementById('level_name');
 		levelNameInput.value = levelsCurrent[level.id].name;
 		levelNameInput.oninput = levelNameInput.onchange = () => {

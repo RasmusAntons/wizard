@@ -214,6 +214,8 @@ function initCategories() {
 		document.getElementById('toolbar-level').style.display = '';
 		document.getElementById('toolbar-settings').style.display = '';
 		document.getElementById('toolbar-nicknames').style.display = '';
+		document.getElementById('toolbar-completionist').style.display = '';
+		document.getElementById('toolbar-admin').style.display = '';
 		document.getElementById('toolbar-category').style.display = 'block';
 		initializeDraggables();
 		if (selectedCategoryId)
