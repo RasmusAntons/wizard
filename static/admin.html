@@ -12,302 +12,393 @@
         <script src="/static/settings.js"></script>
         <title>wizard</title>
     </head>
-    <body>
+    <body class="theme-dark">
         <div id="toolbar">
-            <div id="toolbar-buttons">
+
+            <!-- Top Buttons -->
+            <div id="toolbar-top-buttons">
+
                 <div class="toolbar-group">
-                    <button id="add_level_button">Create level</button>
-                    <button id="add_line_button">Create Line</button>
-                    <button id="delete_line_button">Delete Line</button>
+                    <button id="add_level_button">create level</button>
+                    <div class="toolbar-joined-line">
+                        <button id="add_line_button">create line</button>
+                        <button id="delete_line_button">delete line</button>
+                    </div>
                 </div>
-                <button id="category-menu-button">Categories<span class="edited-category-mark">*</span></button>
-                <button id="settings-menu-button">Settings<span class="edited-category-mark">*</span></button>
+
                 <div class="toolbar-group">
-                    <button id="save_button">Save<span class="edited-category-mark">*</span></button>
-                    <button id="sync_button"><span id="sync_button_label">Sync</span><span class="edited-category-mark">*</span></button>
+                    <button id="category-menu-button">categories<span class="edited-category-mark">*</span></button>
+                    <button id="settings-menu-button">settings<span class="edited-category-mark">*</span></button>
                 </div>
+
+                <div class="toolbar-group">
+                    <button id="save_button">save<span class="edited-category-mark">*</span></button>
+                    <button id="sync_button"><span id="sync_button_label">sync</span><span class="edited-category-mark">*</span></button>
+                </div>
+
 				<div class="toolbar-group">
-					<button id="export_button">export</button>
-					<button id="import_button">import</button>
+                    <div class="toolbar-joined-line">
+                        <button id="export_button">export</button>
+                        <button id="import_button">import</button>
+                    </div>
 				</div>
+                
             </div>
-            <div style="position: relative" id="toolbar-level" class="toolbar-group">
-                <div class="toolbar-row">
+
+            <!-- Toolbar Block Menu -->
+            <div id="toolbar-level" class="toolbar-group toolbar-menu">
+
+                <div class="toolbar-group">
                     <label for="level_name">name</label>
                     <input type="text" id="level_name">
                 </div>
-                <div class="toolbar-row">
-                    <label for="level_nickname_suffix">nickname suffix</label>
-                    <input type="text" id="level_nickname_suffix">
-                    <label class="switch">
-                        <span class="labeltext">merge</span>
-                        <input type="checkbox" checked id="level_nickname_merge">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="toolbar-row">
-                    <label for="level_link">link</label>
-                    <textarea id="level_link" class="break-all"></textarea>
-                </div>
-                <div class="toolbar-row">
-                    <div class="toolbar-col">
-                        <label for="level_link">username</label>
-                        <input type="text" id="level_username">
-                    </div><div class="toolbar-col">
-                        <label for="level_link">password</label>
-                        <input type="text" id="level_password">
+
+                <div class="toolbar-group">
+                    <div class="toolbar-joined-line gap">
+                        <div class="label-container">
+                            <label for="level_nickname_suffix">nickname suffix</label>
+                            <input type="text" id="level_nickname_suffix">
+                        </div>
+                        <div class="label-container no-flex-grow">
+                            <label for="level_nickname_merge">merge</label>
+                            <label class="switch">
+                                <input type="checkbox" checked id="level_nickname_merge">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
+                    <label for="level_link">link</label>
+                    <textarea id="level_link"></textarea>
+                </div>
+
+                <div class="toolbar-group">
+                    <div class="toolbar-joined-line gap">
+                        <div class="label-container">
+                            <label for="level_link">username</label>
+                            <input type="text" id="level_username">
+                        </div>
+                        <div class="label-container">
+                            <label for="level_link">password</label>
+                            <input type="text" id="level_password">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbar-group">
                     <label for="level_solutions">solutions</label>
                     <textarea id="level_solutions"></textarea>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="level_unlocks">unlocks</label>
                     <textarea id="level_unlocks"></textarea>
                 </div>
-                <div id="discordstuff">
-                    <div class="toolbar-row">
-                        <label for="level_discord_channel">discord channel id</label>
-                        <br>
+
+                <div class="toolbar-group">
+                    <label for="level_discord_channel">discord channel id</label>
+                    <div class="toolbar-joined-line gap">
                         <input type="text" maxlength="20" id="level_discord_channel">
-                        <button id="level_create_channel">create</button>
+                        <button id="level_create_channel" class="small-button">create</button>
                     </div>
-                    <div class="toolbar-row">
-                        <label for="level_discord_role">discord role id</label>
-                        <br>
+                </div>
+
+                <div class="toolbar-group">
+                    <label for="level_discord_role">discord role id</label>
+                    <div class="toolbar-joined-line gap">
                         <input type="text" maxlength="20" id="level_discord_role">
-                        <button id="level_create_role">create</button>
+                        <button id="level_create_role" class="small-button">create</button>
                     </div>
-                    <div class="toolbar-row">
-                        <label for="selectable_category_list">level category</label>
-						<div class="category_list_container">
-                        	<ul id="selectable_category_list" class="category_list"></ul>
-						</div>
+                </div>
+
+                <div class="toolbar-group">
+                    <label for="selectable_category_list">level category</label>
+                    <div class="category_list_container">
+                        <ul id="selectable_category_list" class="category-list"></ul>
                     </div>
+                </div>
+                
+                <div class="toolbar-group">
                     <button id="delete_level_button">Delete level</button>
                 </div>
+
             </div>
-            <div id="toolbar-category" class="toolbar-group">
-                <div class="toolbar-row">
+
+            <!-- Toolbar Categories Menu -->
+            <div id="toolbar-category" class="toolbar-group toolbar-menu">
+
+                <div class="toolbar-group">
                     <label for="editable_category_list">category list</label>
 					<div class="category_list_container">
-                    	<ul id="editable_category_list" class="category_list"></ul>
+                    	<ul id="editable_category_list" class="category-list"></ul>
 					</div>
                 </div>
+
                 <div id="category_buttons">
-                    <button id="add_category_button">+</button>
-                    <button id="remove_category_button">-</button>
+                    <div class="toolbar-joined-line">
+                        <button id="add_category_button">+</button>
+                        <button id="remove_category_button">-</button>
+                    </div>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="discord_category_name">category name</label>
-                    <br>
                     <input type="text" id="discord_category_name">
                 </div>
-                <div class="toolbar-row" id="category_id">
+
+                <div class="toolbar-group" id="category_id">
                     <label for="discord_category_id">discord category id</label>
-                    <br>
-                    <input type="text" id="discord_category_id">
-                    <button id="discord_category_create">create</button>
+                    <div class="toolbar-joined-line gap">
+                        <input type="text" id="discord_category_id">
+                        <button id="discord_category_create" class="small-button">create</button>
+                    </div>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="discord_category_color">category color</label>
                     <input type="color" id="discord_category_color" value="#ff0000">
                 </div>
+
             </div>
-            <div id="toolbar-nicknames" class="toolbar-group">
-                <div class="toolbar-row">
+
+            <!-- Toolbar Nicknames Menu -->
+            <div id="toolbar-nicknames" class="toolbar-group toolbar-menu">
+
+                <div class="toolbar-group">
                     <label for="setting_nickname_prefix">prefix</label>
                     <input type="text" id="setting_nickname_prefix">
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="setting_nickname_separator">separator</label>
                     <input type="text" id="setting_nickname_separator">
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="setting_nickname_suffix">suffix</label>
                     <input type="text" id="setting_nickname_suffix">
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
+                    <label for="setting_nickname_enable">display progress</label>
                     <label class="switch">
-                        <span class="labeltext">display progress</span>
                         <input type="checkbox" checked id="setting_nickname_enable">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div class="toolbar-row" id="nicknames_discord_example">
-                    <div class="toolbar-row">
-                        <label for="nicknames_discord_example">discord example</label>
-                    </div>
-                    <div class="toolbar-row">
-                        <div id="discord_container">
-                            <div class="discord_message">
-                                <img src="/static/avatar1.png">
-                                <div class="discord_text_content">
-                                <div class="discord_user">
-                                    <span class="discord_username">Catz</span>
-                                    <span class="discord_time">Today at 22:40</span>
-                                </div>
-                                <div class="discord_text">
-                                    <span>this is an example of one active level!</span>
-                                </div>
-                                </div>
+
+                <div class="toolbar-group" id="nicknames_discord_example">
+                    <label for="nicknames_discord_example">discord example</label>
+                    <div id="discord_container">
+                        <div class="discord_message">
+                            <img src="/static/avatar1.png">
+                            <div class="discord_text_content">
+                            <div class="discord_user">
+                                <span class="discord_username">Catz</span>
+                                <span class="discord_time">Today at 22:40</span>
                             </div>
-                            <br>
-                            <div class="discord_message">
-                                <img src="/static/avatar2.png">
-                                <div class="discord_text_content">
-                                <div class="discord_user">
-                                    <span class="discord_username">weaver</span>
-                                    <span class="discord_time">Today at 22:40</span>
-                                </div>
-                                <div class="discord_text">
-                                    <span>this is an example of multiple active levels!</span>
-                                </div>
-                                </div>
+                            <div class="discord_text">
+                                <span>this is an example of one active level!</span>
                             </div>
-                            <br>
-                            <div class="discord_message">
-                                <img src="/static/avatar3.png">
-                                <div class="discord_text_content">
-                                <div class="discord_user">
-                                    <span class="discord_username">owlbotowlbotowlbotowlbotowlbotow</span>
-                                    <span class="discord_time">Today at 22:40</span>
-                                </div>
-                                <div class="discord_text">
-                                    <span>this is an example of a name that's too long!</span>
-                                </div>
-                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="discord_message">
+                            <img src="/static/avatar2.png">
+                            <div class="discord_text_content">
+                            <div class="discord_user">
+                                <span class="discord_username">weaver</span>
+                                <span class="discord_time">Today at 22:40</span>
+                            </div>
+                            <div class="discord_text">
+                                <span>this is an example of multiple active levels!</span>
+                            </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="discord_message">
+                            <img src="/static/avatar3.png">
+                            <div class="discord_text_content">
+                            <div class="discord_user">
+                                <span class="discord_username">owlbotowlbotowlbotowlbotowlbotow</span>
+                                <span class="discord_time">Today at 22:40</span>
+                            </div>
+                            <div class="discord_text">
+                                <span>this is an example of a name that's too long!</span>
+                            </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <div class="discord_warning">
                         discord name character limit is 32
                     </div>
                 </div>
+
             </div>
-            <div id="toolbar-completionist" class="toolbar-group">
-                <div class="toolbar-row">
+
+            <!-- Toolbar Completionist Menu -->
+            <div id="toolbar-completionist" class="toolbar-group toolbar-menu">
+
+                <div class="toolbar-group">
+                    <label for="setting_completionist_enable_nickname">award nickname</label>
                     <label class="switch">
-                        <span class="labeltext">award nickname</span>
                         <input type="checkbox" checked id="setting_completionist_enable_nickname">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="setting_completionist_badge">nickname badge</label>
                     <input type="text" id="setting_completionist_badge">
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
+                    <label for="setting_completionist_enable_role">award role</label>
                     <label class="switch">
-                        <span class="labeltext">award role</span>
                         <input type="checkbox" checked id="setting_completionist_enable_role">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="setting_completionist_role">discord role id</label>
-                    <br>
-                    <input type="text" maxlength="20" id="setting_completionist_role">
-                    <button id="setting_completionist_create_role">create</button>
+                    <div class="toolbar-joined-line gap">
+                        <input type="text" maxlength="20" id="setting_completionist_role">
+                        <button id="setting_completionist_create_role" class="small-button">create</button>
+                    </div>
                 </div>
+
             </div>
-            <div id="toolbar-admin" class="toolbar-group">
-                <div class="toolbar-row">
+
+            <!-- Toolbar Admin Menu -->
+            <div id="toolbar-admin" class="toolbar-group toolbar-menu">
+
+                <div class="toolbar-group">
+                    <label for="setting_admin_enable">admin nickname</label>
                     <label class="switch">
-                        <span class="labeltext">admin nickname</span>
                         <input type="checkbox" checked id="setting_admin_enable">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="setting_admin_badge">nickname badge</label>
                     <input type="text" id="setting_admin_badge">
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="setting_admin_role">discord role id</label>
-                    <br>
                     <input type="text" maxlength="20" id="setting_admin_role">
                 </div>
+
             </div>
-            <div id="toolbar-settings" class="toolbar-group">
-				<button id="nicknames-menu-button">Nicknames</button>
-                <button id="completionist-menu-button">Completionist</button>
-                <button id="admin-menu-button">Admin</button>
-                <div class="toolbar-row">
+
+            <!-- Toolbar Settings Menu -->
+            <div id="toolbar-settings" class="toolbar-group toolbar-menu">
+                
+                <div class="toolbar-group">
+                    <button id="nicknames-menu-button">nicknames</button>
+                </div>
+
+                <div class="toolbar-group">
+                    <button id="completionist-menu-button">completionist</button>
+                </div>
+
+                <div class="toolbar-group">
+                    <button id="admin-menu-button">admin</button>
+                </div>
+
+                <div class="toolbar-group">
                     <label for="setting_bot_token">bot token</label>
-                    <br>
-                    <input type="password" id="setting_bot_token">
-                    <button id="show_bot_token">
-                        <img src="/static/eye_open.svg" style="width: 23px; opacity: 0.4">
-                    </button>
+                    <div class="toolbar-joined-line gap">
+                        <input type="password" id="setting_bot_token">
+                        <button id="show_bot_token" class="small-button">
+                            <img src="/static/eye_open.svg" style="width: 23px; opacity: 0.4">
+                        </button>
+                    </div>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="setting_key">key</label>
-                    <br>
-                    <input type="password" id="setting_key">
-                    <button id="show_key">
-                        <img src="/static/eye_open.svg" style="width: 23px; opacity: 0.4">
-                    </button>
+                    <div class="toolbar-joined-line gap">
+                        <input type="password" id="setting_key">
+                        <button id="show_key" class="small-button">
+                            <img src="/static/eye_open.svg" style="width: 23px; opacity: 0.4">
+                        </button>
+                    </div>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
                     <label for="setting_guild">discord guild id</label>
-                    <br>
-                    <input id="setting_guild" class="plz_be_longer_thx">
+                    <input type="text" id="setting_guild">
                 </div>
-				<div class="toolbar-row">
+
+				<div class="toolbar-group">
                     <label for="setting_embed_color">embed color</label>
-                    <input type="color" id="setting_embed_color" value="#ff0000">
+                    <input type="color" id="setting_embed_color">
                 </div>
-				<div class="toolbar-row">
+
+				<div class="toolbar-group">
                     <label for="setting_style">leaderboard style</label>
                     <select id="setting_style"></select>
                 </div>
-				<div class="toolbar-row">
+
+				<div class="toolbar-group">
+                    <label for="setting_auth_in_link">auth in link</label>
                     <label class="switch">
-                        <span class="labeltext">auth in link</span>
                         <input type="checkbox" id="setting_auth_in_link">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
+                    <label for="setting_skipto_enable">enable skipto</label>
                     <label class="switch">
-                        <span class="labeltext">enable skipto</span>
                         <input type="checkbox" id="setting_skipto_enable">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
+                    <label for="setting_grid">enable grid</label>
                     <label class="switch">
-                        <span class="labeltext">enable grid</span>
                         <input type="checkbox" checked id="setting_grid">
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div class="toolbar-row">
+
+                <div class="toolbar-group">
+                    <label for="setting_tooltips">enable tooltips</label>
                     <label class="switch">
-                        <span class="labeltext">enable tooltips</span>
                         <input type="checkbox" checked id="setting_tooltips">
                         <span class="slider"></span>
                     </label>
                 </div>
-				<div class="toolbar-row">
+
+				<div class="toolbar-group">
                     <label for="setting_public_url">public url</label>
-                    <br>
-                    <input id="setting_public_url" class="plz_be_longer_thx">
+                    <input type="text" id="setting_public_url">
                 </div>
-				<div class="toolbar-row">
+
+				<div class="toolbar-group">
                     <label for="setting_enigmatics_token">enigmatics.org token</label>
-                    <br>
-                    <input type="password" id="setting_enigmatics_token">
-                    <button id="show_enigmatics_token">
-                        <img src="/static/eye_open.svg" style="width: 23px; opacity: 0.4">
-                    </button>
+                    <div class="toolbar-joined-line gap">
+                        <input type="password" id="setting_enigmatics_token">
+                        <button id="show_enigmatics_token" class="small-button">
+                            <img src="/static/eye_open.svg" style="width: 23px; opacity: 0.4">
+                        </button>
+                    </div>
                 </div>
+
             </div>
         </div>
+
+        <!-- Grid Container -->
         <div id="container">
             <div id="background">
                 <svg id="grid">
@@ -324,58 +415,112 @@
                 </svg>
             </div>
         </div>
-        <div id="page-overlay"></div>
-        <div id="delete_popup">
-            are you sure you want to delete "<span id="delete_popup_name"></span>"?
-            <br>
-            <input type="checkbox" class="delete_popup_checkbox" id="level_delete_channel">
-            also delete channel
-            <br>
-            <input type="checkbox" class="delete_popup_checkbox" id="level_delete_role">
-            also delete role
-            <div class="popup_buttons">
-                <button id="level_delete_ok_button">ok</button>
-                <button id="level_delete_cancel_button">cancel</button>
+
+        <!-- Dialogs -->
+        <div id="page-overlay">
+
+            <!-- Delete Dialog -->
+            <div id="delete_popup" class="popup">
+                <div class="toolbar-group">
+                    are you sure you want to delete "<span id="delete_popup_name"></span>"?
+                </div>
+
+                <div class="toolbar-group">
+                    <input type="checkbox" class="delete_popup_checkbox" id="level_delete_channel">
+                    also delete channel
+                </div>
+
+                <div class="toolbar-group">
+                    <input type="checkbox" class="delete_popup_checkbox" id="level_delete_role">
+                    also delete role
+                </div>
+
+                <div class="toolbar-group">
+                    <div class="toolbar-joined-line">
+                        <button id="level_delete_ok_button">ok</button>
+                        <button id="level_delete_cancel_button">cancel</button>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div id="name_popup">
-            name "<span id="name_popup_name"></span>"'s <span id="name_popup_object"></span> to
-            <br>
-            <input type="text" id="object_name">
-            <br>
-            <div class="popup_buttons">
-                <button id="object_name_ok_button">ok</button>
-                <button id="object_name_cancel_button">cancel</button>
+
+            <!-- Set Name Dialog -->
+            <div id="name_popup" class="popup">
+
+                <div class="toolbar-group">
+                    name "<span id="name_popup_name"></span>"'s <span id="name_popup_object"></span> to
+                </div>
+
+                <div class="toolbar-group">
+                    <input type="text" id="object_name">
+                </div>
+
+                <div class="toolbar-group">
+                    <div class="toolbar-joined-line">
+                        <button id="object_name_ok_button">ok</button>
+                        <button id="object_name_cancel_button">cancel</button>
+                    </div>
+                </div>
+
             </div>
-        </div>
-		<div id="import_popup">
-			<input type="file" id="import_file_input">
-			<p>Note: Importing into a non-empty instance is not supported and may cause issues.</p>
-			<p>Unsaved changes will be lost.</p>
-			<p>After importing you might need to sync to update discord roles and names.</p>
-			<div class="popup_buttons">
-				<button id="import_ok_button">ok</button>
-				<button id="import_cancel_button">cancel</button>
-			</div>
-		</div>
-        <div id="unsaved_changes_popup">
-            you have unsaved changes. are you sure you want to close the tab?
-            <br>
-            <div class="popup_buttons">
-                <button id="unsaved_changes_ok_button">ok</button>
-                <button id="unsaved_changes_cancel_button">cancel</button>
+
+            <!-- Import Dialog -->
+            <div id="import_popup" class="popup">
+
+                <div class="toolbar-group">
+                    <input type="file" id="import_file_input">
+                </div>
+
+                <div class="toolbar-group">
+                    <p>Note: Importing into a non-empty instance is not supported and may cause issues.</p>
+                    <p>Unsaved changes will be lost.</p>
+                    <p>After importing you might need to sync to update discord roles and names.</p>
+                </div>
+
+                <div class="toolbar-group">
+                    <div class="toolbar-joined-line">
+                        <button id="import_ok_button">ok</button>
+                        <button id="import_cancel_button">cancel</button>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div id="saving_popup">
-            saving...
-        </div>
-        <div id="sync_popup">
-            discord sync
-			<textarea readonly id="sync_log"></textarea>
-			<br>
-            <div class="popup_buttons">
-                <button id="sync_close_button">close</button>
+
+            <!-- Unsaved Changes Dialog -->
+            <div id="unsaved_changes_popup" class="popup">
+
+                <div class="toolbar-group">
+                    <p>you have unsaved changes.</p>
+                    <p>are you sure you want to close the tab?</p>
+                </div>
+                
+                <div class="toolbar-group">
+                    <div class="toolbar-joined-line">
+                        <button id="unsaved_changes_ok_button">ok</button>
+                        <button id="unsaved_changes_cancel_button">cancel</button>
+                    </div>
+                </div>
             </div>
+
+            <!-- Saving Dialog -->
+            <div id="saving_popup" class="popup">
+                saving...
+            </div>
+
+            <!-- Syncing Dialog -->
+            <div id="sync_popup" class="popup">
+
+                <div class="toolbar-group">
+                    discord sync
+                </div>
+
+                <div class="toolbar-group">
+                    <textarea readonly id="sync_log"></textarea>
+                </div>
+
+                <div class="toolbar-group">
+                    <button id="sync_close_button">close</button>
+                </div>
+            </div>
+
         </div>
     </body>
 </html>
