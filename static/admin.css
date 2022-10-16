@@ -54,6 +54,7 @@
 	--text-discord-timestamp: #777;
 	--text-disabled: #1a1a21;
 	--bg-marker-edited: #5c5c73;
+	--bg-switch-slider: #fff;
 	/* replace below with new color mixing when that's out */
 	--bg-marker-nickname: #3149a6;
 	--border-marker-nickname: #4d70d9;
@@ -251,7 +252,7 @@ label:not(.switch) {
 	width: 26px;
 	left: 4px;
 	bottom: 4px;
-	background-color: var(--text);
+	background-color: var(--bg-switch-slider);
 	transition-duration: .3s;
 }
 
@@ -507,15 +508,15 @@ input:checked + .slider:before {
 
 	border-radius: 1px;
 	line-height: 32px;
+	display: none;
 }
 
-#delete_popup,
-#name_popup,
-#import_popup,
-#unsaved_changes_popup,
-#saving_popup,
 #sync_popup {
-	display: none;
+	width: 600px;
+}
+
+#sync_popup textarea {
+	height: 200px;
 }
 
 input[type=color] {
