@@ -50,8 +50,8 @@
 	--border-dark: #15151e;
 	--border-dark-2: #000;
 	--text: #fff;
-	--text-discord: #fff;
-	--text-discord-timestamp: #777;
+	--text-discord: #caccce;
+	--text-discord-timestamp: #a3a6aa;
 	--text-disabled: #1a1a21;
 	--bg-marker-edited: #5c5c73;
 	--bg-switch-slider: #fff;
@@ -227,6 +227,7 @@ label:not(.switch):not(.import_file_button) {
 	width: 60px;
 	height: 28px;
 	flex: unset;
+	transform: translateY(1px);
 }
 
 .switch input {
