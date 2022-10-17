@@ -243,12 +243,14 @@ document.addEventListener('DOMContentLoaded', e => {
 	document.getElementById('export_button').onclick = exportData;
 	document.getElementById('import_button').onclick = () => {
 		document.getElementById('import_popup').style.display = 'block';
+		document.getElementById('page-overlay').style.display = 'block';
 	};
 	document.getElementById('import_ok_button').onclick = () => {
 		importData();
 	};
 	document.getElementById('import_cancel_button').onclick = () => {
 		document.getElementById('import_popup').style.display = 'none';
+		document.getElementById('page-overlay').style.display = 'none';
 	};
 	window.onbeforeunload = function() {
 		if (checkChanges(false)) {
