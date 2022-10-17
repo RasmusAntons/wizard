@@ -622,12 +622,10 @@ input[type=color] {
 	width: 500px;
 	padding: 0px 15px 15px;
 	transform: translate(-50%, -50%);
-
 	background-color: var(--bg-medium);
 	border-bottom: 1px solid var(--border-dark);
 	border-top: solid 1px var(--border-light);
 	color: var(--text);
-
 	border-radius: 1px;
 	line-height: 32px;
 	display: none;
@@ -641,11 +639,11 @@ input[type=color] {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
-
 	padding: 20px;
 	border-radius: 10px;
 	border: 3px dashed var(--bg-highlight);
 	transition-duration: 0.2s;
+	user-select: none;
 }
 
 .upload-file-wrapper-highlight {
