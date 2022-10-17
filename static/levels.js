@@ -217,9 +217,16 @@ function createLevelBlock(level, unsaved, select) {
 		}
 		const levelCategory = levelsCurrent[level.id].category;
 		if (levelCategory) {
-			levelCategoryListItems[levelCategory].classList.add('selected-category');
-			// todo: scroll without scrolling toolbar etc.
-			// levelCategoryListItems[levelCategory].scrollIntoView({block: "center"});
+			const categoryListContainer = levelCategoryList.parentNode;
+			const selectedCategoryElement = levelCategoryListItems[levelCategory];
+			const categoryLiHeight = selectedCategoryElement.offsetHeight;
+			const activeCategoryIndex = Array.from(selectedCategoryElement.parentNode.childNodes).indexOf(selectedCategoryElement);
+			selectedCategoryElement.classList.add('selected-category');
+			categoryListContainer.scroll({
+				top: categoryLiHeight * activeCategoryIndex,
+				left: 0,
+				behavior: 'smooth'
+			});
 		}
 	};
 	const container = document.getElementById('container');
