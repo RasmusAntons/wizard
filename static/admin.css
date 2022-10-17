@@ -66,8 +66,8 @@
 	--border-marker-unlocks: #c3ce27;
 	--bg-marker-channel: #549d2b;
 	--border-marker-channel: #7fd051;
-	--bg-marer-role: #136f79;
-	--border-marer-role: #23a3a3;
+	--bg-marker-role: #136f79;
+	--border-marker-role: #23a3a3;
 }
 
 * {
@@ -511,9 +511,9 @@ input[type=color] {
 }
 
 .block.has_discord_role .marker_discord_role {
-	background-color: var(--bg-marer-role);
-	border-top: 1px solid var(--border-marer-role);
-	border-left: 1px solid var(--border-marer-role);
+	background-color: var(--bg-marker-role);
+	border-top: 1px solid var(--border-marker-role);
+	border-left: 1px solid var(--border-makrer-role);
 	border-bottom: none;
 	border-right: none;
 	color: var(--text);
