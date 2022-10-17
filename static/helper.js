@@ -225,6 +225,43 @@ function importData() {
 	reader.readAsText(fileInput.files[0]);
 }
 
+function initImportDialog() {
+	const uploadFileWrapper = document.getElementById("upload-file-wrapper");
+	const importFileInput = document.getElementById('import_file_input');
+	importFileInput.onchange = (e) => {
+		document.getElementById("imported_file_name").innerHTML = e.target.files[0].name;
+	};
+	uploadFileWrapper.ondragenter = (e) => {
+		if (e.currentTarget !== e.target) return;
+		e.target.classList.add("upload-file-wrapper-highlight");
+	};
+	uploadFileWrapper.ondragover = (e) => {
+		e.preventDefault();
+		if (e.currentTarget !== e.target) return;
+		e.target.classList.add("upload-file-wrapper-highlight");
+	};
+	uploadFileWrapper.ondragleave = (e) => {
+		if (e.currentTarget !== e.target) return;
+		e.target.classList.remove("upload-file-wrapper-highlight");
+	};
+	uploadFileWrapper.ondrop = (e) => {
+		e.preventDefault();
+		if (e.currentTarget !== e.target) return;
+		e.target.classList.remove("upload-file-wrapper-highlight");
+		if (e.dataTransfer.files.length !== 1) return;
+		if (e.dataTransfer.items[0].kind !== "file") return;
+		importFileInput.files = e.dataTransfer.files;
+		importFileInput.dispatchEvent(new Event('change'));
+	};
+	document.getElementById('import_ok_button').onclick = () => {
+		importData();
+	};
+	document.getElementById('import_cancel_button').onclick = () => {
+		document.getElementById('import_popup').style.display = 'none';
+		document.getElementById('page-overlay').style.display = 'none';
+	};
+}
+
 document.addEventListener('DOMContentLoaded', e => {
 	if (localStorage.getItem('key') === null) {
 		promptKey();
@@ -233,6 +270,7 @@ document.addEventListener('DOMContentLoaded', e => {
 	initLevels();
 	initCategories();
 	initSettings();
+	initImportDialog();
 	document.getElementById('save_button').onclick = save;
 	document.getElementById('sync_button').onclick = () => {
 		if (unsavedChanges)
@@ -244,13 +282,6 @@ document.addEventListener('DOMContentLoaded', e => {
 	document.getElementById('import_button').onclick = () => {
 		document.getElementById('import_popup').style.display = 'block';
 		document.getElementById('page-overlay').style.display = 'block';
-	};
-	document.getElementById('import_ok_button').onclick = () => {
-		importData();
-	};
-	document.getElementById('import_cancel_button').onclick = () => {
-		document.getElementById('import_popup').style.display = 'none';
-		document.getElementById('page-overlay').style.display = 'none';
 	};
 	window.onbeforeunload = function() {
 		if (checkChanges(false)) {
