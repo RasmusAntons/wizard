@@ -404,11 +404,11 @@
                 <svg id="grid">
                     <defs>
                        <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-                          <path d="M 20 0 L 0 0 L 0 20 L 20 20" fill="#1a1a21" stroke="gray" stroke-width="0.1"/>
+                          <path d="M 20 0 L 0 0 L 0 20 L 20 20" fill="var(--bg-grid)" stroke="var(--border-subgrid)" stroke-width="0.1"/>
                        </pattern>
                        <pattern id="bigGrid" width="200" height="200" patternUnits="userSpaceOnUse">
                           <rect width="200" height="200" fill="url(#smallGrid)"/>
-                          <path d="M 200 0 L 0 0 0 200" fill="none" stroke="lightgray" stroke-width="0.2"/>
+                          <path d="M 200 0 L 0 0 0 200" fill="none" stroke="var(--border-grid)" stroke-width="0.2"/>
                        </pattern>
                     </defs>
                     <rect id="main" fill="url(#bigGrid)" width="8000px" height="5000px"/>
