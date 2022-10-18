@@ -45,10 +45,13 @@
 	--bg-disabled-input: #51515b;
 	--bg-disabled-button: #61616f;
 	--bg-discord: #36393f;
+	--bg-grid: #1a1a21;
 	--border-light: #656475;
 	--border-medium: #45455b;
 	--border-dark: #15151e;
 	--border-dark-2: #000;
+	--border-subgrid: #808080;
+	--border-grid: #d3d3d3;
 	--text: #fff;
 	--text-discord: #caccce;
 	--text-discord-timestamp: #a3a6aa;
