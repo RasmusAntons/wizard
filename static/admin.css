@@ -626,12 +626,12 @@ input[type=color] {
 	width: 500px;
 	padding: 0px 15px 15px;
 	transform: translate(-50%, -50%);
+	accent-color: var(--bg-highlight);
 	background-color: var(--bg-medium);
 	border-bottom: 1px solid var(--border-dark);
 	border-top: solid 1px var(--border-light);
 	color: var(--text);
 	border-radius: 1px;
-	line-height: 32px;
 	display: none;
 }
 
@@ -648,6 +648,7 @@ input[type=color] {
 	border: 3px dashed var(--bg-highlight);
 	transition-duration: 0.2s;
 	user-select: none;
+	line-height: 32px;
 }
 
 .upload-file-wrapper-highlight {
