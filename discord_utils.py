@@ -303,11 +303,11 @@ async def update_role_permissions():
     levels = [level for level in db.session.query(db.Level).all()]
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+    if guild is None:
+        raise Exception(f'guild not set or wrong: {guild_id}')
     channel_permissions = {level.discord_channel: {
         guild.default_role: discord.PermissionOverwrite(read_messages=False)
     } for level in levels if level.discord_channel}
-    if guild is None:
-        raise Exception(f'guild not set or wrong: {guild_id}')
     for level in db.session.query(db.Level).all():
         role = guild.get_role(int(level.discord_role)) if level.discord_role else None
         if role is None:
