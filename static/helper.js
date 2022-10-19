@@ -69,7 +69,7 @@ function save() {
 	savingPopup.style.display = 'block';
 	pageOverlay.style.display = 'block';
 	if (Object.keys(settingsChanged).length) {
-		settingRequest = apiCall(`/api/settings`, 'PATCH', settingsChanged).then(r => {
+		settingRequest = () => apiCall(`/api/settings`, 'PATCH', settingsChanged).then(r => {
 			settingsOriginal = cloneObject(settingsCurrent);
 			if ('key' in settingsChanged)
 				localStorage.setItem('key', settingsChanged['key']);
@@ -77,10 +77,10 @@ function save() {
 			checkSettingChange();
 		});
 	} else {
-		settingRequest = new Promise(r => r());
+		settingRequest = () => new Promise(r => r());
 	}
 	if (Object.keys(categoriesChanged).length > 0) {
-		categoryRequest = apiCall('/api/categories/', 'PATCH', categoriesChanged).then(r => {
+		categoryRequest = () => apiCall('/api/categories/', 'PATCH', categoriesChanged).then(r => {
 			if (r.error) {
 				alert(r.error);
 			} else {
@@ -97,10 +97,10 @@ function save() {
 			}
 		});
 	} else {
-		categoryRequest = new Promise(r => r());
+		categoryRequest = () => new Promise(r => r());
 	}
 	if (Object.keys(levelsChanged).length > 0) {
-		levelRequest = apiCall('/api/levels/', 'PATCH', levelsChanged).then(r => {
+		levelRequest = () => apiCall('/api/levels/', 'PATCH', levelsChanged).then(r => {
 			if (r.error) {
 				alert(r.error);
 			} else {
@@ -117,9 +117,9 @@ function save() {
 			}
 		});
 	} else {
-		levelRequest = new Promise(r => r());
+		levelRequest = () => new Promise(r => r());
 	}
-	return settingRequest.then(() => categoryRequest).then(() => levelRequest).then(() => {
+	return settingRequest().then(() => categoryRequest()).then(() => levelRequest()).then(() => {
 		checkChanges(true);
 		savingPopup.style.display = '';
 		pageOverlay.style.display = '';
@@ -200,27 +200,27 @@ function importData() {
 		document.getElementById('page-overlay').style.display = 'block';
 		let settingRequest, categoryRequest, levelRequest, userdataRequest;
 		if (Object.keys(data.settings).length) {
-			settingRequest = apiCall(`/api/settings`, 'PATCH', data.settings);
+			settingRequest = () => apiCall(`/api/settings`, 'PATCH', data.settings);
 		} else {
-			settingRequest = new Promise(r => r());
+			settingRequest = () => new Promise(r => r());
 		}
 		if (Object.keys(data.categories).length > 0) {
-			categoryRequest = apiCall('/api/categories/', 'PATCH', data.levels);
+			categoryRequest = () => apiCall('/api/categories/', 'PATCH', data.categories);
 		} else {
-			categoryRequest = new Promise(r => r());
+			categoryRequest = () => new Promise(r => r());
 		}
 		if (Object.keys(data.levels).length > 0) {
-			levelRequest = apiCall('/api/levels/', 'PATCH', data.levels);
+			levelRequest = () => apiCall('/api/levels/', 'PATCH', data.levels);
 		} else {
-			levelRequest = new Promise(r => r());
+			levelRequest = () => new Promise(r => r());
 		}
 		if (Object.keys(data.userdata).length > 0) {
-			userdataRequest = apiCall('/api/userdata', 'PATCH', data.userdata);
+			userdataRequest = () => apiCall('/api/userdata', 'PATCH', data.userdata);
 		} else {
-			userdataRequest = new Promise(r => r());
+			userdataRequest = () => new Promise(r => r());
 		}
-		return settingRequest.then(() => categoryRequest).then(() => levelRequest).then(() => userdataRequest)
-			.then(() => {location.reload()});
+		return settingRequest().then(() => categoryRequest()).then(() => levelRequest())
+			.then(() => userdataRequest()).then(() => {location.reload()});
 	};
 	reader.readAsText(fileInput.files[0]);
 }
