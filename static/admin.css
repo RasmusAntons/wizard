@@ -222,6 +222,7 @@ label:not(.switch):not(.import_file_button) {
 .label-container {
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 }
 
 .switch {
