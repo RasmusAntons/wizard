@@ -518,7 +518,7 @@ input[type=color] {
 .block.has_discord_role .marker_discord_role {
 	background-color: var(--bg-marker-role);
 	border-top: 1px solid var(--border-marker-role);
-	border-left: 1px solid var(--border-makrer-role);
+	border-left: 1px solid var(--border-marker-role);
 	border-bottom: none;
 	border-right: none;
 	color: var(--text);
