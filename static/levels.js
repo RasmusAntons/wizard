@@ -407,24 +407,26 @@ function initLevels() {
 		};
 	}
 	document.getElementById('background').onmousedown = e => {
-		if (levelCreationMode) {
-			document.getElementById('add_level_button').classList.remove('active-button');
-			levelCreationMode = false;
-			createLevelBlock({
-				id: uuidv4(), name: '', nickname_suffix: '', nickname_merge: false, parent_levels: [], child_levels: [],
-				solutions: [], unlocks: [], discord_channel: null, discord_role: null, link: null, username: null,
-				password: null, category: null, grid_location: [roundLocation(e.layerX) + 320, roundLocation(e.layerY)]
-			}, true, true);
-			return;
+		if (e.button === 0) {
+			if (levelCreationMode) {
+				document.getElementById('add_level_button').classList.remove('active-button');
+				levelCreationMode = false;
+				createLevelBlock({
+					id: uuidv4(), name: '', nickname_suffix: '', nickname_merge: false, parent_levels: [], child_levels: [],
+					solutions: [], unlocks: [], discord_channel: null, discord_role: null, link: null, username: null,
+					password: null, category: null, grid_location: [roundLocation(e.layerX) + 320, roundLocation(e.layerY)]
+				}, true, true);
+				return;
+			}
+			selectedLevelId = undefined;
+			document.getElementById('toolbar-level').style.display = '';
+			document.getElementById('toolbar-category').style.display = '';
+			document.getElementById('toolbar-settings').style.display = '';
+			document.getElementById('toolbar-nicknames').style.display = '';
+			document.getElementById('toolbar-completionist').style.display = '';
+			document.getElementById('toolbar-admin').style.display = '';
+			for (let selectedLevel of document.querySelectorAll('.selected'))
+				selectedLevel.classList.toggle('selected', false);
 		}
-		selectedLevelId = undefined;
-		document.getElementById('toolbar-level').style.display = '';
-		document.getElementById('toolbar-category').style.display = '';
-		document.getElementById('toolbar-settings').style.display = '';
-		document.getElementById('toolbar-nicknames').style.display = '';
-		document.getElementById('toolbar-completionist').style.display = '';
-		document.getElementById('toolbar-admin').style.display = '';
-		for (let selectedLevel of document.querySelectorAll('.selected'))
-			selectedLevel.classList.toggle('selected', false);
 	};
 }
