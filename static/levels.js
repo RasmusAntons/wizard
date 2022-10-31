@@ -304,8 +304,14 @@ function initLevels() {
 	});
 	const addLevelButton = document.getElementById('add_level_button');
 	addLevelButton.onclick = () => {
-		if (lineMode) {
-			lineMode = null;
+		if (levelCreationMode) {
+			levelCreationMode = false;
+			addLevelButton.classList.remove('active-button');
+			container.style.cursor = "default";
+			return;
+		}
+		if (currentLine) {
+			currentLine = null;
 			for (let levelBlock of Object.values(levelBlocks))
 				levelBlock.style.cursor = 'grab';
 			addLineButton.classList.remove('active-button');
@@ -313,6 +319,7 @@ function initLevels() {
 		}
 		levelCreationMode = true;
 		addLevelButton.classList.add('active-button');
+		container.style.cursor = "copy";
 	};
 	document.getElementById('delete_level_button').onclick = () => {
 		const deletePopup = document.getElementById('delete_popup');
@@ -351,12 +358,20 @@ function initLevels() {
 	};
 	const addLineButton = document.getElementById('add_line_button');
 	addLineButton.onclick = () => {
+		if (currentLine) {
+			currentLine = null;
+			if (lineMode === 'add') {
+				addLineButton.classList.remove('active-button');
+				for (let levelBlock of Object.values(levelBlocks))
+					levelBlock.style.cursor = 'grab';
+				return
+			}
+			deleteLineButton.classList.remove('active-button');
+		}
 		if (levelCreationMode) {
 			levelCreationMode = false;
-			document.getElementById('add_level_button').classList.remove('active-button');
-		}
-		if (lineMode === 'delete') {
-			deleteLineButton.classList.remove('active-button');
+			container.style.cursor = "default";
+			addLevelButton.classList.remove('active-button');
 		}
 		currentLine = [];
 		lineMode = 'add';
@@ -366,12 +381,20 @@ function initLevels() {
 	};
 	const deleteLineButton = document.getElementById('delete_line_button');
 	deleteLineButton.onclick = () => {
+		if (currentLine) {
+			currentLine = null;
+			if (lineMode === 'delete') {
+				deleteLineButton.classList.remove('active-button');
+				for (let levelBlock of Object.values(levelBlocks))
+					levelBlock.style.cursor = 'grab';
+				return
+			}
+			addLineButton.classList.remove('active-button');
+		}
 		if (levelCreationMode) {
 			levelCreationMode = false;
-			document.getElementById('add_level_button').classList.remove('active-button');
-		}
-		if (lineMode === 'add') {
-			addLineButton.classList.remove('active-button');
+			container.style.cursor = "default";
+			addLevelButton.classList.remove('active-button');
 		}
 		currentLine = [];
 		lineMode = 'delete';
@@ -432,6 +455,7 @@ function initLevels() {
 			if (levelCreationMode) {
 				document.getElementById('add_level_button').classList.remove('active-button');
 				levelCreationMode = false;
+				container.style.cursor = "default";
 				createLevelBlock({
 					id: uuidv4(), name: '', nickname_suffix: '', nickname_merge: false, parent_levels: [], child_levels: [],
 					solutions: [], unlocks: [], discord_channel: null, discord_role: null, link: null, username: null,
