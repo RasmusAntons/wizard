@@ -304,6 +304,13 @@ function initLevels() {
 	});
 	const addLevelButton = document.getElementById('add_level_button');
 	addLevelButton.onclick = () => {
+		if (lineMode) {
+			lineMode = null;
+			for (let levelBlock of Object.values(levelBlocks))
+				levelBlock.style.cursor = 'grab';
+			addLineButton.classList.remove('active-button');
+			deleteLineButton.classList.remove('active-button');
+		}
 		levelCreationMode = true;
 		addLevelButton.classList.add('active-button');
 	};
@@ -344,6 +351,13 @@ function initLevels() {
 	};
 	const addLineButton = document.getElementById('add_line_button');
 	addLineButton.onclick = () => {
+		if (levelCreationMode) {
+			levelCreationMode = false;
+			document.getElementById('add_level_button').classList.remove('active-button');
+		}
+		if (lineMode === 'delete') {
+			deleteLineButton.classList.remove('active-button');
+		}
 		currentLine = [];
 		lineMode = 'add';
 		addLineButton.classList.add('active-button');
@@ -352,6 +366,13 @@ function initLevels() {
 	};
 	const deleteLineButton = document.getElementById('delete_line_button');
 	deleteLineButton.onclick = () => {
+		if (levelCreationMode) {
+			levelCreationMode = false;
+			document.getElementById('add_level_button').classList.remove('active-button');
+		}
+		if (lineMode === 'add') {
+			addLineButton.classList.remove('active-button');
+		}
 		currentLine = [];
 		lineMode = 'delete';
 		deleteLineButton.classList.add('active-button');
