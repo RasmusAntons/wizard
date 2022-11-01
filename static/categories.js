@@ -243,5 +243,8 @@ function initCategories() {
 		}, true);
 		initializeDraggables();
 		categoryListItems[categoryId].click();
+		setTimeout(() => {
+			document.getElementById('discord_category_name').focus();
+		}, 0);
 	}
 }
