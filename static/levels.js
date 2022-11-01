@@ -258,6 +258,9 @@ function createLevelBlock(level, unsaved, select) {
 	draggable.autoScroll = {target: container};
 	if (select)
 		levelBlock.onmousedown();
+		setTimeout(() => {
+			document.getElementById('level_name').focus();
+		}, 0);
 }
 
 function loadLevels(cb) {
