@@ -5,6 +5,7 @@ let selectedCategoryId;
 let categoryListItems = {};
 let categoryDraggables = [];
 let levelCategoryListItems = {};
+let dragging = false;
 const listItemHeight = 26;
 
 function checkCategoryChange(categoryId) {
@@ -23,17 +24,25 @@ function checkCategoryChange(categoryId) {
 	checkChanges(true);
 }
 
-function sortCategoryList(updateOrdinals) {
+function sortCategoryList(updateOrdinals, skipAnimation) {
 	const toolbar = document.getElementById('toolbar');
+	const editableCategoryList = document.getElementById('editable_category_list');
+	const parentOffset = editableCategoryList.offsetTop;
+	const scrollOffset = editableCategoryList.parentElement.scrollTop + toolbar.scrollTop;
 	categoryDraggables.sort((e, o) => e.top + 1 - o.top);
 	for (let [i, draggable] of categoryDraggables.entries()) {
-		const parentOffset = draggable.element.parentElement.offsetTop;
-		const scrollOffset = draggable.element.parentElement.parentElement.scrollTop + toolbar.scrollTop;
-		if(Math.abs(draggable.top - parentOffset - scrollOffset - i * listItemHeight) >= 1)
+		if (Math.abs(draggable.top - parentOffset - scrollOffset - i * listItemHeight) >= 1)
 			draggable.top = i * listItemHeight + parentOffset - scrollOffset;
 		if (updateOrdinals && categoriesCurrent[draggable.category].ordinal !== i) {
 			categoriesCurrent[draggable.category].ordinal = i;
 			checkCategoryChange(draggable.category);
+		}
+		const listIndex = Array.from(editableCategoryList.children).indexOf(draggable.element);
+		draggable.element.style.transform = `translate(0px, ${26 * (i - listIndex)}px)`;
+		if (skipAnimation) {
+			const originalDuration = draggable.element.style.transitionDuration;
+			draggable.element.style.transitionDuration = '0s';
+			setTimeout(() => draggable.element.style.transitionDuration = originalDuration, 0);
 		}
 	}
 }
@@ -42,6 +51,10 @@ function initializeDraggables() {
 	for (let oldDraggable of categoryDraggables)
 		oldDraggable.remove();
 	categoryDraggables = [];
+	document.getElementById('editable_category_list').parentElement.addEventListener('wheel', e => {
+		if (dragging)
+			e.preventDefault();
+	});
 	for (let [categoryId, listItem] of Object.entries(categoryListItems)) {
 		const draggable = new PlainDraggable(listItem, {
 			handle: listItem.querySelector('.handle'),
@@ -50,13 +63,21 @@ function initializeDraggables() {
 				if (!moveTo.snapped)
 					return false;
 				sortCategoryList(false);
+				dragging = true;
 				return true;
 			},
 			onDragEnd: function (moveTo) {
 				sortCategoryList(true);
+				dragging = false;
 				return true;
 			}
 		});
+		/*
+		draggable.autoScroll = {
+			target: draggable.element.parentElement.parentElement,
+			speed: [5, 25, 100],
+		};
+		*/
 		draggable.category = categoryId;
 		categoryDraggables.push(draggable);
 	}
@@ -162,9 +183,12 @@ function createCategory(category, unsaved) {
 		categoryRemoveButton.disabled = false;
 		categoryRemoveButton.onclick = () => {
 			categoryListItems[category.id].remove();
+			delete categoryListItems[category.id];
 			levelCategoryListItems[category.id].remove();
+			delete levelCategoryListItems[category.id];
 			categoriesCurrent[category.id] = {};
-			checkCategoryChange(category.id);
+			categoryDraggables = categoryDraggables.filter(e => e.category !== category.id);
+			selectedCategoryId = undefined;
 			for (let level of Object.values(levelsCurrent)) {
 				if (level.category === category.id) {
 					level.category = null;
@@ -172,6 +196,7 @@ function createCategory(category, unsaved) {
 					checkLevelChange(level.id);
 				}
 			}
+			sortCategoryList(true, true);
 		};
 	};
 	const levelCategoryList = document.getElementById('selectable_category_list');
