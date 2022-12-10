@@ -76,6 +76,7 @@
 * {
 	font-family: 'Share Tech Mono', monospace;
 	box-sizing: border-box;
+	scrollbar-width: thin;
 }
 
 body {
