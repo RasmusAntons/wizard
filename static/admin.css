@@ -131,7 +131,7 @@ body {
 	gap: 2px;
 }
 
-.toolbar-joined-line * {
+.toolbar-joined-line > * {
 	flex-grow: 1;
 }
 
