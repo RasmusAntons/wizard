@@ -13,9 +13,10 @@ def init_db():
         logger.log('database already initialised, skipping init_db...')
         return
     db.set_setting('guild', os.environ.get('GUILD_ID') or input('Guild id: '))
-    db.set_setting('enable_grid', 'true')
-    db.set_setting('enable_tooltips', 'true')
+    db.set_setting('grid', 'true')
+    db.set_setting('tooltips', 'true')
     db.set_setting('auth_in_link', 'true')
+    db.set_setting('skipto_enable', 'true')
     db.set_setting('embed_color', '#000000')
     db.set_setting('nickname_prefix', ' [')
     db.set_setting('nickname_separator', ', ')
