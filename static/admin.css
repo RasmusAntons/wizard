@@ -296,9 +296,11 @@ input:checked + .slider:before {
 	cursor: pointer;
 	height: 26px;
 	line-height: 25px;
-	width: 100%;
 	border-bottom: solid 1px var(--border-dark-2);
 	border-left: 2px solid;
+	padding: 0px 10px 0px 26px;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .category-list li:hover {
