@@ -332,6 +332,10 @@ input[type=color] {
 	border: none;
 }
 
+input[type=color]:disabled {
+	cursor: not-allowed;
+}
+
 /* discord preview */
 
 #discord_container {
