@@ -86,10 +86,16 @@ def has_user_solved_everything(user_id):
     unsolved_level = db.session.query(db.Level).where(
         and_(
             exists().where(db.Level.id == db.Solution.level_id),
-            ~exists().where(and_(db.UserSolve.user_id == str(user_id), db.Level.id == db.UserSolve.level_id))
+            ~exists().where(and_(db.UserSolve.user_id == str(user_id), db.Level.id == db.UserSolve.level_id)),
         )
     ).first()
-    return unsolved_level is None
+    locked_level = db.session.query(db.Level).where(
+        and_(
+            exists().where(db.Level.id == db.Unlock.level_id),
+            ~exists().where(and_(db.UserUnlock.user_id == str(user_id), db.Level.id == db.UserUnlock.level_id)),
+        )
+    ).first()
+    return unsolved_level is None and locked_level is None
 
 
 def get_used_role_ids():
