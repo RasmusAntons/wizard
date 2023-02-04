@@ -232,6 +232,7 @@ async def skipto_command(interaction: discord.Interaction, link: str, username: 
     logger.info('%s (%s) executed in %s /skipto %s username=%s password=%s', interaction.user.name, interaction.user.id,
                 interaction.channel.type, link, username, password)
     if interaction.channel.type == discord.ChannelType.private:
+        is_deferred = False
         try:
             if db.get_setting('skipto_enable') != 'true':
                 raise Exception('this command is disabled')
@@ -241,10 +242,14 @@ async def skipto_command(interaction: discord.Interaction, link: str, username: 
             if target_level[0].username != username or target_level[0].password != password:
                 raise Exception('wrong username or password')
             await interaction.response.defer(ephemeral=True)
+            is_deferred = True
             msg = await discord_utils.skip_user_to_level(interaction.user.id, target_level[0], False)
-            await interaction.response.send_message(msg, ephemeral=True)
+            await interaction.followup.send(msg, ephemeral=True)
         except Exception as e:
-            await interaction.response.send_message(str(e), ephemeral=True)
+            if is_deferred:
+                await interaction.followup.send(str(e), ephemeral=True)
+            else:
+                await interaction.response.send_message(str(e), ephemeral=True)
     else:
         await interaction.response.send_message(messages.use_in_dms, ephemeral=True)
 
@@ -271,9 +276,9 @@ async def setprogress_command(interaction: discord.Interaction, user: discord.Us
     await interaction.response.defer(ephemeral=True)
     try:
         msg = await discord_utils.skip_user_to_level(user.id, target_level[0], status == 'solved')
-        await interaction.response.send_message(msg, ephemeral=True)
+        await interaction.followup.send(msg, ephemeral=True)
     except Exception as e:
-        await interaction.response.send_message(str(e), ephemeral=True)
+        await interaction.followup.send(str(e), ephemeral=True)
 
 
 @setprogress_command.autocomplete('level')
