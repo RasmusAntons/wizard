@@ -4,6 +4,7 @@ let levelsChanged = {};
 let selectedLevelId;
 let levelBlocks = {};
 let lines = {};
+let levelDraggables = {};
 let currentLine = null;
 let lineMode = null;
 let levelCreationMode = false;
@@ -231,6 +232,7 @@ function createLevelBlock(level, unsaved, select) {
 	};
 	const container = document.getElementById('container');
 	const draggable = new PlainDraggable(levelBlock);
+	levelDraggables[level.id] = draggable;
 	if (level.grid_location[0] !== null)
 		draggable.left = level.grid_location[0] - container.scrollLeft;
 	if (level.grid_location[1] !== null)
@@ -243,15 +245,36 @@ function createLevelBlock(level, unsaved, select) {
 			position.left = snappedX;
 			position.top = snappedY;
 		}
+		const movedX = snappedX - levelsCurrent[level.id].grid_location[0];
+		const movedY = snappedY - levelsCurrent[level.id].grid_location[1];
+		for (let otherLevel of Object.values(levelsCurrent)) {
+			if (level.id === otherLevel.id)
+				continue;
+			const otherX = otherLevel.grid_location[0] + movedX;
+			const otherY = otherLevel.grid_location[1] + movedY;
+			levelDraggables[otherLevel.id].left = otherX;
+			levelDraggables[otherLevel.id].top = otherY;
+		}
 		for (let line of Object.values(lines))
 			line.position();
 	};
 	draggable.onDragEnd = function (position) {
-		levelsCurrent[level.id].grid_location = [
-			roundLocation(position.left + container.scrollLeft),
-			roundLocation(position.top + container.scrollTop)
-		];
-		checkLevelChange(level.id);
+		const movedX = position.left - levelsCurrent[level.id].grid_location[0];
+		const movedY = position.top - levelsCurrent[level.id].grid_location[1];
+		for (let selectedLevel of Object.values(levelsCurrent)) {
+			if (level.id !== selectedLevel.id) {
+				const otherX = selectedLevel.grid_location[0] + movedX;
+				const otherY = selectedLevel.grid_location[1] + movedY;
+				levelDraggables[selectedLevel.id].left = otherX;
+				levelDraggables[selectedLevel.id].top = otherY;
+			}
+			const selectedLevelDraggable = levelDraggables[selectedLevel.id];
+			levelsCurrent[selectedLevel.id].grid_location = [
+				roundLocation(selectedLevelDraggable.left + container.scrollLeft),
+				roundLocation(selectedLevelDraggable.top + container.scrollTop)
+			];
+			checkLevelChange(selectedLevel.id);
+		}
 		for (let line of Object.values(lines))
 			line.position();
 	}
