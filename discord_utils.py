@@ -1,9 +1,5 @@
-import asyncio
-import unicodedata
-
 import discord
 from sqlalchemy import and_, or_, exists
-import sqlalchemy.testing
 
 import db
 import discord_bot
@@ -72,9 +68,10 @@ def get_solved_or_unlocked_levels(user_id, name=None, start='', limit=None):
         query = query.limit(limit)
     return query.all()
 
+
 def get_user_level_suffixes(user_id):
     levels = list(get_solvable_levels(user_id))
-    levels.sort(key=lambda l: ((l.category.ordinal or 0) if l.category else -1,  l.name))
+    levels.sort(key=lambda l: ((l.category.ordinal or 0) if l.category else -1, l.name))
     user_level_suffixes = []
     for level in levels:
         if level.nickname_suffix and (not level.nickname_merge or level.nickname_suffix not in user_level_suffixes):
@@ -271,7 +268,8 @@ async def move_level_to_category(level):
                 position = None
                 found_child = False
                 for other_channel in discord_category.channels:
-                    for other_level in db.session.query(db.Level).where(db.Level.discord_channel == str(other_channel.id)):
+                    for other_level in db.session.query(db.Level).where(
+                            db.Level.discord_channel == str(other_channel.id)):
                         if other_level.id in child_ids:
                             position = other_channel.position
                             found_child = True
@@ -327,6 +325,18 @@ async def update_role_permissions():
         channel = guild.get_channel(int(channel_id))
         if channel is not None:
             permissions_as_list = list(permissions.items())
+            current_permissions = {chid: overwrite for chid, overwrite in channel.overwrites.items() if
+                                   overwrite.read_messages}
+            roles_to_add = set(permissions.keys()) - set(current_permissions.keys())
+            roles_to_remove = set(set(current_permissions.keys() - permissions.keys()))
+            if len(roles_to_add) == 0 and len(roles_to_remove) == 0:
+                continue
+            if len(roles_to_add) + len(roles_to_remove) < len(permissions_as_list) - 100:
+                for role in roles_to_remove:
+                    await channel.set_permissions(role, overwrite=None)
+                for role in roles_to_add:
+                    await channel.set_permissions(role, overwrite=permissions[role])
+                continue
             first_batch = dict(permissions_as_list[:100])
             await channel.edit(overwrites=first_batch)
             for role, overwrite in permissions_as_list[100:]:
@@ -367,7 +377,8 @@ async def skip_user_to_level(user_id, level, include_self=False):
 
 
 def get_invalid_user_solves():
-    return db.session.query(db.UserSolve).where(~exists(db.Solution).where(db.UserSolve.level_id == db.Solution.level_id)).all()
+    return db.session.query(db.UserSolve).where(
+        ~exists(db.Solution).where(db.UserSolve.level_id == db.Solution.level_id)).all()
 
 
 def get_leaderboard(categories=None):
