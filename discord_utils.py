@@ -328,7 +328,7 @@ async def update_role_permissions():
             current_permissions = {chid: overwrite for chid, overwrite in channel.overwrites.items() if
                                    overwrite.read_messages}
             roles_to_add = set(permissions.keys()) - set(current_permissions.keys())
-            roles_to_remove = set(current_permissions.keys() - permissions.keys())
+            roles_to_remove = set(current_permissions.keys()) - set(permissions.keys())
             if len(roles_to_add) == 0 and len(roles_to_remove) == 0:
                 continue
             if len(roles_to_add) + len(roles_to_remove) < len(permissions_as_list) - 100:
