@@ -239,7 +239,9 @@ async def skipto_command(interaction: discord.Interaction, link: str, username: 
             target_level = db.session.query(db.Level).where(db.Level.link == link).all()
             if len(target_level) != 1:
                 raise Exception('level not found')
-            if target_level[0].username != username or target_level[0].password != password:
+            if (target_level[0].username or username) and target_level[0].username != username:
+                raise Exception('wrong username or password')
+            if (target_level[0].password or password) and target_level[0].password != password:
                 raise Exception('wrong username or password')
             await interaction.response.defer(ephemeral=True)
             is_deferred = True
