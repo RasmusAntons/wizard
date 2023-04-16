@@ -79,6 +79,10 @@
 	scrollbar-width: thin;
 }
 
+*::-webkit-scrollbar {
+	width: 5px;
+}
+
 body {
 	margin: 0;
 	padding: 0;
@@ -119,6 +123,10 @@ body {
 	user-select: none;
 	overflow: hidden auto;
 	scrollbar-width: none;
+}
+
+#toolbar::-webkit-scrollbar {
+	display: none;
 }
 
 #toolbar-top-buttons {
