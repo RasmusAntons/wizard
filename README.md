@@ -1,33 +1,33 @@
-# wizard ![<3](https://cdn.discordapp.com/attachments/607727243346837525/937686164104691743/wizard.png) Documentation
+# wizard ![<3](https://cat.enigmatics.org/wizard-images/wizard.png) Documentation
 Created for web-puzzle communities, wizard is a bot for managing automatic channel access on Discord.
 
 ## Admin UI
 The interface allows puzzle creators to configure the bot using an interactive flowchart with draggable elements.
 
-![ui](https://cdn.discordapp.com/attachments/819395604152844368/957054138393452614/unknown.png)
+![ui](https://cat.enigmatics.org/wizard-images/ui.png)
 
-![create-level](https://cdn.discordapp.com/attachments/513014307978739714/937692245992280074/unknown.png)
+![create-level](https://cat.enigmatics.org/wizard-images/create-level.png)
 
 Allows the user to create a new level block by clicking anywhere on the grid.
 These blocks contain all relevant information about individual levels, such as solutions and Discord channels and roles.
 
-![create-and delete-line](https://cdn.discordapp.com/attachments/513014307978739714/937692958159949844/unknown.png)
+![create-and delete-line](https://cat.enigmatics.org/wizard-images/create-and-delete-line.png)
 
 Allows the user to create or delete a dependency line by clicking on two level blocks in order of parent to child.
 
-![categories](https://cdn.discordapp.com/attachments/513014307978739714/937695801537363978/unknown.png)
+![categories](https://cat.enigmatics.org/wizard-images/categories.png)
 
 Opens a menu allowing the user to create and edit level categories. Categories visually compartmentalize related levels blocks into groups.
 
-![categories-menu](https://cdn.discordapp.com/attachments/513014307978739714/937715012011720744/unknown.png)
+![categories-menu](https://cat.enigmatics.org/wizard-images/categories-menu.png)
 
 Categories can also be linked to Discord categories.
 
-![settings](https://cdn.discordapp.com/attachments/513014307978739714/937698230278447124/unknown.png)
+![settings](https://cat.enigmatics.org/wizard-images/settings.png)
 
 The settings menu consists of options that can generally be considered to be one-time configurations.
 
-![settings-menu](https://cdn.discordapp.com/attachments/543661397242937355/958319135958372442/unknown.png)
+![settings-menu](https://cat.enigmatics.org/wizard-images/settings-menu.png)
 
 - `Bot Token` Sets the Discord bot token.
 - `Key` Sets the password used to access the site.
@@ -41,37 +41,37 @@ The settings menu consists of options that can generally be considered to be one
 - `Completionist` Opens the completionist configurations menu.
 - `Admin` Opens the admin configurations menu.
 
-![nicknames](https://cdn.discordapp.com/attachments/513014307978739714/937701310785024000/unknown.png)
+![nicknames](https://cat.enigmatics.org/wizard-images/nicknames.png)
 
 Nicknames are a way to display your current progress over Discord. These statuses use the `nickname suffix` parameter assigned to level blocks.
 
-![nicknames-menu](https://cdn.discordapp.com/attachments/513014307978739714/937701375054323772/unknown.png)
+![nicknames-menu](https://cat.enigmatics.org/wizard-images/nicknames-menu.png)
 
 The menu contains a real-time Discord preview of what nickname look like with the current settings.
 
-![completionist](https://cdn.discordapp.com/attachments/513014307978739714/940290959948795954/unknown.png)
+![completionist](https://cat.enigmatics.org/wizard-images/completionist.png)
 
 The completionist menu provides rewards for players who have solved every level block that has at least one solution.
 
-![completionist-menu](https://cdn.discordapp.com/attachments/513014307978739714/940291495582375936/unknown.png)
+![completionist-menu](https://cat.enigmatics.org/wizard-images/completionist-menu.png)
 
 To give a sense of freedom from a puzzle, the nickname badge removes the currently set prefix, separator, and suffix. You can of course manually add them back if you want.
 
-![admin](https://cdn.discordapp.com/attachments/513014307978739714/957048423339659314/unknown.png)
+![admin](https://cat.enigmatics.org/wizard-images/admin.png)
 
 The admin menu allows you to add additional admins to your server. This allows the users to use the `/setprogress` and `/resetuser` commands. 
 
-![admin-menu](https://cdn.discordapp.com/attachments/513014307978739714/957049978239479818/unknown.png)
+![admin-menu](https://cat.enigmatics.org/wizard-images/admin-menu.png)
 
 Being an admin removes all progress badges from your nickname. The menu allows you to configure the admin role, as well as an admin nickname badge.
 
-![save](https://cdn.discordapp.com/attachments/513014307978739714/937702495873036328/unknown.png)
+![save](https://cat.enigmatics.org/wizard-images/save.png)
 
-The save button saves the current configuration. If there are changes to save, the edited marker ![edited-marker](https://cdn.discordapp.com/attachments/513014307978739714/937702781387673620/edited.png) appears on it.
+The save button saves the current configuration. If there are changes to save, the edited marker ![edited-marker](https://cat.enigmatics.org/wizard-images/edited-marker.png) appears on it.
 The marker appears on any edited object, including level blocks and buttons.
 When saving, wizard will abandon the process if any errors are detected, including loops in level dependencies
 
-![sync](https://cdn.discordapp.com/attachments/819395604152844368/966423758933983242/unknown.png)
+![sync](https://cat.enigmatics.org/wizard-images/sync.png)
 
 The sync button synchronises the discord server. If there are unsaved changes, those will be saved first, but the button can also be used to fix inconsistencies otherwise. 
 - Level channels and roles are updated on Discord.
@@ -82,19 +82,19 @@ The sync button synchronises the discord server. If there are unsaved changes, t
 ### Level Blocks
 Level blocks are the fundamental building blocks of wizard. Each block represents a single level within a puzzle.
 
-![level-block](https://cdn.discordapp.com/attachments/513014307978739714/957050680399515688/unknown.png)
+![level-block](https://cat.enigmatics.org/wizard-images/level-block.png)
 
 Each block displays it's level's name, a colored line displaying the category it's related to, and markers showing which parameters are set.
-The markers are: ![nickname-suffix-marker](https://cdn.discordapp.com/attachments/513014307978739714/937707398381068348/unknown.png)ickname suffix,
-![link-marker](https://cdn.discordapp.com/attachments/513014307978739714/957046390486360064/unknown.png)ink,
-![solutions-marker](https://cdn.discordapp.com/attachments/513014307978739714/957046606228758588/unknown.png)olutions,
-![unlocks-marker](https://cdn.discordapp.com/attachments/513014307978739714/957046606442688622/unknown.png)unlocks,
-![channel-marker](https://cdn.discordapp.com/attachments/513014307978739714/957046606711095326/unknown.png)hannel,
-![role-marker](https://cdn.discordapp.com/attachments/513014307978739714/957046606925017189/unknown.png)role.
+The markers are: ![nickname-suffix-marker](https://cat.enigmatics.org/wizard-images/nickname-suffix-marker.png)ickname suffix,
+![link-marker](https://cat.enigmatics.org/wizard-images/link-marker.png)ink,
+![solutions-marker](https://cat.enigmatics.org/wizard-images/solutions-marker.png)olutions,
+![unlocks-marker](https://cat.enigmatics.org/wizard-images/unlocks-marker.png)nlocks,
+![channel-marker](https://cat.enigmatics.org/wizard-images/channel-marker.png)hannel,
+![role-marker](https://cat.enigmatics.org/wizard-images/role-marker.png)ole.
 
 Clicking on a block opens the level block menu in the toolbar.
 
-![level-block-menu](https://cdn.discordapp.com/attachments/513014307978739714/957055187820904488/unknown.png)
+![level-block-menu](https://cat.enigmatics.org/wizard-images/level-block-menu.png)
 
 It's important to note that both `solutions` and `unlocks` allow for multiple strings separated by new lines.
 The merge checkbox next to the nickname suffix input field makes it so that duplicate suffixes are merged. For example: `[8, 8]` -> `[8]`.
