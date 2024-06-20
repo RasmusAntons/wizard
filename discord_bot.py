@@ -31,7 +31,7 @@ async def setup_hook():
 @client.event
 async def on_ready():
     logger.info(f'logged in as %s', client.user)
-    client.loop.run_in_executor(None, initial_setup)
+    await client.loop.run_in_executor(None, initial_setup)
 
 
 async def initial_setup():
