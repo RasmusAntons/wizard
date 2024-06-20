@@ -22,6 +22,7 @@ ui_port = 8000
 
 @client.event
 async def setup_hook():
+    # noinspection PyAsyncCall
     client.loop.create_task(ui.ui_server(host=ui_host, port=ui_port))
     await command_tree.sync()
 
