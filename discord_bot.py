@@ -16,6 +16,7 @@ intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
 command_tree = discord.app_commands.CommandTree(client)
+is_setup = False
 ui_host = '127.0.0.1'
 ui_port = 8000
 
@@ -30,6 +31,10 @@ async def setup_hook():
 @client.event
 async def on_ready():
     logger.info(f'logged in as %s', client.user)
+    client.loop.run_in_executor(None, initial_setup)
+
+
+async def initial_setup():
     invalid_solves = discord_utils.get_invalid_user_solves()
     if invalid_solves:
         logger.warning('User solves for levels without solution')
@@ -54,6 +59,7 @@ async def on_ready():
     await discord_utils.update_all_avatars()
     logger.info('startup complete')
     await update_enigmatics()
+    is_setup = True
 
 
 @tasks.loop(minutes=28)
