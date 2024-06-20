@@ -1,3 +1,4 @@
+import asyncio
 import traceback
 
 import aiohttp
@@ -31,7 +32,7 @@ async def setup_hook():
 @client.event
 async def on_ready():
     logger.info(f'logged in as %s', client.user)
-    await client.loop.run_in_executor(None, initial_setup)
+    await asyncio.to_thread(initial_setup)
 
 
 async def initial_setup():
