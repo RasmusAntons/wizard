@@ -11,6 +11,7 @@ import messages
 import time
 from logger import logger
 import ui
+import asyncio
 
 intents = discord.Intents.default()
 intents.members = True
