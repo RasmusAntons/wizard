@@ -1,4 +1,3 @@
-import asyncio
 import traceback
 
 import aiohttp
@@ -17,7 +16,6 @@ intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
 command_tree = discord.app_commands.CommandTree(client)
-is_setup = False
 ui_host = '127.0.0.1'
 ui_port = 8000
 
@@ -32,10 +30,6 @@ async def setup_hook():
 @client.event
 async def on_ready():
     logger.info(f'logged in as %s', client.user)
-    await asyncio.to_thread(initial_setup)
-
-
-async def initial_setup():
     invalid_solves = discord_utils.get_invalid_user_solves()
     if invalid_solves:
         logger.warning('User solves for levels without solution')
@@ -50,17 +44,18 @@ async def initial_setup():
         if time.time() - last_update > 10:
             logger.info(f'%s user roles updated', progress)
             last_update = time.time()
+            await asyncio.sleep(1)
     logger.info('updating user nicknames')
     last_update = time.time()
     async for progress in discord_utils.update_all_user_nicknames():
         if time.time() - last_update > 10:
             logger.info(f'%s nicknames updated', progress)
             last_update = time.time()
+            await asyncio.sleep(1)
     logger.info('updating user avatars')
     await discord_utils.update_all_avatars()
     logger.info('startup complete')
     await update_enigmatics()
-    is_setup = True
 
 
 @tasks.loop(minutes=28)
