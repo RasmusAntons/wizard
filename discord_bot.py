@@ -11,6 +11,7 @@ import messages
 import time
 from logger import logger
 import ui
+import asyncio
 
 intents = discord.Intents.default()
 intents.members = True
@@ -44,12 +45,14 @@ async def on_ready():
         if time.time() - last_update > 10:
             logger.info(f'%s user roles updated', progress)
             last_update = time.time()
+            await asyncio.sleep(1)
     logger.info('updating user nicknames')
     last_update = time.time()
     async for progress in discord_utils.update_all_user_nicknames():
         if time.time() - last_update > 10:
             logger.info(f'%s nicknames updated', progress)
             last_update = time.time()
+            await asyncio.sleep(1)
     logger.info('updating user avatars')
     await discord_utils.update_all_avatars()
     logger.info('startup complete')
