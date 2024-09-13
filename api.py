@@ -309,18 +309,21 @@ async def discord_sync():
         if time.time() - last_update > 10:
             await discord_sync_update(f'{progress} role permissions updated')
             last_update = time.time()
+            await asyncio.sleep(1)
     await discord_sync_update('updating user roles')
     last_update = time.time()
     async for progress in discord_utils.update_all_user_roles():
         if time.time() - last_update > 10:
             await discord_sync_update(f'{progress} user roles updated')
             last_update = time.time()
+            await asyncio.sleep(1)
     await discord_sync_update('updating user nicknames')
     last_update = time.time()
     async for progress in discord_utils.update_all_user_nicknames():
         if time.time() - last_update > 10:
             await discord_sync_update(f'{progress} nicknames updated')
             last_update = time.time()
+            await asyncio.sleep(1)
     used_time = time.time() - start_time
     await discord_sync_update(f'finished discord sync after {used_time:.2f}s', True)
 
