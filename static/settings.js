@@ -3,7 +3,7 @@ let settingsCurrent = {};
 let settingsChanged = {};
 
 const inputSettings = {
-	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'grid': 'check', 'tooltips': 'check', 'auth_in_link': 'check',
+	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'guild_invite': 'text', 'grid': 'check', 'tooltips': 'check', 'auth_in_link': 'check',
 	'skipto_enable': 'check', 'embed_color': 'text',
 	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check',
 	'completionist_enable_nickname': 'check', 'completionist_badge': 'text',

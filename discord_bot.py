@@ -116,12 +116,32 @@ async def on_user_update(before, after):
         discord_utils.update_avatar(after)
 
 
+async def command_ensure_member(interaction: discord.Interaction, send_response=True):
+    member = None
+    try:
+        guild_id = int(db.get_setting('guild'))
+        guild = client.get_guild(guild_id) or await client.fetch_guild(guild_id)
+        user = interaction.user
+        member = guild.get_member(user.id) or await guild.fetch_member(user.id)
+    except discord.errors.NotFound:
+        pass
+    if member is None and send_response:
+        guild_invite = db.get_setting('guild_invite')
+        message = 'To use this bot please join the discord.'
+        if guild_invite:
+            message += f'\n\n{guild_invite}'
+        await interaction.response.send_message(message)
+    return member
+
+
 @command_tree.command(name='solve', description='Solve')
 @discord.app_commands.describe(solution='The solution of the level you solved.')
 async def solve_command(interaction: discord.Interaction, solution: str):
     logger.info('%s (%s) executed in %s /solve %s', interaction.user.name, interaction.user.id,
                 interaction.channel.type, solution)
     if interaction.channel.type == discord.ChannelType.private:
+        if await command_ensure_member(interaction) is None:
+            return
         level_solutions = db.session.query(db.Solution).where(db.Solution.text == solution)
         for level_solution in level_solutions:
             level = level_solution.level
@@ -144,6 +164,8 @@ async def unlock_command(interaction: discord.Interaction, unlock: str):
     logger.info('%s (%s) executed in %s /unlock %s', interaction.user.name, interaction.user.id,
                 interaction.channel.type, unlock)
     if interaction.channel.type == discord.ChannelType.private:
+        if await command_ensure_member(interaction) is None:
+            return
         level_unlocks = db.session.query(db.Unlock).where(db.Unlock.text == unlock)
         for level_unlock in level_unlocks:
             level = level_unlock.level
@@ -166,6 +188,8 @@ async def recall_command(interaction: discord.Interaction, level: str):
     logger.info('%s (%s) executed in %s /recall %s', interaction.user.name, interaction.user.id,
                 interaction.channel.type, level)
     if interaction.channel.type == discord.ChannelType.private:
+        if await command_ensure_member(interaction) is None:
+            return
         found_levels = discord_utils.get_solved_or_unlocked_levels(interaction.user.id, name=level)
         if len(found_levels) == 0:
             await interaction.response.send_message('No such level', ephemeral=True)
@@ -194,6 +218,9 @@ async def recall_autocomplete(interaction: discord.Interaction, level: str):
     logger.debug('%s (%s) autocomplete in %s /recall %s', interaction.user.name, interaction.user.id,
                  interaction.channel.type, level)
     if interaction.channel.type == discord.ChannelType.private:
+        if await command_ensure_member(interaction, send_response=False) is None:
+            await interaction.response.autocomplete([])
+            return
         start = level or ''
         solved_levels = discord_utils.get_solved_or_unlocked_levels(interaction.user.id, start=start, limit=25)
         await interaction.response.autocomplete([
@@ -210,6 +237,8 @@ async def continue_command(interaction: discord.Interaction):
     logger.info('%s (%s) executed in %s /continue', interaction.user.name, interaction.user.id,
                 interaction.channel.type)
     if interaction.channel.type == discord.ChannelType.private:
+        if await command_ensure_member(interaction) is None:
+            return
         current_levels = list(filter(lambda l: l.solutions, discord_utils.get_solvable_levels(interaction.user.id)))
         embed = discord.Embed(title='Current Levels')
         embed.colour = int(db.get_setting('embed_color', '#000000')[1:], 16)
@@ -236,6 +265,8 @@ async def skipto_command(interaction: discord.Interaction, link: str, username: 
     logger.info('%s (%s) executed in %s /skipto %s username=%s password=%s', interaction.user.name, interaction.user.id,
                 interaction.channel.type, link, username, password)
     if interaction.channel.type == discord.ChannelType.private:
+        if await command_ensure_member(interaction) is None:
+            return
         is_deferred = False
         try:
             if db.get_setting('skipto_enable') != 'true':
