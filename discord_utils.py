@@ -118,6 +118,8 @@ def is_member_admin(member):
 
 
 async def update_user_nickname(user_id):
+    if db.get_setting('nickname_disable_all'):
+        return
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))

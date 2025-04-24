@@ -165,7 +165,6 @@
 
             <!-- Toolbar Nicknames Menu -->
             <div id="toolbar-nicknames" class="toolbar-group toolbar-menu">
-
                 <div class="toolbar-group">
                     <label for="setting_nickname_prefix">prefix</label>
                     <input type="text" id="setting_nickname_prefix">
@@ -230,6 +229,9 @@
                             </div>
                             </div>
                         </div>
+                    </div>
+                    <div id="nicknames_disabled_warning" class="discord_warning" style="display: none">
+                        nicknames are disabled globally
                     </div>
                 </div>
 
@@ -365,6 +367,14 @@
                     <label for="setting_skipto_enable">enable skipto</label>
                     <label class="switch">
                         <input type="checkbox" id="setting_skipto_enable">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toolbar-group">
+                    <label for="setting_nickname_disable_all">disable nickname updates</label>
+                    <label class="switch">
+                        <input type="checkbox" checked id="setting_nickname_disable_all">
                         <span class="slider"></span>
                     </label>
                 </div>

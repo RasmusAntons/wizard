@@ -18,6 +18,7 @@ def init_db():
     db.set_setting('auth_in_link', 'true')
     db.set_setting('skipto_enable', 'true')
     db.set_setting('embed_color', '#000000')
+    db.set_setting('nickname_disable_all', bool(os.environ.get('NO_NICKNAME_UPDATES')))
     db.set_setting('nickname_prefix', ' [')
     db.set_setting('nickname_separator', ', ')
     db.set_setting('nickname_suffix', ']')

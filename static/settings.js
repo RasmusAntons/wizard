@@ -5,7 +5,7 @@ let settingsChanged = {};
 const inputSettings = {
 	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'guild_invite': 'text', 'grid': 'check', 'tooltips': 'check', 'auth_in_link': 'check',
 	'skipto_enable': 'check', 'embed_color': 'text',
-	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check',
+	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check', 'nickname_disable_all': 'check',
 	'completionist_enable_nickname': 'check', 'completionist_badge': 'text',
 	'completionist_enable_role': 'check', 'completionist_role': 'text',
 	'admin_enable': 'check', 'admin_badge': 'text', 'admin_role': 'text', 'style': 'select',
@@ -30,6 +30,15 @@ function nick(nickName, prefix, separator, suffix, levels) {
 }
 
 function updateNicknamePreview() {
+	const nicknamesDisabled = settingsCurrent['nickname_disable_all'] === 'true';
+	if (nicknamesDisabled) {
+		document.getElementById('discord_container').style.display = 'none';
+		document.getElementById('nicknames_disabled_warning').style.display = 'block';
+		return;
+	} else {
+		document.getElementById('discord_container').style.display = 'block';
+		document.getElementById('nicknames_disabled_warning').style.display = 'none';
+	}
 	const discordContainer = document.getElementById('discord_container');
 	const discordUsernames = discordContainer.querySelectorAll('.discord_username');
 	const baseNames = {0: 'Catz', 1: 'weaver', 2: 'owlbotowlbotowlbotowlbotowlbotow'};
