@@ -114,6 +114,14 @@
                 </div>
 
                 <div class="toolbar-group">
+                    <label for="level_announce_solve">announce solve</label>
+                    <label class="switch">
+                        <input type="checkbox" checked id="level_announce_solve">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toolbar-group">
                     <label for="selectable_category_list">level category</label>
                     <div class="category_list_container">
                         <ul id="selectable_category_list" class="category-list"></ul>
@@ -398,6 +406,13 @@
 				<div class="toolbar-group">
                     <label for="setting_public_url">public url</label>
                     <input type="text" id="setting_public_url">
+                </div>
+
+                <div class="toolbar-group">
+                    <label for="setting_announcement_channel">discord announcement channel</label>
+                    <input type="text" id="setting_announcement_channel">
+                    <label for="setting_announcement_template">discord announcement text</label>
+                    <input type="text" id="setting_announcement_template" placeholder="%user% solved %level%">
                 </div>
 
 				<div class="toolbar-group">

@@ -211,6 +211,13 @@ function createLevelBlock(level, unsaved, select) {
 				checkLevelMarkerChange(level.id);
 			}
 		}
+		const announceSolveInput = document.getElementById('level_announce_solve');
+		announceSolveInput.checked = levelsCurrent[level.id].announce_solve;
+		announceSolveInput.onchange = () => {
+			levelsCurrent[level.id].announce_solve = announceSolveInput.checked;
+			checkLevelChange(level.id);
+			checkLevelMarkerChange(level.id);
+		}
 		const levelCategoryList = document.getElementById('selectable_category_list');
 		for (let otherLevelCategoryListItem of levelCategoryList.getElementsByTagName('li')) {
 			otherLevelCategoryListItem.classList.remove('selected-category');
@@ -462,7 +469,8 @@ function initLevels() {
 				createLevelBlock({
 					id: uuidv4(), name: '', nickname_suffix: '', nickname_merge: false, parent_levels: [], child_levels: [],
 					solutions: [], unlocks: [], discord_channel: null, discord_role: null, link: null, username: null,
-					password: null, category: null, grid_location: [roundLocation(e.layerX) + 320, roundLocation(e.layerY)]
+					password: null, category: null, grid_location: [roundLocation(e.layerX) + 320, roundLocation(e.layerY)],
+					announce_solve: false
 				}, true, true);
 				return;
 			}

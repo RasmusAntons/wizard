@@ -151,6 +151,7 @@ async def solve_command(interaction: discord.Interaction, solution: str):
                 await interaction.response.send_message(messages.confirm_solve.format(level_name=level.name))
                 await discord_utils.update_user_roles(str(interaction.user.id))
                 await discord_utils.update_user_nickname(str(interaction.user.id))
+                await discord_utils.announce_solve(str(interaction.user.id), level)
                 break
         else:
             await interaction.response.send_message(messages.reject_solve)

@@ -118,8 +118,6 @@ def is_member_admin(member):
 
 
 async def update_user_nickname(user_id):
-    if db.get_setting('nickname_disable_all'):
-        return
     guild_id = int(db.get_setting('guild'))
     guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
     member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))
@@ -132,6 +130,9 @@ async def update_user_nickname(user_id):
     if user is None:
         user = db.User(id=str(user_id))
         db.session.add(user)
+    if db.get_setting('nickname_disable_all') == 'true':
+        db.session.commit()
+        return
     if db.get_setting('admin_enable') == 'true' and is_member_admin(member):
         name_suffix = db.get_setting('admin_badge', '')
     elif db.get_setting('completionist_enable_nickname') == 'true' and has_user_solved_everything(user_id):
@@ -367,6 +368,7 @@ async def skip_user_to_level(user_id, level, include_self=False):
                 and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == str(member.id))).scalar():
             solved_level_names.append(parent_level.name)
             db.session.add(db.UserSolve(user_id=str(member.id), level=parent_level))
+            await discord_utils.announce_solve(user_id, parent_level)
     db.session.commit()
     await update_user_roles(str(member.id))
     await update_user_nickname(str(member.id))
@@ -461,3 +463,25 @@ def get_used_categories():
             continue
         used_categories.append(category)
     return used_categories
+
+
+async def announce_solve(user_id, level):
+    logger.info(f'maybe announcing %s solving %s', user_id, level.name)
+    if not level.announce_solve:
+        logger.info('level should not be announced')
+        return
+    guild_id = int(db.get_setting('guild'))
+    channel_id = int(db.get_setting('announcement_channel', 0))
+    if not channel_id:
+        logger.info('cannot find channel id')
+        return
+    guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+    try:
+        member = guild.get_member(int(user_id)) or await guild.fetch_member(int(user_id))
+        channel = guild.get_channel(channel_id) or await guild.fetch_channel(channel_id)
+    except discord.errors.NotFound as e:
+        logger.info('cannot find channel or member: %s', str(e))
+        return
+    template = db.get_setting('announcement_template', '%user% solved %level%')
+    msg = template.replace('%user%', member.mention).replace('%level%', level.name)
+    await channel.send(msg)

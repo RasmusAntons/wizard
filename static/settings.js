@@ -4,7 +4,7 @@ let settingsChanged = {};
 
 const inputSettings = {
 	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'guild_invite': 'text', 'grid': 'check', 'tooltips': 'check', 'auth_in_link': 'check',
-	'skipto_enable': 'check', 'embed_color': 'text',
+	'skipto_enable': 'check', 'embed_color': 'text', 'announcement_channel': 'text', 'announcement_template': 'text',
 	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check', 'nickname_disable_all': 'check',
 	'completionist_enable_nickname': 'check', 'completionist_badge': 'text',
 	'completionist_enable_role': 'check', 'completionist_role': 'text',
@@ -76,6 +76,10 @@ function loadSettings(cb) {
 		settingsCurrent = cloneObject(settings);
 		for (let [settingKey, settingType] of Object.entries(inputSettings)) {
 			const settingInput = document.getElementById(`setting_${settingKey}`);
+			if (!settingInput) {
+				console.error(`missing settings widget for ${settingKey}`);
+				continue;
+			}
 			if (settingType === 'text' || settingType === 'select') {
 				if (settingKey in settings)
 					settingInput.value = settings[settingKey];

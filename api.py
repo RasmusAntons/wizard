@@ -135,6 +135,7 @@ async def patch_levels(request):
             level.password = level_body.get('password')
             level.discord_channel = level_body.get('discord_channel')
             level.discord_role = level_body.get('discord_role')
+            level.announce_solve = level_body.get('announce_solve')
             level.category_id = level_body.get('category')
             level.grid_x, level.grid_y = level_body.get('grid_location')
             db.session.merge(level)

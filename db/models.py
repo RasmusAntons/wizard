@@ -29,6 +29,7 @@ class Level(Base):
     password = Column(String, nullable=True)
     discord_channel = Column(String(20), nullable=True, index=True)
     discord_role = Column(String(20), nullable=True)
+    announce_solve = Column(Boolean, default=False)
     category_id = Column(String(36), ForeignKey('category.id', ondelete='SET NULL'))
     category = relationship('Category', backref=backref('levels'))
     grid_x = Column(Integer, nullable=True)
@@ -49,6 +50,7 @@ class Level(Base):
             'password': self.password,
             'discord_channel': self.discord_channel if self.discord_channel else None,
             'discord_role': self.discord_role if self.discord_role else None,
+            'announce_solve': self.announce_solve,
             'category': self.category_id,
             'grid_location': (self.grid_x, self.grid_y)
         }
