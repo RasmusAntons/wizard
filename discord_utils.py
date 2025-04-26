@@ -368,7 +368,7 @@ async def skip_user_to_level(user_id, level, include_self=False):
                 and_(db.UserSolve.level_id == parent_level.id, db.UserSolve.user_id == str(member.id))).scalar():
             solved_level_names.append(parent_level.name)
             db.session.add(db.UserSolve(user_id=str(member.id), level=parent_level))
-            await discord_utils.announce_solve(user_id, parent_level)
+            await announce_solve(user_id, parent_level)
     db.session.commit()
     await update_user_roles(str(member.id))
     await update_user_nickname(str(member.id))
