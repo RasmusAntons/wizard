@@ -129,8 +129,11 @@ async def update_user_nickname(user_id):
     user = db.session.get(db.User, str(user_id))
     if user is None:
         user = db.User(id=str(user_id))
+        user.name = member.display_name
         db.session.add(user)
     if db.get_setting('nickname_disable_all') == 'true':
+        user.nick = user.name
+        db.session.merge(user)
         db.session.commit()
         return
     if db.get_setting('admin_enable') == 'true' and is_member_admin(member):
