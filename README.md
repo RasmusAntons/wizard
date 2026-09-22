@@ -132,4 +132,3 @@ Users can unlock a level by calling the `/unlock` command with one of its unlock
 - Run the server `python manage.py run --host 0.0.0.0 --port 8000`
   - Run with `--debug` to see more information about requests. 
 - Login on the admin interface Go to `http://localhost:8000` in your browser and enter the access key.
-> Note: Or install with Conda using `conda_env.yaml`
