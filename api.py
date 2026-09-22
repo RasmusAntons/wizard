@@ -319,6 +319,14 @@ async def discord_sync():
                 await discord_sync_update(f'{progress} user roles updated')
                 last_update = time.time()
                 await asyncio.sleep(1)
+        if db.get_setting('direct_channel_access') == 'true':
+            await discord_sync_update('updating user channel access')
+            last_update = time.time()
+            async for progress in discord_utils.update_all_user_channel_access():
+                if time.time() - last_update > 10:
+                    await discord_sync_update(f'{progress} user channel access updated')
+                    last_update = time.time()
+                    await asyncio.sleep(1)
         await discord_sync_update('updating user nicknames')
         last_update = time.time()
         async for progress in discord_utils.update_all_user_nicknames():

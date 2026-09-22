@@ -213,6 +213,47 @@ async def update_all_user_roles():
         yield f'{i}/{guild.member_count}'
 
 
+async def update_user_channel_access(user_id):
+    if db.get_setting('direct_channel_access') != 'true':
+        return
+
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+
+    channel_updates = []
+    for level in db.session.query(db.Level).all():
+        if level.discord_channel:
+            if has_user_reached(level, user_id):
+                channel_updates.append((level.discord_channel, True))
+            else:
+                channel_updates.append((level.discord_channel, False))
+
+    member = guild.get_member(int(user_id)) or await guild.fetch_member(user_id)
+    if member is None or member.bot:
+        return
+
+    for channel_id, access in channel_updates:
+        try:
+            channel = guild.get_channel(int(channel_id)) or await guild.fetch_channel(int(channel_id))
+            if channel.permissions_for(member).view_channel != access:
+                await channel.set_permissions(member, view_channel=access)
+        except Exception as e:
+            logger.error(f'failed to update direct channel permissions for {user} in {channel_id}: {e}')
+
+
+async def update_all_user_channel_access():
+    if db.get_setting('direct_channel_access') != 'true':
+        return
+
+    guild_id = int(db.get_setting('guild'))
+    guild = discord_bot.client.get_guild(guild_id) or await discord_bot.client.fetch_guild(guild_id)
+    used_role_ids = get_used_role_ids()
+    for i, member in enumerate(guild.members):
+        if not member.bot:
+            await update_user_channel_access(str(member.id))
+        yield f'{i}/{guild.member_count}'
+
+
 def can_user_solve(level, user_id):
     if db.session.query(db.UserSolve).where(
             and_(db.UserSolve.level_id == level.id, db.UserSolve.user_id == str(user_id))
@@ -374,6 +415,7 @@ async def skip_user_to_level(user_id, level, include_self=False):
             await announce_solve(user_id, parent_level)
     db.session.commit()
     await update_user_roles(str(member.id))
+    await update_user_channel_access(str(member.id))
     await update_user_nickname(str(member.id))
     message_parts = []
     if solved_level_names:

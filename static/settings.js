@@ -6,7 +6,7 @@ const inputSettings = {
 	'bot_token': 'text', 'key': 'text', 'guild': 'text', 'guild_invite': 'text', 'grid': 'check', 'tooltips': 'check', 'auth_in_link': 'check',
 	'skipto_enable': 'check', 'embed_color': 'text', 'announcement_channel': 'text', 'announcement_template': 'text',
 	'nickname_prefix': 'text', 'nickname_suffix': 'text', 'nickname_separator': 'text', 'nickname_enable': 'check', 'nickname_disable_all': 'check',
-	'completionist_enable_nickname': 'check', 'completionist_badge': 'text',
+	'direct_channel_access': 'check', 'completionist_enable_nickname': 'check', 'completionist_badge': 'text',
 	'completionist_enable_role': 'check', 'completionist_role': 'text',
 	'admin_enable': 'check', 'admin_badge': 'text', 'admin_role': 'text', 'style': 'select',
 	'public_url': 'text', 'enigmatics_token': 'text'
@@ -90,10 +90,8 @@ function loadSettings(cb) {
 						updateNicknamePreview();
 				}
 			} else if (settingType === 'check') {
-				if (settingKey in settings) {
-					settingInput.checked = JSON.parse(settings[settingKey]);
-					settingInput.dispatchEvent(new Event('change'));
-				}
+				settingInput.checked = (settingKey in settings) ? JSON.parse(settings[settingKey]) : false;
+				settingInput.dispatchEvent(new Event('change'));
 				settingInput.addEventListener('change', () => {
 					settingsCurrent[settingKey] = JSON.stringify(settingInput.checked);
 					checkSettingChange(settingKey);

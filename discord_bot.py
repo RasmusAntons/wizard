@@ -5,7 +5,6 @@ import discord
 from discord.ext import tasks
 
 import db
-from sqlalchemy import and_
 import discord_utils
 import messages
 import time
@@ -74,8 +73,9 @@ async def on_member_join(member):
     logger.debug('member joined: %s (%s)', member.name, member.id)
     db.session.merge(db.User(id=str(member.id), name=member.nick))
     db.session.commit()
-    await discord_utils.update_user_roles(member.id)
-    await discord_utils.update_user_nickname(member.id)
+    await discord_utils.update_user_roles(str(member.id))
+    await discord_utils.update_user_channel_access(str(member.id))
+    await discord_utils.update_user_nickname(str(member.id))
     discord_utils.update_avatar(member)
 
 
@@ -150,6 +150,7 @@ async def solve_command(interaction: discord.Interaction, solution: str):
                 db.session.commit()
                 await interaction.response.send_message(messages.confirm_solve.format(level_name=level.name))
                 await discord_utils.update_user_roles(str(interaction.user.id))
+                await discord_utils.update_user_channel_access(str(interaction.user.id))
                 await discord_utils.update_user_nickname(str(interaction.user.id))
                 await discord_utils.announce_solve(str(interaction.user.id), level)
                 break
@@ -175,6 +176,7 @@ async def unlock_command(interaction: discord.Interaction, unlock: str):
                 db.session.commit()
                 await interaction.response.send_message(messages.confirm_unlock.format(level_name=level.name))
                 await discord_utils.update_user_roles(str(interaction.user.id))
+                await discord_utils.update_user_channel_access(str(interaction.user.id))
                 await discord_utils.update_user_nickname(str(interaction.user.id))
                 break
         else:
@@ -355,6 +357,7 @@ async def resetuser_command(interaction: discord.Interaction, user: discord.User
         db.session.delete(db_user)
         db.session.commit()
         await discord_utils.update_user_roles(str(member.id))
+        await discord_utils.update_user_channel_access(str(member.id))
         await discord_utils.update_user_nickname(str(member.id))
         await interaction.response.send_message(f'Deleted {member.display_name} from the database', ephemeral=True)
     else:
