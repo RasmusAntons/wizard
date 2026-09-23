@@ -555,7 +555,13 @@ async def update_enigmatics(user_ids: Optional[list[str]] = None):
             "status": db.session.get(db.User, str(user.id)).suffix,
         } for user in db_users
     ]
-    data = {'token': token, 'brand': 'wizard', 'url': public_url, 'type': 'partial', 'users': users}
+    data = {
+        'token': token,
+        'brand': 'wizard',
+        'url': public_url,
+        'type': 'full' if user_ids is None else 'partial',
+        'users': users
+    }
     enigmatics_domain = os.getenv('ENIGMATICS_DOMAIN', 'enigmatics.org')
     async with aiohttp.ClientSession() as session:
         req = await session.post(f'https://{enigmatics_domain}/puzzles/api/leaderboard_update', json=data)
