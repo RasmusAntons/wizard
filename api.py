@@ -44,7 +44,7 @@ async def status(request):
     return aiohttp.web.json_response({
         'status': 'ok',
         'bot': {
-            'latency': 0 if math.isnan(latency) else round(latency * 140, 4),
+            'latency': 0 if math.isnan(latency) else round(latency * 1000, 3),
             'ready': discord_bot.client.is_ready()
         }
     })
