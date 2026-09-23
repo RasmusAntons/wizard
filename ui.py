@@ -37,6 +37,7 @@ async def ui_server(host='127.0.0.1', port=8000):
         aiohttp.web.get('/favicon.ico', get_favicon),
         aiohttp.web.static('/static', 'static'),
         aiohttp.web.get('/', get_index),
+        aiohttp.web.get('/status', api.status),
         aiohttp.web.get('/api/settings', api.get_settings),
         aiohttp.web.patch('/api/settings', api.patch_settings),
         aiohttp.web.get('/api/levels/', api.get_levels),

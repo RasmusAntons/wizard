@@ -1,6 +1,6 @@
 import asyncio
 import json
-import os.path
+import math
 import time
 import traceback
 import glob
@@ -37,6 +37,17 @@ def protected(f):
             logger.error('api call to %s with invalid api key', request.path)
             return aiohttp.web.json_response({'error': 'invalid api key'}, status=403)
     return wrapper
+
+
+async def status(request):
+    latency = discord_bot.client.latency
+    return aiohttp.web.json_response({
+        'status': 'ok',
+        'bot': {
+            'latency': 0 if math.isnan(latency) else round(latency * 140, 4),
+            'ready': discord_bot.client.is_ready()
+        }
+    })
 
 
 @protected
