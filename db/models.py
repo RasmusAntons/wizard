@@ -94,7 +94,7 @@ class Category(Base):
     __tablename__ = 'category'
     id = Column(String(36), primary_key=True, default=generate_id)
     name = Column(String, nullable=True)
-    discord_category = Column(String(18), nullable=True)
+    discord_category = Column(String(20), nullable=True)
     colour = Column(Integer, nullable=True)
     ordinal = Column(Integer, nullable=True)
 
@@ -119,6 +119,7 @@ class User(Base):
     id = Column(String(20), primary_key=True)
     name = Column(String(32))
     nick = Column(String(32))
+    suffix = Column(String(32))
     avatar = Column(String, nullable=True)
 
     def avatar_size(self, size):

@@ -1,6 +1,5 @@
 import traceback
 
-import aiohttp
 import discord
 from discord.ext import tasks
 
@@ -54,18 +53,15 @@ async def on_ready():
             await asyncio.sleep(1)
     logger.info('updating user avatars')
     await discord_utils.update_all_avatars()
+    if db.get_setting('enigmatics_token') is not None:
+        logger.info('updating enigmatics.org data')
+        await discord_utils.update_enigmatics(user_ids=None)
     logger.info('startup complete')
-    await update_enigmatics()
 
 
 @tasks.loop(minutes=28)
-async def update_enigmatics():
-    token = db.get_setting('enigmatics_token')
-    public_url = db.get_setting('public_url')
-    if token:
-        data = {'token': token, 'url': public_url}
-        async with aiohttp.ClientSession() as session:
-            await session.post('https://enigmatics.org/puzzles/api/wizard_update', json=data)
+async def periodically_update_enigmatics():
+    await discord_utils.update_enigmatics(user_ids=[])
 
 
 @client.event
@@ -76,6 +72,7 @@ async def on_member_join(member):
     await discord_utils.update_user_roles(str(member.id))
     await discord_utils.update_user_channel_access(str(member.id))
     await discord_utils.update_user_nickname(str(member.id))
+    await discord_utils.update_enigmatics(user_ids=[str(member.id)])
     discord_utils.update_avatar(member)
 
 
@@ -152,6 +149,7 @@ async def solve_command(interaction: discord.Interaction, solution: str):
                 await discord_utils.update_user_roles(str(interaction.user.id))
                 await discord_utils.update_user_channel_access(str(interaction.user.id))
                 await discord_utils.update_user_nickname(str(interaction.user.id))
+                await discord_utils.update_enigmatics(user_ids=[str(interaction.user.id)])
                 await discord_utils.announce_solve(str(interaction.user.id), level)
                 break
         else:
@@ -178,6 +176,7 @@ async def unlock_command(interaction: discord.Interaction, unlock: str):
                 await discord_utils.update_user_roles(str(interaction.user.id))
                 await discord_utils.update_user_channel_access(str(interaction.user.id))
                 await discord_utils.update_user_nickname(str(interaction.user.id))
+                await discord_utils.update_enigmatics(user_ids=[str(interaction.user.id)])
                 break
         else:
             await interaction.response.send_message(messages.reject_unlock)
@@ -359,6 +358,7 @@ async def resetuser_command(interaction: discord.Interaction, user: discord.User
         await discord_utils.update_user_roles(str(member.id))
         await discord_utils.update_user_channel_access(str(member.id))
         await discord_utils.update_user_nickname(str(member.id))
+        await discord_utils.update_enigmatics(user_ids=[str(member.id)])
         await interaction.response.send_message(f'Deleted {member.display_name} from the database', ephemeral=True)
     else:
         await interaction.response.send_message(f'{member.display_name} is not in the database', ephemeral=True)

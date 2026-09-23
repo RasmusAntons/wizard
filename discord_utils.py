@@ -1,4 +1,8 @@
+import os
+from typing import Optional
+
 import discord
+import aiohttp
 from sqlalchemy import and_, or_, exists
 
 import db
@@ -149,6 +153,7 @@ async def update_user_nickname(user_id):
     else:
         name_suffix = None
     user.nick = user.name or member.name
+    user.suffix = name_suffix
     if name_suffix:
         user.nick = user.nick[:32 - max(0, len(name_suffix))] + name_suffix[:32]
     db.session.commit()
@@ -417,6 +422,7 @@ async def skip_user_to_level(user_id, level, include_self=False):
     await update_user_roles(str(member.id))
     await update_user_channel_access(str(member.id))
     await update_user_nickname(str(member.id))
+    await discord_utils.update_enigmatics(user_ids=[str(member.id)])
     message_parts = []
     if solved_level_names:
         message_parts.append(f'{len(solved_level_names)} solves ({", ".join(reversed(solved_level_names))})')
@@ -530,3 +536,30 @@ async def announce_solve(user_id, level):
     template = db.get_setting('announcement_template', '%user% solved %level%')
     msg = template.replace('%user%', member.mention).replace('%level%', level.name)
     await channel.send(msg)
+
+
+async def update_enigmatics(user_ids: Optional[list[str]] = None):
+    token = db.get_setting('enigmatics_token')
+    if not token:
+        return
+    public_url = db.get_setting('public_url')
+    db_users = []
+    if user_ids is None:
+        db_users = db.session.query(db.User).all()
+    elif len(user_ids) > 0:
+        db_users = db.session.query(db.User).filter(db.User.id.in_(map(str, user_ids)))
+    users = [
+        {
+            "discord_id": user.id,
+            "solved": has_user_solved_everything(user.id),
+            "status": db.session.get(db.User, str(user.id)).suffix,
+        } for user in db_users
+    ]
+    data = {'token': token, 'brand': 'wizard', 'url': public_url, 'type': 'partial', 'users': users}
+    enigmatics_domain = os.getenv('ENIGMATICS_DOMAIN', 'enigmatics.org')
+    async with aiohttp.ClientSession() as session:
+        req = await session.post(f'https://{enigmatics_domain}/puzzles/api/leaderboard_update', json=data)
+        try:
+            logger.info(f'updated enigmatics data: {await req.json()}')
+        except Exception as e:
+            logger.error(f'failed to update enigmatics leaderboard data: {str(e)}')

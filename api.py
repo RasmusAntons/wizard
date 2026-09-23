@@ -63,7 +63,7 @@ async def patch_settings(request):
             db.session.execute(db.Setting.__table__.delete().where(db.Setting.key == config_key))
     db.session.commit()
     if 'enigmatics_token' in body or 'public_url' in body:
-        await discord_bot.update_enigmatics()
+        await discord_utils.update_enigmatics(user_ids=[])
     return aiohttp.web.json_response({'message': 'ok'})
 
 
@@ -334,6 +334,9 @@ async def discord_sync():
                 await discord_sync_update(f'{progress} nicknames updated')
                 last_update = time.time()
                 await asyncio.sleep(1)
+        if db.get_setting('enigmatics_token') is not None:
+            await discord_sync_update('updating enigmatics.org data')
+            await discord_utils.update_enigmatics(user_ids=None)
         used_time = time.time() - start_time
         await discord_sync_update(f'finished discord sync after {used_time:.2f}s', True)
     except Exception as e:
